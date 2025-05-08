@@ -86,7 +86,7 @@ def build_graph(footways, nodes):
 def index():
     """ หน้าเว็บหลัก """
     footways, nodes = parse_osm_footways('map.osm')
-    return render_template('index.html', 
+    return render_template('demoNav.html', 
                            footways=json.dumps(footways),
                            nodes=json.dumps(nodes),
                            building_entries=building_entries)
