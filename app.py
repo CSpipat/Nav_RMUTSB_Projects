@@ -7,6 +7,7 @@ import csv
 
 app = Flask(__name__)
 
+
 def load_building_entries(csv_file):
     """ โหลดข้อมูลอาคารจาก CSV และเก็บเป็น dictionary {ชื่ออาคาร: (latitude, longitude)} """
     building_entries = {}
@@ -20,13 +21,15 @@ def load_building_entries(csv_file):
             building_entries[building_name] = (latitude, longitude)
     return building_entries
 
+
 building_entries = load_building_entries('Building.csv')
+
 
 def parse_osm_footways(osm_file):
     """ อ่านข้อมูลทางเดินจากไฟล์ OSM และเก็บเป็น footways + nodes """
     tree = ET.parse(osm_file)
     root = tree.getroot()
-    
+
     footways = []
     nodes = {}
 
@@ -38,7 +41,7 @@ def parse_osm_footways(osm_file):
 
     for way in root.findall('.//way'):
         is_footway = any(tag.get('k') == 'highway' and tag.get('v') == 'footway' for tag in way.findall('tag'))
-        
+
         if is_footway:
             way_coords = []
             way_nodes = []
@@ -47,28 +50,30 @@ def parse_osm_footways(osm_file):
                 if node_id in nodes:
                     way_coords.append(nodes[node_id])
                     way_nodes.append(node_id)
-            
+
             if way_coords:
                 footways.append(way_coords)
 
     return footways, nodes
 
+
 def haversine(lat1, lon1, lat2, lon2):
     """ คำนวณระยะทางระหว่างจุดสองจุดโดยใช้สูตร Haversine """
-    R = 6371000  
+    R = 6371000
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
-    
-    a = math.sin(dphi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda/2)**2
+
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    
+
     return R * c
+
 
 def build_graph(footways, nodes):
     """ สร้างกราฟจากข้อมูลทางเดิน """
     G = nx.Graph()
-    
+
     for footway in footways:
         for i in range(len(footway) - 1):
             lat1, lon1 = footway[i]
@@ -77,19 +82,21 @@ def build_graph(footways, nodes):
 
             node1 = list(nodes.keys())[list(nodes.values()).index(footway[i])]
             node2 = list(nodes.keys())[list(nodes.values()).index(footway[i + 1])]
-            
+
             G.add_edge(node1, node2, weight=dist)
 
     return G
+
 
 @app.route('/')
 def index():
     """ หน้าเว็บหลัก """
     footways, nodes = parse_osm_footways('map.osm')
-    return render_template('demoNav.html', 
+    return render_template('Test.html',
                            footways=json.dumps(footways),
                            nodes=json.dumps(nodes),
                            building_entries=building_entries)
+
 
 @app.route('/route', methods=['POST'])
 def route():
@@ -108,8 +115,10 @@ def route():
 
     try:
         # หาโหนดเริ่มต้นและปลายทางที่ใกล้ที่สุด
-        start_node = min(nodes.keys(), key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0], nodes[node][1]))
-        end_node = min(nodes.keys(), key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
+        start_node = min(nodes.keys(),
+                         key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0], nodes[node][1]))
+        end_node = min(nodes.keys(),
+                       key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
 
         # ตรวจสอบว่าโหนดอยู่ในกราฟ
         if start_node not in G or end_node not in G:
@@ -118,10 +127,13 @@ def route():
                 return jsonify(error="No valid route found"), 404
 
             if start_node not in G:
-                start_node = min(valid_nodes, key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0], nodes[node][1]))
+                start_node = min(valid_nodes,
+                                 key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0],
+                                                            nodes[node][1]))
 
             if end_node not in G:
-                end_node = min(valid_nodes, key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
+                end_node = min(valid_nodes,
+                               key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
 
         # กำหนด heuristic function (Haversine ระหว่าง node ปัจจุบันและ node ปลายทาง)
         def heuristic(n1, n2):
@@ -132,7 +144,7 @@ def route():
         # คำนวณเส้นทางโดยใช้ A*
         path = nx.astar_path(G, source=start_node, target=end_node, weight='weight', heuristic=heuristic)
         path_coords = [nodes[node] for node in path]
-        
+
         # คำนวณระยะทางรวม
         total_distance = 0
         for i in range(len(path) - 1):
@@ -140,7 +152,7 @@ def route():
             lat2, lon2 = nodes[path[i + 1]]
             segment_distance = haversine(lat1, lon1, lat2, lon2)
             total_distance += segment_distance
-        
+
         # แปลงเป็นหน่วยเมตร
         total_distance_meters = round(total_distance)
 
