@@ -1,8 +1,12 @@
 ﻿C_ID ,NodeID,ConnectedTO,Type
-1,P1,"P2,P3",walkway
-2,P2,P1,walkway
-3,P3,"P1,P4",walkway
-4,P4,"P3,P5",walkway
-5,P5,P4,walkway
-6,P6,"P4,P7",walkway
-7,P7,P6,walkway
+0,Elevator,P1,walkway
+1,P1,"Elevator,P2,P4",walkway
+2,P2,"P1,17077,P3",walkway
+3,P3,"17076",walkway
+4,P4,"P1,17075,P5",walkway
+5,P5,"P4,17074,P6",walkway
+6,P6,"P5,P7,P9",walkway
+7,P7,"P6,P8,17073",walkway
+8,P8,"P7,17072",walkway
+9,P9,"P6,P10,17071",walkway
+10,P10,"P9,Toilet",walkway
