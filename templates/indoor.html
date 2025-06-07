@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Indoor Navigation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .modal-backdrop.fade.show {
+            z-index: 1040;
+        }
+        #indoorModal {
+            z-index: 1050;
+        }
+        .navigation-container {
+            position: relative;
+        }
+        #pathCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Indoor Navigation System</h2>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="ค้นหาตึก หรือห้อง...">
+                <button class="btn btn-outline-secondary" type="button" onclick="performSearch()">
+                    ค้นหา
+                </button>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#buildingModal">
+                เลือกตึก
+            </button>
+        </div>
+    </div>
+    <div id="searchResults" class="list-group mb-3" style="display: none;"></div>
+</div>
+
+    <!-- Building Modal -->
+    <div class="modal fade" id="buildingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เลือกตึก</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="buildingList" class="list-group">
+                        <!-- Buildings will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floor Modal -->
+    <div class="modal fade" id="floorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">เลือกชั้น</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="floorList" class="list-group">
+                        <!-- Floors will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indoor Navigation Modal -->
+    <div class="modal fade" id="indoorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">แผนผังตึก</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <select id="destinationSelect" class="form-select" onchange="onDestinationChange()">
+                            <option value="">เลือกห้องที่ต้องการไป</option>
+                        </select>
+                    </div>
+                    <div class="navigation-container">
+                        <img id="floorPlan" src="" alt="Floor Plan" style="width: 100%;">
+                        <canvas id="pathCanvas"></canvas>
+                    </div>
+                    <div id="pathInfo" class="mt-3"></div>
+                    <div id="loadingIndicator" style="display: none;">กำลังค้นหาเส้นทาง...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/building-navigation.js') }}"></script>
+
+    </script>
+</body>
+</html>
