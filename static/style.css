@@ -11,6 +11,95 @@ html {
     overflow-x: hidden;
 }
 
+/* =================modal indoor===================== */
+
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    /* ซ่อนไว้ก่อน */
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}
+
+.modal-container.show .detail-building-modal {
+    opacity: 1;
+    transform: scale(1);
+}
+
+
+.detail-building-modal {
+    display: grid;
+    grid-template-rows: 13% 97%;
+    background-color: rgb(255, 255, 255);
+    border-radius: 18px;
+    width: 450px;
+    height: 630px;
+    overflow: hidden;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+
+
+}
+
+.header {
+    background-color: #FFB700;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding: 20px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.image {
+    background-color: rgba(151, 151, 151, 0.562);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 12px;
+    border-radius: 20px;
+}
+
+.list {
+    background-color: rgb(250, 250, 250);
+    margin: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(204, 204, 204, 0.459);
+    padding: 10px;
+    font-size: 13px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.list li {
+    background-color: #FFB700;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 7px;
+    margin-left: -40px;
+    outline: none;
+    list-style: none;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    width: 200px;
+}
+
+.container {
+    display: grid;
+    grid-template-rows: 45% 55%;
+    height: 85%;
+    margin: 15px;
+    border-radius: 20px;
+    border: 2px dashed rgba(0, 0, 0, 0.205);
+}
+
+/* ========================indoor modal====================== */
+
 .container-fluid {
     display: flex;
     flex-direction: column;
@@ -526,90 +615,103 @@ html {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 
 
 /* Mobile Responsive View */
 @media screen and (max-width: 576px) {
-    body, html {
+
+    body,
+    html {
         margin: 0;
         padding: 0;
         min-height: 100vh;
         width: 100%;
         overflow-x: hidden;
     }
-    
+
     /* ใช้ตัวอื่นแทน container-fluid */
-    main, section, .content-wrapper {
+    main,
+    section,
+    .content-wrapper {
         display: flex;
         flex-direction: column;
         width: 100%;
         margin: 0;
         padding: 0;
     }
-    
+
     /* จัดการพื้นที่หลักที่มีความสูงพอดี */
     body {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
     }
-    
+
     .row {
         justify-content: center;
         height: 100px;
         margin: 0;
         width: 100%;
-        padding: 0; /* Added padding: 0 */
+        padding: 0;
+        /* Added padding: 0 */
     }
-    
+
     #logo-area {
         display: flex;
         align-items: center;
         justify-content: center;
         height: 100%;
-        padding: 0; /* Added padding: 0 */
+        padding: 0;
+        /* Added padding: 0 */
     }
-    
+
     #nav-logo {
         content: url(/static/img/Main_logo.png);
         border-radius: 0%;
         background-color: transparent;
         height: 80px;
     }
-    
+
     #menu-area {
         display: none !important;
     }
-    
+
     #clock-part {
         display: none !important;
     }
-    
+
     #main-part {
         flex: 1;
         display: flex;
         flex-direction: column;
         width: 100%;
-        padding: 10px; /* Reduced padding from 20px to 10px */
+        padding: 10px;
+        /* Reduced padding from 20px to 10px */
         box-sizing: border-box;
         margin: 0;
-        gap: 15px; /* Reduced gap from 20px to 15px */
+        gap: 15px;
+        /* Reduced gap from 20px to 15px */
     }
-    
+
     .menu-button {
         display: flex;
     }
-    
+
     #nav-search-part {
         padding: 5px 0;
         margin: 0;
         width: 100%;
     }
-    
+
     #bg-img-part {
         display: flex;
         justify-content: center;
@@ -622,14 +724,14 @@ html {
         width: 100%;
         box-sizing: border-box;
     }
-    
+
     #bg-img-part img {
         max-width: 100%;
         height: auto;
         object-fit: contain;
         border-radius: 6px;
     }
-    
+
     /* Improved list-tower-part for mobile */
     .list-tower-part {
         display: flex;
@@ -639,13 +741,15 @@ html {
         background-color: #F9B508;
         width: 100%;
         border-radius: 30px;
-        padding: 6px; /* Reduced padding from 8px to 6px */
+        padding: 6px;
+        /* Reduced padding from 8px to 6px */
         max-height: 350px;
         box-sizing: border-box;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 8px; /* Reduced margin from 10px to 8px */
+        margin-bottom: 8px;
+        /* Reduced margin from 10px to 8px */
     }
-    
+
     .Wrap-list-tower {
         flex: 1;
         overflow-y: auto;
@@ -653,30 +757,33 @@ html {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 8px; /* Reduced padding from 10px to 8px */
+        padding: 8px;
+        /* Reduced padding from 10px to 8px */
         scrollbar-width: thin;
         scrollbar-color: rgba(255, 255, 255, 0.5) rgba(249, 181, 8, 0.1);
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .Wrap-list-tower::-webkit-scrollbar {
         width: 5px;
     }
-    
+
     .Wrap-list-tower::-webkit-scrollbar-track {
         background: rgba(249, 181, 8, 0.1);
         border-radius: 10px;
     }
-    
+
     .Wrap-list-tower::-webkit-scrollbar-thumb {
         background-color: rgba(255, 255, 255, 0.5);
         border-radius: 10px;
         border: 1px solid rgba(249, 181, 8, 0.1);
     }
-    
+
     .Wrap-list-tower .list-tower-card {
-        padding: 16px; /* Reduced padding from 18px to 16px */
-        margin: 5px 0; /* Reduced margin from 6px to 5px */
+        padding: 16px;
+        /* Reduced padding from 18px to 16px */
+        margin: 5px 0;
+        /* Reduced margin from 6px to 5px */
         background-color: white;
         width: 100%;
         border-radius: 20px;
@@ -688,27 +795,29 @@ html {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
     .Wrap-list-tower .list-tower-card:active {
         transform: scale(0.98);
     }
-    
+
     .tw-name {
         font-size: 14px;
         width: calc(100% - 40px);
         padding-right: 10px;
     }
-    
+
     #nav-search {
         transition: 0.3s ease-in-out;
-        width: 100%; /* Added width: 100% */
+        width: 100%;
+        /* Added width: 100% */
     }
-    
-    #nav-search:hover, #nav-search:focus {
+
+    #nav-search:hover,
+    #nav-search:focus {
         transform: scale(1.02);
         transition: 0.3s ease-in-out;
     }
-    
+
     .icons {
         display: flex;
         justify-content: center;
@@ -719,7 +828,7 @@ html {
         color: white;
         flex-shrink: 0;
     }
-    
+
     #footer-area {
         width: 100%;
         color: rgb(54, 54, 54);
@@ -730,35 +839,165 @@ html {
         padding: 10px 0;
         box-sizing: border-box;
     }
+
+    .detail-building-modal {
+        display: grid;
+        grid-template-rows: 10% 90%;
+        background-color: rgb(255, 255, 255);
+        border-radius: 18px;
+        height: 720px;
+        overflow: hidden;
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .header {
+        background-color: #FFB700;
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        /* เปลี่ยนจาก start เป็น center */
+        padding: 20px;
+        font-size: 20px;
+        font-weight: 600;
+        width: 100%;
+        margin: 0;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+    }
+
+
+
+    .image img {
+        width: 100%;
+        max-width: 90px;
+        height: auto;
+        border-radius: 10px;
+    }
+
+
+    .list {
+        background-color: rgb(250, 250, 250);
+        margin: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(204, 204, 204, 0.459);
+        padding: 20px;
+        font-size: 13px;
+        box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+        max-height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        /* Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: #ccc transparent;
+    }
+
+    /* Chrome, Edge, Safari */
+    .list::-webkit-scrollbar {
+        width: 6px;
+        /* ความกว้าง scrollbar */
+    }
+
+    .list::-webkit-scrollbar-track {
+        background: transparent;
+        /* พื้นหลังราง */
+    }
+
+    .list::-webkit-scrollbar-thumb {
+        background-color: #e6e6e686;
+        /* สีของแถบ */
+        border-radius: 4px;
+        /* ทำให้มน */
+        border: 1px solid transparent;
+    }
+
+
+    .list li {
+        background-color: #ffb700e3;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 7px;
+        outline: none;
+        list-style: none;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        width: 200px;
+    }
+
+    .list ul {
+        padding-left: 0;
+    }
+
+    .btn-nav {
+        /* ดันไปทางขวา */
+        height: 55px;
+        width: 55px;
+        background-color: #FFB700;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-left: 240px;
+        transition: 0.2s ease-in-out;
+    }
+
+    .btn-nav:hover{
+        transform: scale(1.1);
+        transition: 0.2s ease-in-out;
+        background-color: rgba(153, 112, 7, 0.827);
+        cursor: pointer;
+    }
+
     
-    /* Adjustments for very small mobile screens */
-    @media screen and (max-width: 380px) {
-        #main-part {
-            padding: 8px; /* Further reduced padding */
-            gap: 10px; /* Further reduced gap */
-        }
-        
-        .tw-name {
-            font-size: 13px;
-            width: calc(100% - 35px);
-        }
-        
-        .Wrap-list-tower .list-tower-card {
-            padding: 14px; /* Further reduced padding */
-        }
-        
-        .icons {
-            padding: 6px;
-        }
+
+    .btn-nav i{
+        font-size: 25px;
+        color: #ffffff;
+    }
+
+    .container {
+        display: grid;
+        grid-template-rows: 45% 55%;
+        height: 93%;
+        width: 90%;
+        margin: 25px;
+        margin-bottom: 20px;
+        border-radius: 20px;
+        border: 2px dashed rgba(0, 0, 0, 0.205);
+    }
+
+
+}
+
+/* Adjustments for very small mobile screens */
+@media screen and (max-width: 380px) {
+    #main-part {
+        padding: 8px;
+        /* Further reduced padding */
+        gap: 10px;
+        /* Further reduced gap */
+    }
+
+    .tw-name {
+        font-size: 13px;
+        width: calc(100% - 35px);
+    }
+
+    .Wrap-list-tower .list-tower-card {
+        padding: 14px;
+        /* Further reduced padding */
+    }
+
+    .icons {
+        padding: 6px;
     }
 }
 
 
-/* Tablet Responsive View  */
-@media (min-width:577px) and (max-width:768) {
 
-    
-}
+/* Tablet Responsive View  */
+@media (min-width:577px) and (max-width:768) {}
 
 
 
