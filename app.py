@@ -187,7 +187,7 @@ def haversine(lat1, lon1, lat2, lon2):
 
 @app.route('/')
 def index():
-    return render_template('Test.html')
+    return render_template('index.html')
 
 
 @app.route('/indoor')
