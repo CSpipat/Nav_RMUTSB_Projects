@@ -78,7 +78,7 @@ function watchUserLocation() {
             (error) => {
                 console.error("Geolocation error:", error);
             },
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 3000 }
         );
     } else {
         console.log("Geolocation not supported");
