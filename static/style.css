@@ -625,10 +625,8 @@ html {
 }
 
 
-
-/* Mobile Responsive View */
-@media screen and (max-width: 576px) {
-
+/* Mobile Responsive View for 375px to 576px */
+@media screen and (min-width: 375px) and (max-width: 576px) {
     body,
     html {
         margin: 0;
@@ -636,9 +634,10 @@ html {
         min-height: 100vh;
         width: 100%;
         overflow-x: hidden;
-    }
+    
 
-    /* ใช้ตัวอื่นแทน container-fluid */
+    /* ... ส่วนอื่นยังเหมือนเดิม ... */
+
     main,
     section,
     .content-wrapper {
@@ -741,7 +740,7 @@ html {
         background-color: #F9B508;
         width: 100%;
         border-radius: 30px;
-        padding: 12px;
+        padding: 15px;
         /* Reduced padding from 8px to 6px */
         max-height: 350px;
         box-sizing: border-box;
@@ -751,9 +750,10 @@ html {
     }
 
     .Wrap-list-tower {
+        background-color:#2c3e50;
         flex: 1;
         overflow-y: auto;
-        width: 370px;
+        width: 360px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -762,6 +762,7 @@ html {
         scrollbar-width: thin;
         scrollbar-color: rgba(255, 255, 255, 0.5) rgba(249, 181, 8, 0.1);
         -webkit-overflow-scrolling: touch;
+        border-radius: 30px;
     }
 
     .Wrap-list-tower::-webkit-scrollbar {
@@ -847,6 +848,7 @@ html {
         border-radius: 18px;
         height: 670px;
         width: 390px;
+        margin: 10px;
         overflow: hidden;
         box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
     }
@@ -884,6 +886,7 @@ html {
         font-size: 13px;
         box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
         max-height: 100%;
+        width: 300px;
         overflow-y: none;
         overflow-x: hidden;
 
@@ -916,7 +919,7 @@ html {
         background-color: #ffb700e3;
         border-radius: 5px;
         padding: 5px;
-        margin: 7px;
+        margin-left: -35px;
         outline: none;
         list-style: none;
         display: flex;
@@ -926,29 +929,30 @@ html {
     }
 
     .list ul {
-        font-size: 12px;
-        padding-left: 0;
+        font-size: 11px;
     }
 
     .list p {
-        font-size: 13px;
+        font-size: 11px;
     }
 
     .btn-nav {
-        /* ดันไปทางขวา */
-        height: 55px;
-        width: 55px;
-        background-color: #FFB700;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-left: 200px;
-        margin-bottom: 20px;
-        transition: 0.2s ease-in-out;
-        position: relative;
-        bottom: 10px;
-    }
+    height: 45px;
+    width: 45px;
+    background-color: #FFB700;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    transition: 0.2s ease-in-out;
+
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
+    z-index: 999;
+}
+
 
     .btn-nav:hover{
         transform: scale(1.1);
@@ -968,14 +972,23 @@ html {
         display: grid;
         grid-template-rows: 45% 55%;
         height: 93%;
-        width: 93%;
+        width: auto;
         margin-bottom: 20px;
         border-radius: 20px;
         border: 2px dashed rgba(0, 0, 0, 0.205);
     }
 
+    .image{
+        width: auto;
+    }
+
+    .list{
+        width: auto;
+    }
 
 }
+}
+
 
 /* Adjustments for very small mobile screens */
 @media screen and (max-width: 380px) {
