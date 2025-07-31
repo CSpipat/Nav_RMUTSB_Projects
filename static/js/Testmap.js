@@ -223,214 +223,74 @@ function findRoute() {
  * เปิด Modal แสดงรายละเอียดอาคาร
  * @param {string} buildingName - ชื่ออาคาร
  */function openBuildingModal(buildingName) {
-    const modalContainer = document.getElementById('building-modal');
-    const modal = modalContainer.querySelector('.detail-building-modal');
-
-    if (buildingName) {
-        modal.querySelector('.header h2').textContent = buildingName;
-        updateBuildingData(buildingName, modal);
-
-        // ✅ เก็บชื่ออาคารไว้ใน attribute
-        modal.dataset.buildingName = buildingName;
+    let id = '';
+    if (buildingName.startsWith('อาคาร')) {
+        id = buildingName.replace('อาคาร', '').trim();
+    } else if (buildingName === 'โรงอาหาร') {
+        id = '0'; // หรือใช้ชื่อที่คุณตั้งจริง
+    } else {
+        // fallback: ใช้ชื่อเต็ม
+        id = buildingName.trim();
     }
 
-    modalContainer.style.display = 'flex';
-
-    setTimeout(() => {
-        modalContainer.classList.add('show');
-    }, 10);
+    const modal = document.getElementById(`building-modal-${id}`);
+    if (modal) {
+        modal.style.display = 'flex';
+        const detailModal = modal.querySelector('.detail-building-modal');
+        if (detailModal) {
+            setTimeout(() => {
+                detailModal.classList.add('show');
+            }, 10);
+        }
+    } else {
+        console.warn(`ไม่พบ modal: building-modal-${id}`);
+    }
 }
 
 
-function closeBuildingModal() {
-    const modalContainer = document.getElementById('building-modal');
-    modalContainer.classList.remove('show');
 
-    setTimeout(() => {
-        modalContainer.style.display = 'none';
-    },);
+
+
+
+function closeBuildingModal(modalId) {
+    if (!modalId) return; // ถ้าไม่มี id ก็ไม่ทำอะไร
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        const detailModal = modal.querySelector('.detail-building-modal');
+        if (detailModal) {
+            detailModal.classList.remove('show');
+        }
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
 }
+
+
+
 
 // ปิด modal เมื่อคลิกนอก modal (click backdrop)
-const modalContainer = document.getElementById('building-modal');
-modalContainer.addEventListener('click', (e) => {
-    // ถ้าคลิกตรง backdrop (ไม่ใช่ใน detail-building-modal)
-    if (e.target === modalContainer) {
-        closeBuildingModal();
+// สมมติ modalContainer คือ element ที่มี id เช่น 'building-modal-21'
+// เลือก modal ทุกตัวที่ id เริ่มต้นด้วย 'building-modal-'
+const modalContainers = document.querySelectorAll('[id^="building-modal-"]');
+
+modalContainers.forEach(modalContainer => {
+    modalContainer.addEventListener('click', (e) => {
+        if (e.target === modalContainer) {
+            closeBuildingModal(modalContainer.id);
+        }
+    });
+
+    // สมมติว่ามีปุ่มปิดใน modal
+    const closeBtn = modalContainer.querySelector('.detail-building-modal .header div');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            closeBuildingModal(modalContainer.id);
+        });
     }
 });
 
-// ปุ่มปิด modal ใน header
-const modal = modalContainer.querySelector('.detail-building-modal');
-const closeBtn = modal.querySelector('.header div'); // สมมติ div นี้คือปุ่มปิด
-closeBtn.addEventListener('click', () => {
-    closeBuildingModal();
-});
 
-/**
- * อัพเดตข้อมูลอาคารใน Modal
- * @param {string} buildingName - ชื่ออาคาร
- * @param {HTMLElement} modal - Element ของ Modal
- */
-function updateBuildingData(buildingName, modal) {
-    // ข้อมูลอาคารแต่ละหลัง
-    const buildingData = {
-        'อาคาร 21': {
-            buildingName: 'อาคาร21',
-            description: 'อาคารปฏิบัติการเทคโนโลยีออกแบบวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์',
-            floors: [
-                'ชั้น 1: ห้องปฏิบัติการคอมพิวเตอร์',
-                'ชั้น 2: ห้องเรียนทฤษฎี',
-                'ชั้น 3: ห้องปฏิบัติการออกแบบ',
-                'ชั้น 4: ห้องประชุม'
-            ],
-            image: 'https://via.placeholder.com/100?text=Building+21'
-        },
-        'อาคาร 20': {
-            buildingName: 'อาคาร20',
-            description: 'อาคารเรียนรวมและปฏิบัติการคณะบริหารและเทคโนโลยีสารสนเทศ',
-            floors: [
-                'ชั้น 1: ห้องสมุด',
-                'ชั้น 2: ห้องเรียน',
-                'ชั้น 3: ห้องปฏิบัติการคอมพิวเตอร์',
-                'ชั้น 4: ห้องสำนักงาน'
-            ],
-            image: 'https://via.placeholder.com/100?text=Building+20'
-        },
-        'อาคาร 19': {
-            buildingName: 'อาคาร19',
-            description: 'อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ',
-            floors: [
-                'ชั้น 1: ห้องบริการ',
-                'ชั้น 2: ห้องสมุด',
-                'ชั้น 3: ห้องปฏิบัติการ IT'
-            ],
-            image: 'https://via.placeholder.com/100?text=Building+19'
-        },
-        'อาคาร 18': {
-            buildingName: 'อาคาร18',
-            description: 'อาคารคณะวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์',
-            floors: [
-                'ชั้น 1: ห้องสำนักงาน',
-                'ชั้น 2: ห้องเรียน',
-                'ชั้น 3: ห้องปฏิบัติการ',
-                'ชั้น 4: ห้องแขก'
-            ],
-            image: 'https://via.placeholder.com/100?text=Building+18'
-        },
-        'อาคาร17': {
-            buildingName: 'อาคาร17',
-            description: 'อาคารเฉลิมพระเกียรติ (ตึกคณะวิทยาศาสตร์และเทคโนโลยี)',
-            floors: [
-                'ชั้น 1: ห้องปฏิบัติการเคมี',
-                'ชั้น 2: ห้องปฏิบัติการฟิสิกส์',
-                'ชั้น 3: ห้องปฏิบัติการชีววิทยา',
-                'ชั้น 4: ห้องเรียน'
-            ],
-            image: 'https://via.placeholder.com/100?text=Building+17'
-        },
-        'อาคาร 16': {
-            buildingName: 'อาคาร16',
-            description: 'อาคารสาขาวิศวกรรมเครื่องกล',
-            floors: [
-                'ชั้น 1: ห้องปฏิบัติการเครื่องกล',
-                'ชั้น 2: ห้องเรียน',
-                'ชั้น 3: ห้องสำนักงาน'
-            ],
-            image: 'https://via.placeholder.com/100?text=Building+16'
-        },
-        'โรงอาหาร': {
-            buildingName: 'โรงอาหาร',
-            description: 'โรงอาหารของมหาวิทยาลัย',
-            floors: [
-                'ชั้น 1: ร้านอาหาร',
-                'ชั้น 2: พื้นที่นั่งรับประทานอาหาร'
-            ],
-            image: 'https://via.placeholder.com/100?text=Cafeteria'
-        }
-    };
-
-    // ตรวจสอบว่ามีข้อมูลอาคารหรือไม่
-    if (buildingData[buildingName]) {
-        const data = buildingData[buildingName];
-
-        // อัพเดตรายละเอียด
-        const descElement = modal.querySelector('.desc p');
-        if (descElement) {
-            descElement.textContent = data.description;
-        }
-
-        // อัพเดตรูปภาพ
-        const imgElement = modal.querySelector('.image img');
-        if (imgElement) {
-            imgElement.src = data.image;
-            imgElement.alt = buildingName;
-        }
-
-        // อัพเดตรายการชั้น
-        const listElement = modal.querySelector('.list ul');
-        if (listElement) {
-            listElement.innerHTML = '';
-            data.floors.forEach(floor => {
-                const li = document.createElement('li');
-                li.textContent = floor;
-                listElement.appendChild(li);
-            });
-        }
-
-        // อัพเดตปุ่มนำทาง
-        const navButton = modal.querySelector('.btn-nav');
-        if (navButton) {
-            navButton.onclick = () => {
-                const buildingName = modal.dataset.buildingName;
-                const buildingInfo = buildingData[buildingName];
-                if (buildingInfo && buildingInfo.buildingName) {
-                    showMapForBuilding(buildingInfo.buildingName);
-                    closeBuildingModal();
-                } else {
-                    console.warn('ไม่พบข้อมูลอาคาร:', buildingName);
-                }
-            };
-        }
-
-
-
-    } else {
-        // ถ้าไม่มีข้อมูล ใช้ข้อมูล default
-        const descElement = modal.querySelector('.desc p');
-        if (descElement) {
-            descElement.textContent = 'รายละเอียดของอาคาร เช่น ข้อมูลพื้นฐาน ทำเล หรือความสำคัญของอาคาร';
-        }
-
-        // รีเซ็ตรูปภาพและรายการชั้น
-        const imgElement = modal.querySelector('.image img');
-        if (imgElement) {
-            imgElement.src = 'https://via.placeholder.com/100';
-            imgElement.alt = 'Building';
-        }
-
-        const listElement = modal.querySelector('.list ul');
-        if (listElement) {
-            listElement.innerHTML = `
-                <li>ชั้น 1: สำนักงาน</li>
-                <li>ชั้น 2: ห้องเรียน</li>
-                <li>ชั้น 3: ห้องปฏิบัติการ</li>
-            `;
-        }
-
-        // กำหนดปุ่มนำทางให้ปิด modal เฉย ๆ
-        const navButton = modal.querySelector('.btn-nav');
-        if (navButton) {
-            navButton.onclick = () => {
-                modal.style.display = 'none';
-                const backdrop = document.getElementById('modal-backdrop');
-                if (backdrop) {
-                    backdrop.style.display = 'none';
-                }
-            };
-        }
-    }
-}
 
 // ===== Event Listeners =====
 
@@ -464,10 +324,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const buildingCards = document.querySelectorAll('.list-tower-card .icons');
     buildingCards.forEach(card => {
         card.addEventListener('click', function () {
-            const buildingName = this.parentElement.querySelector('.tw-name').textContent.split(' ')[0] + ' ' + this.parentElement.querySelector('.tw-name').textContent.split(' ')[1];
-            openBuildingModal(buildingName.trim());
+            const fullName = this.parentElement.querySelector('.tw-name').textContent.trim();
+            openBuildingModal(fullName); // fullName = เช่น "อาคาร 21"
         });
     });
+
 });
 
 // ===== CSS Animation Styles =====
