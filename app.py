@@ -8,6 +8,7 @@ import math
 import networkx as nx
 import numpy as np
 import pandas as pd
+from flask import request
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -398,6 +399,40 @@ def search():
             'error': 'An error occurred during search',
             'message': str(e)
         }), 500
+
+
+# ============================= Start Point feedBack=====================
+
+import csv
+from datetime import datetime
+
+def save_rating_to_csv(rating, rating_text, file_path='feedback.csv'):
+    with open(file_path, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow([datetime.now().isoformat(), rating, rating_text])
+
+
+@app.route('/submit-rating', methods=['POST'])
+def submit_rating():
+    try:
+        data = request.get_json()
+        rating = data.get('rating')
+        rating_text = data.get('ratingText')  # แก้จาก ratingTexts เป็น ratingText
+
+        if not isinstance(rating, int) or rating < 1 or rating > 5:
+            return jsonify({'error': 'Invalid rating value. Must be 1–5'}), 400
+        if not isinstance(rating_text, str):
+            return jsonify({'error': 'Invalid ratingText'}), 400
+
+        save_rating_to_csv(rating, rating_text)
+
+        return jsonify({'message': 'Rating saved successfully'}), 200
+
+    except Exception as e:
+        print("🔥 Error:", str(e))  # จะพิมพ์ใน terminal
+        return jsonify({'error': str(e)}), 500
+
+
 
 
 if __name__ == '__main__':
