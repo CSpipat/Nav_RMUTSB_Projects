@@ -1,11 +1,5 @@
 // Debug mode flag
 let debugMode = false;
-let currentZoom = 1;
-let panX = 0;
-let panY = 0;
-let isDragging = false;
-let lastMouseX = 0;
-let lastMouseY = 0;
 
 // Animation variables
 let animationId = null;
@@ -49,83 +43,12 @@ function setupCanvas() {
     debugLog(`Canvas initialized with dimensions: ${canvas.width}x${canvas.height}`);
 }
 
-// Setup interactive features
-function setupInteractivity() {
-    const canvas = document.getElementById('pathCanvas');
-    const container = document.querySelector('.navigation-container');
 
-    // Mouse wheel zoom
-    container.addEventListener('wheel', function(e) {
-        e.preventDefault();
-        const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-        zoom(zoomFactor, e.clientX, e.clientY);
-    });
 
-    // Touch events for mobile
-    let touchStartDistance = 0;
-    container.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 2) {
-            touchStartDistance = getTouchDistance(e.touches[0], e.touches[1]);
-        }
-    });
-
-    container.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            const currentDistance = getTouchDistance(e.touches[0], e.touches[1]);
-            const zoomFactor = currentDistance / touchStartDistance;
-            zoom(zoomFactor, e.touches[0].clientX, e.touches[0].clientY);
-            touchStartDistance = currentDistance;
-        }
-    });
-}
-
-function getTouchDistance(touch1, touch2) {
-    const dx = touch1.clientX - touch2.clientX;
-    const dy = touch1.clientY - touch2.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-
-function zoom(factor, centerX, centerY) {
-    const newZoom = Math.max(0.5, Math.min(3, currentZoom * factor));
-    if (newZoom !== currentZoom) {
-        currentZoom = newZoom;
-        applyTransform();
-    }
-}
-
-function zoomIn() {
-    zoom(1.2);
-}
-
-function zoomOut() {
-    zoom(0.8);
-}
-
-function resetView() {
-    currentZoom = 1;
-    panX = 0;
-    panY = 0;
-    applyTransform();
-}
-
-function applyTransform() {
-    const container = document.querySelector('.navigation-container');
-    const img = document.getElementById('floorPlan');
-    const canvas = document.getElementById('pathCanvas');
-
-    const transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
-    img.style.transform = transform;
-    canvas.style.transform = transform;
-}
 
 // Find path to selected destination
 function findPath() {
     const destination = document.getElementById('destinationSelect').value;
-    if (!destination) {
-        alert('กรุณาเลือกห้องที่ต้องการ');
-        return;
-    }
 
     // Show loading indicator with animation
     const loadingIndicator = document.getElementById('loadingIndicator');
@@ -515,21 +438,22 @@ function updatePathInfo(path, pathCoords) {
     let info = '<h3>🗺️ ข้อมูลเส้นทาง</h3><ol class="path-steps">';
 
     path.forEach((node, i) => {
+        const name = node.detail || node.node_id; // ใช้ detail ถ้ามี
         if (i === 0) {
-            info += `<li class="step-start">🚀 เริ่มต้นจาก <strong>${node}</strong></li>`;
+            info += `<li class="step-start">เริ่มต้นจาก <strong>${name}</strong></li>`;
         } else if (i === path.length - 1) {
-            info += `<li class="step-end">🎯 ถึงห้อง <strong>${node}</strong></li>`;
-        } else if (node.startsWith('P')) {
-            info += `<li class="step-waypoint">📍 เดินผ่านจุด ${node}</li>`;
+            info += `<li class="step-end">ถึงห้อง <strong>${name}</strong></li>`;
+        } else if (node.node_id && node.node_id.startsWith('P')) {
+            info += `<li class="step-waypoint">เดินผ่านจุด ${name}</li>`;
         } else {
-            info += `<li class="step-through">➡️ ผ่าน ${node}</li>`;
+            info += `<li class="step-through">ผ่าน ${name}</li>`;
         }
     });
 
     info += '</ol>';
 
     const totalDistance = calculateTotalDistance(pathCoords);
-    const estimatedTime = Math.ceil(totalDistance * 0.01); // Rough time estimate
+    const estimatedTime = Math.ceil(totalDistance * 0.01);
 
     info += `
         <div class="path-summary">
@@ -548,6 +472,7 @@ function updatePathInfo(path, pathCoords) {
 
     document.getElementById('pathInfo').innerHTML = info;
 }
+
 
 // Initialize canvas when page loads
 window.onload = function () {

@@ -57,18 +57,20 @@ function selectBuilding(buildingId) {
 }
 
 function selectFloor(floor, callback = null) {
+    clearPath();
     currentFloor = floor;
     fetch(`/get_rooms/${currentBuildingId}/${floor}`)
-        .then(response => response.json())
-        .then(rooms => {
-            const select = document.getElementById('destinationSelect');
-            select.innerHTML = '<option value="">เลือกห้องที่ต้องการไป</option>';
-            rooms.forEach(room => {
-                const option = document.createElement('option');
-                option.value = room;
-                option.textContent = `ห้อง ${room}`;
-                select.appendChild(option);
-            });
+    .then(response => response.json())
+    .then(rooms => {
+        const select = document.getElementById('destinationSelect');
+        select.innerHTML = '<option value="">เลือกห้องที่ต้องการไป</option>';
+
+        rooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.NodeID;
+            option.textContent = room.Detail;
+            select.appendChild(option);
+        });
 
             const floorPlan = document.getElementById('floorPlan');
             
@@ -80,25 +82,9 @@ function selectFloor(floor, callback = null) {
             // แสดง indoor modal
             const indoorModal = new bootstrap.Modal(document.getElementById('indoorModal'));
             indoorModal.show();
-            
-            // รอให้ modal แสดงเสร็จแล้วจึงโหลดรูป
-            setTimeout(() => {
-                floorPlan.onload = function() {
-                    // รอให้รูปโหลดเสร็จและ DOM เสถียร
-                    setTimeout(() => {
-                        setupCanvas();
-                        // เรียก callback หลังจากโหลดเสร็จ (ถ้ามี)
-                        if (callback) callback();
-                    }, 50);
-                };
-                
-                // ถ้ารูปโหลดแล้ว ให้เรียก onload ทันที
-                if (floorPlan.complete && floorPlan.naturalWidth > 0) {
-                    floorPlan.onload();
-                } else {
-                    floorPlan.src = `/static/img/planTower${currentBuildingId}Flor${currentFloor}.png`;
-                }
-            }, 300); // รอให้ modal animation เสร็จ
+
+                    floorPlan.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
+
         });
 }
 
@@ -232,67 +218,4 @@ function setupCanvas() {
         
         console.log('Canvas setup - Width:', canvas.width, 'Height:', canvas.height);
     }, 50);
-}
-
-// เพิ่มฟังก์ชันสำหรับจัดการ resize
-window.addEventListener('resize', function() {
-    if (currentBuildingId && currentFloor) {
-        setTimeout(() => {
-            setupCanvas();
-            const destination = document.getElementById('destinationSelect').value;
-            if (destination) {
-                findPath();
-            }
-        }, 100);
-    }
-});
-
-// เพิ่มฟังก์ชันสำหรับการซูม (ถ้ายังไม่มี)
-function zoomIn() {
-    const img = document.getElementById('floorPlan');
-    const container = img.parentElement;
-    const currentScale = parseFloat(img.dataset.scale || '1');
-    const newScale = Math.min(currentScale * 1.2, 3);
-    
-    img.style.transform = `scale(${newScale})`;
-    img.dataset.scale = newScale;
-    
-    setTimeout(() => {
-        setupCanvas();
-        const destination = document.getElementById('destinationSelect').value;
-        if (destination) {
-            findPath();
-        }
-    }, 100);
-}
-
-function zoomOut() {
-    const img = document.getElementById('floorPlan');
-    const currentScale = parseFloat(img.dataset.scale || '1');
-    const newScale = Math.max(currentScale / 1.2, 0.5);
-    
-    img.style.transform = `scale(${newScale})`;
-    img.dataset.scale = newScale;
-    
-    setTimeout(() => {
-        setupCanvas();
-        const destination = document.getElementById('destinationSelect').value;
-        if (destination) {
-            findPath();
-        }
-    }, 100);
-}
-
-function resetView() {
-    const img = document.getElementById('floorPlan');
-    img.style.transform = 'scale(1)';
-    img.dataset.scale = '1';
-    
-    setTimeout(() => {
-        setupCanvas();
-        const destination = document.getElementById('destinationSelect').value;
-        if (destination) {
-            findPath();
-        }
-    }, 100);
 }

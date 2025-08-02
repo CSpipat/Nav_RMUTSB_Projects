@@ -7,6 +7,7 @@ let animatedPath = null;
 let animationFrame = null;
 let selectedBuilding = null;
 let dashOffset = 0;
+let hasArrived = false; // ใช้สำหรับเช็คว่าเคยแสดง modal แล้วหรือยัง
 const distanceInfo = document.getElementById('distance-info');
 const distanceValue = document.getElementById('distance-value');
 const loadingIndicator = document.getElementById('loading-indicator');
@@ -56,7 +57,7 @@ function initMap() {
 function updateStartMarker(coords) {
     if (startMarker) map.removeLayer(startMarker);
     startCoords = coords;
-    startMarker = L.marker(startCoords, { icon: userIcon }).addTo(map);
+    startMarker = L.marker(startCoords, {icon: userIcon}).addTo(map);
 }
 
 /**
@@ -69,6 +70,26 @@ function watchUserLocation() {
                 console.log("Got position:", position.coords.latitude, position.coords.longitude);
                 const userCoords = [position.coords.latitude, position.coords.longitude];
                 updateStartMarker(userCoords);
+                // ตรวจสอบระยะห่างจากจุดหมาย
+                if (destinationMarker && destinationMarker.getLatLng) {
+                    const endLatLng = destinationMarker.getLatLng();
+                    const distanceToEnd = calculateDistance(
+                        userCoords[0], userCoords[1],
+                        endLatLng.lat, endLatLng.lng
+                    );
+
+                    console.log("ระยะห่างจากจุดหมาย:", distanceToEnd);
+
+                    if (distanceToEnd < 30 && !hasArrived) {
+                        hasArrived = true;
+                        showSuccessModal(); // แสดง modal แจ้งเตือน
+                    }
+
+                    // Optional: reset ถ้าออกห่างไป
+                    if (distanceToEnd > 100 && hasArrived) {
+                        hasArrived = false; // อนุญาตให้แจ้งเตือนใหม่ ถ้าต้องการ
+                    }
+                }
 
                 // ถ้ามีเส้นทางแสดงอยู่แล้ว ให้คำนวณใหม่
                 if (selectedBuilding && routeLayer) {
@@ -78,7 +99,7 @@ function watchUserLocation() {
             (error) => {
                 console.error("Geolocation error:", error);
             },
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 3000 }
+            {enableHighAccuracy: true, timeout: 5000, maximumAge: 3000}
         );
     } else {
         console.log("Geolocation not supported");
@@ -159,8 +180,8 @@ function findRoute() {
 
     fetch('/route', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ start: startCoords, end: selectedBuilding })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({start: startCoords, end: selectedBuilding})
     })
         .then(response => {
             if (!response.ok) throw new Error("Failed to fetch route");
@@ -180,7 +201,7 @@ function findRoute() {
             if (destinationMarker) map.removeLayer(destinationMarker);
             if (animationFrame) cancelAnimationFrame(animationFrame);
 
-            routeLayer = L.polyline(data.path_coords, { color: 'gray', weight: 9 }).addTo(map);
+            routeLayer = L.polyline(data.path_coords, {color: 'gray', weight: 9}).addTo(map);
 
             // สร้างเส้นทางแบบแอนิเมชั่นด้วยรูปแบบเส้นประ
             animatedPath = L.polyline(data.path_coords, {
@@ -197,9 +218,9 @@ function findRoute() {
             }
 
             const endCoords = data.path_coords[data.path_coords.length - 1];
-            destinationMarker = L.marker(endCoords, { icon: destinationIcon }).addTo(map);
+            destinationMarker = L.marker(endCoords, {icon: destinationIcon}).addTo(map);
 
-            map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] });
+            map.fitBounds(routeLayer.getBounds(), {padding: [50, 50]});
 
             // แสดงระยะทาง
             if (data.distance) {
@@ -248,10 +269,6 @@ function findRoute() {
 }
 
 
-
-
-
-
 function closeBuildingModal(modalId) {
     if (!modalId) return; // ถ้าไม่มี id ก็ไม่ทำอะไร
     const modal = document.getElementById(modalId);
@@ -265,8 +282,6 @@ function closeBuildingModal(modalId) {
         }, 300);
     }
 }
-
-
 
 
 // ปิด modal เมื่อคลิกนอก modal (click backdrop)
@@ -289,7 +304,6 @@ modalContainers.forEach(modalContainer => {
         });
     }
 });
-
 
 
 // ===== Event Listeners =====
@@ -363,4 +377,16 @@ if (document.head) {
     document.addEventListener('DOMContentLoaded', function () {
         document.head.appendChild(style);
     });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
 }

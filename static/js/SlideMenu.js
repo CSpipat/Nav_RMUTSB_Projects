@@ -197,3 +197,37 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Slide Menu initialized successfully');
     console.log('Found building menus:', buildingMenus.length);
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const menuButton = document.getElementById('menuButton');
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('overlay');
+    let isMenuOpen = false;
+
+    function openMainMenu() {
+        sideMenu.classList.add('active');
+        menuButton.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        isMenuOpen = true;
+    }
+
+    function closeMainMenu() {
+        sideMenu.classList.remove('active');
+        menuButton.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        isMenuOpen = false;
+    }
+
+    function toggleMainMenu() {
+        if (isMenuOpen) {
+            closeMainMenu();
+        } else {
+            openMainMenu();
+        }
+    }
+
+    menuButton.addEventListener('click', toggleMainMenu);
+    overlay.addEventListener('click', closeMainMenu);
+});

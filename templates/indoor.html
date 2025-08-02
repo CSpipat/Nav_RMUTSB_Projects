@@ -195,24 +195,13 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="destinationSelect" class="form-label">เลือกห้องปลายทาง</label>
-                        <select id="destinationSelect" class="form-select" onchange="onDestinationChange()" aria-label="เลือกห้องที่ต้องการไป">
+                        <select id="destinationSelect" class="form-select" onchange="onDestinationChange()" aria-label="เลือกห้องปลายทาง">
                             <option value="">🎯 เลือกห้องที่ต้องการไป</option>
                         </select>
                     </div>
                     <div class="navigation-container" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
                         <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
                         <canvas id="pathCanvas" aria-hidden="true"></canvas>
-                        <div class="navigation-controls" role="toolbar" aria-label="เครื่องมือควบคุมแผนที่">
-                            <button class="nav-btn" onclick="zoomIn()" title="ซูมเข้า" aria-label="ซูมเข้า">
-                                <span aria-hidden="true">🔍</span>
-                            </button>
-                            <button class="nav-btn" onclick="zoomOut()" title="ซูมออก" aria-label="ซูมออก">
-                                <span aria-hidden="true">🔍</span>
-                            </button>
-                            <button class="nav-btn" onclick="resetView()" title="รีเซ็ตมุมมอง" aria-label="รีเซ็ตมุมมอง">
-                                <span aria-hidden="true">🏠</span>
-                            </button>
-                        </div>
                         <div id="distanceIndicator" class="distance-indicator" style="display: none;" aria-live="polite"></div>
                     </div>
                     <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>

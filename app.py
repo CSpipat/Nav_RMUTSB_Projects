@@ -226,7 +226,7 @@ def get_path():
 
     _, nodes_df, connections_df, plan_df = load_data()
     graph = create_graph(nodes_df, connections_df)
-    start_node = 'Elevator'
+    start_node = nodes_df.loc[nodes_df['Type'] == 'Elevator', 'NodeID'].iloc[0]
 
     if start_node not in graph:
         return jsonify({'error': f'Start node {start_node} not found in graph'}), 404
@@ -239,9 +239,21 @@ def get_path():
     if path:
         path_coords, img_width, img_height = get_path_coordinates_and_image_size(nodes_df, path, plan_df)
 
+        #  เพิ่มส่วนนี้เพื่อแม็พ NodeID → Detail
+        path_details = []
+        for node_id in path:
+            row = nodes_df[nodes_df['NodeID'] == node_id]
+            if not row.empty:
+                path_details.append({
+                    "node_id": node_id,
+                    "detail": str(row.iloc[0]['Detail']) if 'Detail' in row else node_id
+                })
+            else:
+                path_details.append({"node_id": node_id, "detail": node_id})
+
         result = {
             'path': path_coords,
-            'nodes': path,
+            'nodes': path_details,  # แทนที่ list เดิม
             'img_width': img_width,
             'img_height': img_height
         }
@@ -251,8 +263,10 @@ def get_path():
             status=200,
             mimetype='application/json'
         )
+
     else:
         return jsonify({'error': f'No path found from {start_node} to {destination}'}), 404
+
 
 
 @app.route('/route', methods=['POST'])
@@ -336,16 +350,19 @@ def get_building_info():
 @app.route('/get_floor_info/<int:b_id>', methods=['GET'])
 def get_floor_info(b_id):
     nodes_df = pd.read_csv('nodes.csv')
-    floors = nodes_df[nodes_df['B_ID'] == b_id]['flor'].unique().tolist()
+    floors = nodes_df[nodes_df['B_ID'] == b_id]['floor'].unique().tolist()
     return jsonify(floors)
 
 
 @app.route('/get_rooms/<int:b_id>/<int:floor>', methods=['GET'])
 def get_rooms(b_id, floor):
     nodes_df = pd.read_csv('nodes.csv')
-    rooms = nodes_df[(nodes_df['B_ID'] == b_id) &
-                    (nodes_df['flor'] == floor) &
-                    (nodes_df['Type'].isin(['Room', 'Toilet']))]['NodeID'].tolist()
+    filtered_df = nodes_df[
+        (nodes_df['B_ID'] == b_id) &
+        (nodes_df['floor'] == floor) &
+        (nodes_df['Type'].isin(['Room', 'Toilet']))
+        ]
+    rooms = filtered_df[['NodeID', 'Detail']].to_dict(orient='records')
     return jsonify(rooms)
 
 
@@ -388,7 +405,7 @@ def search():
             'id': str(row['NodeID']),
             'name': str(row['Detail']),
             'building_id': int(row['B_ID']),
-            'floor': int(row['flor'])
+            'floor': int(row['floor'])
         }, axis=1).tolist()
 
         return jsonify(building_results + room_results)
