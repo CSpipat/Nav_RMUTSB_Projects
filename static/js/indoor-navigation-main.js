@@ -192,7 +192,7 @@ function loadFloorPlan(buildingId, floor) {
 
     floorPlan.onerror = function() {
         console.error('Failed to load floor plan image');
-        floorPlan.src = '/static/img/placeholder-floorplan.png'; // Fallback image
+        floorPlan.src = '/static/img/null.png'; // Fallback image
     };
 }
 
