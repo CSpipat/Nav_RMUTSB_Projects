@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const menuButton = document.getElementById('menuButton');
     const sideMenu = document.getElementById('sideMenu');
-    const overlay = document.getElementById('overlay');
+    // const overlay = document.getElementById('overlay');
 
     // Building menu elements
     const buildingMenus = document.querySelectorAll('.building-menu');
@@ -25,22 +25,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function openMainMenu() {
         sideMenu.classList.add('active');
         menuButton.classList.add('active');
-        overlay.classList.add('active');
+        // overlay.classList.add('active');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
         isMenuOpen = true;
     }
 
     // Close main menu
     function closeMainMenu() {
-        sideMenu.classList.remove('active');
-        menuButton.classList.remove('active');
-        overlay.classList.remove('active');
-        document.body.style.overflow = ''; // Restore scrolling
-        isMenuOpen = false;
+    if (sideMenu) sideMenu.classList.remove('active');
+    if (menuButton) menuButton.classList.remove('active');
+    // if (overlay) overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    isMenuOpen = false;
 
-        // Close any open building menus when main menu closes
-        closeAllBuildingMenus();
-    }
+    closeAllBuildingMenus();
+}
+
 
     // Toggle building menu
     function toggleBuildingMenu(buildingMenu) {
@@ -83,9 +83,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Overlay click to close menu
-    if (overlay) {
-        overlay.addEventListener('click', closeMainMenu);
-    }
+    // if (overlay) {
+    //     overlay.addEventListener('click', closeMainMenu);
+    // }
 
     // Building menu headers click
     buildingMenus.forEach(buildingMenu => {

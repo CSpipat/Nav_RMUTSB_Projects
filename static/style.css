@@ -616,7 +616,7 @@ html {
 
 /* ================================== Alert Success================================= */
 
-.success-modal {
+.success-modal  {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -630,10 +630,10 @@ html {
     width: 300px;
     height: 60%;
 }
-
+/* 
 .success-modal.hidden {
     display: none !important;
-}
+} */
 
 .success-modal.show {
     display: grid; /* หรือ flex แล้วแต่คุณออกแบบ */
@@ -1129,14 +1129,106 @@ html {
 
         /*Alert Part Css */
 
-        .success-modal {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: white;
-            border: 2px dashed rgb(200, 200, 200);
-            height: 2000px;
+        .success-modal  {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: grid;
+            grid-template-rows: 30% 70%;
+            background-color: #F9B508;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            width: 300px;
+            height: 70%;
         }
+
+        .success-modal.hidden {
+            display: none !important;
+        }
+        
+        .success-modal.show {
+            display: grid; /* หรือ flex แล้วแต่คุณออกแบบ */
+        }
+        
+        
+        .icon-wrapper {
+            background-color: white;
+            border-radius: 50%;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 70px;
+            height: 70px;
+        }
+        
+        #alert-logo {
+            height: 60px;
+            width: 60px;
+            object-fit: contain;
+        }
+        
+        .success-modal h1 {
+            color: #222;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 20px;
+            text-transform: lowercase;
+            background-color: white;
+            padding: 8px;
+            border-radius: 20px;
+        }
+        
+        .img-wrapper img {
+            display: flex;
+            justify-self: center;
+            align-items: center;
+            background-color: white;
+            width: auto;
+            border-radius: 50%;
+            position: relative;
+            top: 60px;
+        
+        }
+        
+        .first {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(38, 151, 15, 0.918);
+            width: 100%;
+            height: 100%;
+            border-radius: 20px 20px 0px 0px;
+        
+        }
+        
+        .first img {
+            height: 80px;
+            width: 80px;
+        }
+        
+        .second {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(255, 255, 255);
+            width: 100%;
+            height: 100%;
+            border-radius: 0px 0px 20px 20px;
+        }
+        
+        .second h1 {
+            font-size: 20px;
+        }
+        
+        .second p {
+            font-size: 13px;
+            font-weight: 400;
+        }
+
 
     }
 }
@@ -1544,5 +1636,4 @@ html {
             font-size: 14px;
         }
     }
-
 }

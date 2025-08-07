@@ -8,6 +8,7 @@ let animationFrame = null;
 let selectedBuilding = null;
 let dashOffset = 0;
 let hasArrived = false; // ใช้สำหรับเช็คว่าเคยแสดง modal แล้วหรือยัง
+let modalShown = false;
 const distanceInfo = document.getElementById('distance-info');
 const distanceValue = document.getElementById('distance-value');
 const loadingIndicator = document.getElementById('loading-indicator');
@@ -80,15 +81,11 @@ function watchUserLocation() {
 
                     console.log("ระยะห่างจากจุดหมาย:", distanceToEnd);
 
-                    if (distanceToEnd < 30 && !hasArrived) {
+                    if (distanceToEnd < 1000 && !hasArrived) {
                         hasArrived = true;
                         showSuccessModal(); // แสดง modal แจ้งเตือน
                     }
 
-                    // Optional: reset ถ้าออกห่างไป
-                    if (distanceToEnd > 100 && hasArrived) {
-                        hasArrived = false; // อนุญาตให้แจ้งเตือนใหม่ ถ้าต้องการ
-                    }
                 }
 
                 // ถ้ามีเส้นทางแสดงอยู่แล้ว ให้คำนวณใหม่
@@ -105,6 +102,31 @@ function watchUserLocation() {
         console.log("Geolocation not supported");
     }
 }
+
+function showSuccessModal() {
+  const modal = document.querySelector('.success-modal');
+  if (modal) {
+    modal.classList.add('show');
+    modal.classList.remove('hidden');
+    modalShown = true;
+  }
+}
+
+function hideSuccessModal() {
+  const modal = document.querySelector('.success-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    modal.classList.add('hidden');
+    modalShown = false; // ถ้าต้องการให้เช็คใหม่อีกครั้งหลังจากปิด modal
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const closeBtn = document.querySelector('.success-modal button');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', hideSuccessModal);
+  }
+});
 
 /**
  * แอนิเมชั่นสำหรับเส้นทาง
@@ -158,6 +180,7 @@ function closeModal() {
         cancelAnimationFrame(animationFrame);
         animationFrame = null;
     }
+    hideSuccessModal()
 }
 
 /**
