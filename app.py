@@ -369,53 +369,152 @@ def get_rooms(b_id, floor):
 @app.route('/search', methods=['GET'])
 def search():
     try:
-        query = request.args.get('q', '').lower()
+        # Get and validate query
+        query = request.args.get('q', '').strip()
         if not query:
             return jsonify([])
 
-        building_df = pd.read_csv('Building.csv')
-        nodes_df = pd.read_csv('nodes.csv')
+        query_lower = query.lower()
 
-        building_mask = pd.Series(False, index=building_df.index)
-        
-        building_mask |= building_df['Name'].astype(str).str.lower().str.contains(query, na=False)
-        
-        def match_keywords(detail):
-            if pd.isna(detail):
-                return False
-            keywords = str(detail).lower().split(',')
-            return any(query in keyword.strip() for keyword in keywords)
-        
-        building_mask |= building_df['detail'].apply(match_keywords)
+        # Load data
+        try:
+            building_df = pd.read_csv('Building.csv')
+            nodes_df = pd.read_csv('nodes.csv')
+        except FileNotFoundError as e:
+            return jsonify({
+                'error': 'Data file not found',
+                'message': str(e)
+            }), 500
 
-        building_results = building_df[building_mask].apply(lambda row: {
-            'type': 'building',
-            'id': int(row['B_ID']),
-            'name': str(row['Name']),
-            'detail': str(row['detail']) if pd.notnull(row['detail']) else None,
-            'floor': int(row['Floor']),
-            'keywords': [kw.strip() for kw in str(row['detail']).split(',')] if pd.notnull(row['detail']) else []
-        }, axis=1).tolist()
+        # Search buildings
+        building_results = search_buildings(building_df, query_lower)
 
-        room_results = nodes_df[
-            (nodes_df['Type'].isin(['Room', 'Toilet'])) &
-            nodes_df['Detail'].astype(str).str.lower().str.contains(query, na=False)
-        ].apply(lambda row: {
-            'type': 'room',
-            'id': str(row['NodeID']),
-            'name': str(row['Detail']),
-            'building_id': int(row['B_ID']),
-            'floor': int(row['floor'])
-        }, axis=1).tolist()
+        # Search rooms/toilets
+        room_results = search_rooms(nodes_df, query_lower)
 
-        return jsonify(building_results + room_results)
-    
+        # Combine and return results
+        all_results = building_results + room_results
+
+        return jsonify(all_results)
+
     except Exception as e:
-        print(f"Search error: {str(e)}")
+        app.logger.error(f"Search error: {str(e)}")
         return jsonify({
             'error': 'An error occurred during search',
             'message': str(e)
         }), 500
+
+
+def search_buildings(building_df, query_lower):
+    """Search for buildings by name and detail keywords"""
+    if building_df.empty:
+        return []
+
+    results = []
+
+    for _, row in building_df.iterrows():
+        if matches_building(row, query_lower):
+            try:
+                result = {
+                    'type': 'building',
+                    'id': safe_int_convert(row.get('B_ID')),
+                    'name': safe_str_convert(row.get('Name')),
+                    'detail': safe_str_convert(row.get('detail')),
+                    'floor': safe_int_convert(row.get('Floor')),
+                    'keywords': parse_keywords(row.get('detail'))
+                }
+                results.append(result)
+            except Exception as e:
+                app.logger.warning(f"Error processing building row: {e}")
+                continue
+
+    return results
+
+
+def search_rooms(nodes_df, query_lower):
+    """Search for rooms and toilets by detail and keywords"""
+    if nodes_df.empty:
+        return []
+
+    # Filter for Room and Toilet types only
+    filtered_nodes = nodes_df[nodes_df['Type'].isin(['Room', 'Toilet'])].copy()
+
+    results = []
+
+    for _, row in filtered_nodes.iterrows():
+        if matches_room(row, query_lower):
+            try:
+                result = {
+                    'type': 'room',
+                    'id': safe_str_convert(row.get('NodeID')),
+                    'name': safe_str_convert(row.get('Detail')),
+                    'building_id': safe_int_convert(row.get('B_ID')),
+                    'floor': safe_int_convert(row.get('floor')),
+                    'keywords': parse_keywords(row.get('keyword'))
+                }
+                results.append(result)
+            except Exception as e:
+                app.logger.warning(f"Error processing room row: {e}")
+                continue
+
+    return results
+
+
+def matches_building(row, query_lower):
+    """Check if building matches the search query"""
+    # Check name
+    name = safe_str_convert(row.get('Name'))
+    if name and query_lower in name.lower():
+        return True
+
+    # Check detail (full text match)
+    detail = safe_str_convert(row.get('detail'))
+    if detail and query_lower in detail.lower():
+        return True
+
+    # Check keywords (individual keyword match)
+    keywords = parse_keywords(row.get('detail'))
+    return any(query_lower in keyword.lower() for keyword in keywords)
+
+
+def matches_room(row, query_lower):
+    """Check if room matches the search query"""
+    # Check detail/name
+    detail = safe_str_convert(row.get('Detail'))
+    if detail and query_lower in detail.lower():
+        return True
+
+    # Check keywords
+    keywords = parse_keywords(row.get('keyword'))
+    return any(query_lower in keyword.lower() for keyword in keywords)
+
+
+def parse_keywords(keywords_str):
+    """Parse comma-separated keywords string into a list"""
+    if pd.isna(keywords_str) or not keywords_str:
+        return []
+
+    keywords = str(keywords_str).split(',')
+    return [kw.strip() for kw in keywords if kw.strip()]
+
+
+def safe_str_convert(value):
+    """Safely convert value to string, return None for null values"""
+    if pd.isna(value) or value is None:
+        return None
+    return str(value)
+
+
+def safe_int_convert(value):
+    """Safely convert value to integer, return None for invalid values"""
+    if pd.isna(value) or value is None:
+        return None
+
+    try:
+        return int(float(value))  # Handle float strings like "1.0"
+    except (ValueError, TypeError):
+        return None
+
 
 
 # ============================= Start Point feedBack=====================

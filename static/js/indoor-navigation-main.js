@@ -14,7 +14,7 @@ let pathProgress = 0;
 let isAnimating = false;
 
 // Initialize indoor navigation when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initializeIndoorNavigation();
 });
 
@@ -182,7 +182,7 @@ function loadFloorPlan(buildingId, floor) {
     // Load floor plan image
     floorPlan.src = `/static/img/planTower${buildingId}Floor${floor}.png`;
 
-    floorPlan.onload = function() {
+    floorPlan.onload = function () {
         console.log('Floor plan loaded successfully');
         // Wait a bit for the DOM to settle
         setTimeout(() => {
@@ -190,7 +190,7 @@ function loadFloorPlan(buildingId, floor) {
         }, 200);
     };
 
-    floorPlan.onerror = function() {
+    floorPlan.onerror = function () {
         console.error('Failed to load floor plan image');
         floorPlan.src = '/static/img/null.png'; // Fallback image
     };
@@ -263,9 +263,9 @@ function setupCanvas() {
             const displayHeight = img.offsetHeight || img.clientHeight;
 
             console.log('Image dimensions:', {
-                natural: { width: img.naturalWidth, height: img.naturalHeight },
-                displayed: { width: displayWidth, height: displayHeight },
-                rect: { width: imgRect.width, height: imgRect.height }
+                natural: {width: img.naturalWidth, height: img.naturalHeight},
+                displayed: {width: displayWidth, height: displayHeight},
+                rect: {width: imgRect.width, height: imgRect.height}
             });
 
             // Set canvas dimensions to match exactly the displayed image
@@ -325,14 +325,14 @@ function findPath() {
             floor: currentFloor
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => handlePathData(data))
-    .catch(handleError);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => handlePathData(data))
+        .catch(handleError);
 }
 
 // Handle path data response
@@ -451,7 +451,6 @@ function clearPath() {
 }
 
 
-
 // Handle error in path finding
 function handleError(error) {
     hideLoadingIndicator();
@@ -478,9 +477,9 @@ function scalePathToImageSize(pathCoords, originalWidth, originalHeight) {
     const scaleY = currentHeight / originalHeight;
 
     console.log('Scaling path coordinates:', {
-        original: { width: originalWidth, height: originalHeight },
-        current: { width: currentWidth, height: currentHeight },
-        scale: { x: scaleX, y: scaleY }
+        original: {width: originalWidth, height: originalHeight},
+        current: {width: currentWidth, height: currentHeight},
+        scale: {x: scaleX, y: scaleY}
     });
 
     const scaledCoords = pathCoords.map(point => ({
@@ -677,8 +676,8 @@ function drawDirectionArrows(ctx, pathCoords, progress) {
 function calculateTotalDistance(pathCoords) {
     let total = 0;
     for (let i = 1; i < pathCoords.length; i++) {
-        const dx = pathCoords[i].x - pathCoords[i-1].x;
-        const dy = pathCoords[i].y - pathCoords[i-1].y;
+        const dx = pathCoords[i].x - pathCoords[i - 1].x;
+        const dy = pathCoords[i].y - pathCoords[i - 1].y;
         total += Math.sqrt(dx * dx + dy * dy);
     }
     return total;
