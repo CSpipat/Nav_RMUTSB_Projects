@@ -4,7 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     searchInput.addEventListener("input", function () {
         const query = this.value.trim();
+
         if (query.length < 2) {
+            resultBox.style.display = "none"; // ซ่อนถ้าพิมพ์น้อยกว่า 2 ตัว
             resultBox.innerHTML = "";
             return;
         }
@@ -16,42 +18,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (data.length === 0) {
                     resultBox.innerHTML = "<div style='padding: 8px;'>ไม่พบข้อมูล</div>";
-                    return;
+                } else {
+                    data.forEach(item => {
+                        const div = document.createElement("div");
+                        div.style.padding = "8px";
+                        div.style.cursor = "pointer";
+                        div.style.borderBottom = "1px solid #eee";
+                        div.textContent = `${item.name} (ชั้น ${item.floor})`;
+
+                        div.addEventListener("click", function () {
+                            if (item.type === "building") {
+                                openBuildingModal(item.name);
+                            }
+                            if (item.type === "room") {
+                                openIndoorNavigation(item.building_id, item.floor);
+                            }
+                            searchInput.value = item.name;
+                            resultBox.style.display = "none"; // ซ่อนเมื่อเลือก
+                        });
+
+                        resultBox.appendChild(div);
+                    });
                 }
 
-                data.forEach(item => {
-                    const div = document.createElement("div");
-                    div.style.padding = "8px";
-                    div.style.cursor = "pointer";
-                    div.style.borderBottom = "1px solid #eee";
-
-                    div.textContent = `${item.name} (ชั้น ${item.floor}) `;
-
-                    div.addEventListener("click", function () {
-                        if(item.type === "building"){
-                            openBuildingModal(item.name)
-                        }
-                        if(item.type === "room"){
-                            openIndoorNavigation(item.building_id,item.floor)
-                        }
-                        // alert(`คุณเลือก: ${item.name} | อาคาร ${item.building_id} | ชั้น ${item.floor}`);
-                        searchInput.value = item.name;
-                        resultBox.innerHTML = "";
-                    });
-
-                    resultBox.appendChild(div);
-                });
+                resultBox.style.display = "block"; // << โชว์กล่องผลลัพธ์
             })
             .catch(err => {
                 console.error("Search error:", err);
                 resultBox.innerHTML = "<div style='padding: 8px;'>เกิดข้อผิดพลาด</div>";
+                resultBox.style.display = "block";
             });
     });
 
-    // ซ่อนกล่องผลลัพธ์เมื่อคลิกนอก
+    // ซ่อนเมื่อคลิกนอก
     document.addEventListener("click", function (event) {
         if (!document.getElementById("nav-search-part").contains(event.target)) {
-            resultBox.innerHTML = "";
+            resultBox.style.display = "none";
         }
     });
 });
