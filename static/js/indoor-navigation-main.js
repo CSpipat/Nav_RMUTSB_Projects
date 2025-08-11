@@ -739,3 +739,15 @@ window.addEventListener('beforeunload', () => {
         cancelAnimationFrame(animationId);
     }
 });
+
+// ดักจับ event ปิด modal แล้ว reload
+document.addEventListener('DOMContentLoaded', function () {
+    const indoorModal = document.getElementById('indoorModal');
+    if (indoorModal) {
+        indoorModal.addEventListener('hidden.bs.modal', function () {
+            setTimeout(() =>{
+            location.reload();
+            },500)
+        });
+    }
+});
