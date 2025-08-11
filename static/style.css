@@ -1233,436 +1233,446 @@ html {
             font-weight: 400;
         }
 
-        #nav-search-part{
-            z-index: 1000;
+        #nav-search-part {
+            position: relative;
         }
 
         #nav-search-part #search-results {
-            position: fixed;
-            top: 84%;
-            border: 1px solid rgb(168, 168, 168);
-            border-top: none;
-            border-radius: 0px  0px 15px 15px;
-            width: 99%;
-            border: none;
-            background-color: red;
-            /* แค่ทดสอบ */
-            display: none;
-            /* ซ่อนตอนแรก */
-            z-index: -1;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow-y: auto;
+            z-index: 1000;
+            justify-content: center;
+            padding-left: 20px;
+
+            /* สำหรับ animation */
+            max-height: 0;
+            opacity: 0;
             overflow: hidden;
+            transition: max-height 1s ease, opacity 1s ease;
         }
 
+        #nav-search-part #search-results.show {
+            max-height: 300px;
+            /* ความสูงตอนแสดง */
+            opacity: 1;
+        }
 
-
-    }
-
-
-
-}
-
-
-/* Adjustments for very small mobile screens */
-@media screen and (max-width: 380px) {
-    #main-part {
-        padding: 8px;
-        /* Further reduced padding */
-        gap: 10px;
-        /* Further reduced gap */
-    }
-
-    .tw-name {
-        font-size: 13px;
-        width: calc(100% - 35px);
-    }
-
-    .Wrap-list-tower .list-tower-card {
-        padding: 14px;
-        margin: 5px;
-        /* Further reduced padding */
-    }
-
-    .icons {
-        padding: 6px;
-    }
-}
-
-
-/* Tablet Responsive View  */
-@media (min-width: 577px) and (max-width: 768) {}
-
-
-/* Desktop Responsive View */
-@media screen and (min-width: 769px) {
-    .row {
-        height: 100px;
-    }
-
-    #menu-area ul a {
-        margin-left: 30px;
-        margin-right: 30px;
-        font-size: 15px;
-    }
-
-    #footer-area {
-        display: none;
-    }
-
-    #menu-desk-form {
-        display: flex !important;
-    }
-
-    #logo-area {
-        display: flex;
-        justify-content: start;
-        align-items: center;
-        height: 100%;
-    }
-
-    #nav-search-part {
-        display: none !important;
+        .modal-content{
+            overflow: scroll;
+        }
 
     }
 
-    .menu-button {
-        display: none;
+
+    /* Adjustments for very small mobile screens */
+    @media screen and (max-width: 380px) {
+        #main-part {
+            padding: 8px;
+            /* Further reduced padding */
+            gap: 10px;
+            /* Further reduced gap */
+        }
+
+        .tw-name {
+            font-size: 13px;
+            width: calc(100% - 35px);
+        }
+
+        .Wrap-list-tower .list-tower-card {
+            padding: 14px;
+            margin: 5px;
+            /* Further reduced padding */
+        }
+
+        .icons {
+            padding: 6px;
+        }
     }
 
-    /* ======= Indoor Navigation Styles ======= */
-    .modal-backdrop.fade.show {
-        z-index: 1040;
-    }
 
-    #indoorModal {
-        z-index: 1050;
-    }
+    /* Tablet Responsive View  */
+    @media (min-width: 577px) and (max-width: 768) {}
 
-    .navigation-container {
-        position: relative !important;
-        display: inline-block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        background: #764ba2;
 
-    }
+    /* Desktop Responsive View */
+    @media screen and (min-width: 769px) {
+        .row {
+            height: 100px;
+        }
 
-    .navigation-container img {
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-        max-width: 100% !important;
-        object-fit: contain;
-    }
+        #menu-area ul a {
+            margin-left: 30px;
+            margin-right: 30px;
+            font-size: 15px;
+        }
 
-    #pathCanvas {
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        pointer-events: none !important;
-        z-index: 10 !important;
-        background: transparent !important;
-    }
+        #footer-area {
+            display: none;
+        }
 
-    /* Ensure modal body has proper positioning */
-    .modal-body {
-        position: relative;
-        padding: 1rem;
-    }
+        #menu-desk-form {
+            display: flex !important;
+        }
 
-    /* Distance indicator positioning */
-    .distance-indicator {
-        position: absolute !important;
-        bottom: 10px !important;
-        left: 10px !important;
-        background: rgba(0, 0, 0, 0.8) !important;
-        color: white !important;
-        padding: 8px 15px !important;
-        border-radius: 20px !important;
-        font-size: 14px !important;
-        font-weight: bold !important;
-        z-index: 20 !important;
-        pointer-events: none !important;
-    }
+        #logo-area {
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            height: 100%;
+        }
 
-    /* Ensure proper box sizing */
-    * {
-        box-sizing: border-box;
-    }
+        #nav-search-part {
+            display: none !important;
 
-    /* Modal adjustments for better canvas display */
-    .modal-dialog.modal-lg {
-        max-width: 90%;
-    }
+        }
 
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-    }
+        .menu-button {
+            display: none;
+        }
 
-    /* Loading indicator overlay */
-    #loadingIndicator {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(255, 255, 255, 0.95);
-        padding: 20px;
-        border-radius: 10px;
-        z-index: 100;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
+        /* ======= Indoor Navigation Styles ======= */
+        .modal-backdrop.fade.show {
+            z-index: 1040;
+        }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .modal-dialog.modal-lg {
-            max-width: 95%;
-            margin: 10px auto;
+        #indoorModal {
+            z-index: 1050;
         }
 
         .navigation-container {
-            border-radius: 5px;
+            position: relative !important;
+            display: inline-block !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: #764ba2;
+
+        }
+
+        .navigation-container img {
+            display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            max-width: 100% !important;
+            object-fit: contain;
+        }
+
+        #pathCanvas {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+            background: transparent !important;
+        }
+
+        /* Ensure modal body has proper positioning */
+        .modal-body {
+            position: relative;
+            padding: 1rem;
+        }
+
+        /* Distance indicator positioning */
+        .distance-indicator {
+            position: absolute !important;
+            bottom: 10px !important;
+            left: 10px !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: white !important;
+            padding: 8px 15px !important;
+            border-radius: 20px !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            z-index: 20 !important;
+            pointer-events: none !important;
+        }
+
+        /* Ensure proper box sizing */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Modal adjustments for better canvas display */
+        .modal-dialog.modal-lg {
+            max-width: 90%;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: scroll;
+        }
+
+        /* Loading indicator overlay */
+        #loadingIndicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-dialog.modal-lg {
+                max-width: 95%;
+                margin: 10px auto;
+            }
+
+            .navigation-container {
+                border-radius: 5px;
+            }
+
+            .distance-indicator {
+                bottom: 5px !important;
+                left: 5px !important;
+                font-size: 12px !important;
+                padding: 6px 12px !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-dialog.modal-lg {
+                max-width: 98%;
+                margin: 5px auto;
+            }
+
+            .modal-body {
+                padding: 0.5rem;
+            }
+
+            .navigation-container {
+                border-radius: 3px;
+            }
+        }
+
+
+        .path-info-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-animation {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .distance-indicator {
-            bottom: 5px !important;
-            left: 5px !important;
-            font-size: 12px !important;
-            padding: 6px 12px !important;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .modal-dialog.modal-lg {
-            max-width: 98%;
-            margin: 5px auto;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
         }
 
-        .modal-body {
-            padding: 0.5rem;
+        /* Path info styles */
+        .path-steps {
+            padding-left: 0;
+            list-style: none;
         }
 
-        .navigation-container {
-            border-radius: 3px;
-        }
-    }
-
-
-    .path-info-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        border-radius: 10px;
-        padding: 15px;
-        margin-top: 15px;
-        border: none;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .loading-animation {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
+        .path-steps li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        100% {
-            transform: rotate(360deg);
-        }
-    }
-
-    .distance-indicator {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    /* Path info styles */
-    .path-steps {
-        padding-left: 0;
-        list-style: none;
-    }
-
-    .path-steps li {
-        padding: 8px 0;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .path-steps li:last-child {
-        border-bottom: none;
-    }
-
-    .step-start {
-        color: #4285F4;
-        font-weight: bold;
-    }
-
-    .step-end {
-        color: #EA4335;
-        font-weight: bold;
-    }
-
-    .step-waypoint {
-        color: #34A853;
-    }
-
-    .step-through {
-        color: #666;
-    }
-
-    .path-summary {
-        margin-top: 15px;
-        padding: 15px;
-        background: rgba(66, 133, 244, 0.1);
-        border-radius: 8px;
-        display: flex;
-        justify-content: space-around;
-        gap: 15px;
-    }
-
-    .summary-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .summary-item .icon {
-        font-size: 24px;
-        margin-bottom: 5px;
-    }
-
-    .summary-item .label {
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 2px;
-    }
-
-    .summary-item .value {
-        font-weight: bold;
-        color: #4285F4;
-    }
-
-    /* Enhanced dropdown animations */
-    .dropdown-menu {
-        animation: slideDown 0.3s ease;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    }
-
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
+        .path-steps li:last-child {
+            border-bottom: none;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .step-start {
+            color: #4285F4;
+            font-weight: bold;
         }
-    }
 
-    .dropdown-item {
-        padding: 8px 15px;
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
+        .step-end {
+            color: #EA4335;
+            font-weight: bold;
+        }
 
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
-        color: #4285F4;
-        transform: translateX(5px);
-    }
+        .step-waypoint {
+            color: #34A853;
+        }
 
-    /* Side menu enhancements */
-    .side-menu .dropdown-item:hover {
-        background-color: rgba(66, 133, 244, 0.1);
-        color: #4285F4;
-        padding-left: 20px;
-    }
-
-    /* Modal enhancements */
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 15px 15px 0 0;
-        border-bottom: none;
-    }
-
-    .modal-title {
-        font-weight: 600;
-    }
-
-    .btn-close {
-        filter: invert(1);
-    }
-
-    .form-select {
-        border-radius: 10px;
-        border: 2px solid #e9ecef;
-        padding: 10px 15px;
-        transition: all 0.3s ease;
-    }
-
-    .form-select:focus {
-        border-color: #4285F4;
-        box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.25);
-    }
-
-    /* Loading indicator styles */
-    #loadingIndicator {
-        padding: 20px;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        margin: 10px 0;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .modal-dialog.modal-lg {
-            max-width: 95%;
-            margin: 10px auto;
+        .step-through {
+            color: #666;
         }
 
         .path-summary {
-            flex-direction: column;
-            gap: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(66, 133, 244, 0.1);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
         }
 
         .summary-item {
-            flex-direction: row;
-            justify-content: space-between;
-            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
+        .summary-item .icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .summary-item .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .summary-item .value {
+            font-weight: bold;
+            color: #4285F4;
+        }
+
+        /* Enhanced dropdown animations */
         .dropdown-menu {
-            font-size: 14px;
+            animation: slideDown 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 8px 15px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #4285F4;
+            transform: translateX(5px);
+        }
+
+        /* Side menu enhancements */
+        .side-menu .dropdown-item:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+            color: #4285F4;
+            padding-left: 20px;
+        }
+
+        /* Modal enhancements */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: scroll;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border-bottom: none;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: #4285F4;
+            box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.25);
+        }
+
+        /* Loading indicator styles */
+        #loadingIndicator {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-dialog.modal-lg {
+                max-width: 95%;
+                margin: 10px auto;
+            }
+
+            .path-summary {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .summary-item {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+
+            .dropdown-menu {
+                font-size: 14px;
+            }
         }
     }
 }
