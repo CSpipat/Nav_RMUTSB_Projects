@@ -421,7 +421,9 @@ def search_buildings(building_df, query_lower):
                     'name': safe_str_convert(row.get('Name')),
                     'detail': safe_str_convert(row.get('detail')),
                     'floor': safe_int_convert(row.get('Floor')),
-                    'keywords': parse_keywords(row.get('detail'))
+                    'keywords': parse_keywords(row.get('keywords')),
+                    'latitude': row.get('latitude'),
+                    'longitude': row.get('longitude')
                 }
                 results.append(result)
             except Exception as e:

@@ -1233,9 +1233,9 @@ html {
             font-weight: 400;
         }
 
-        #nav-search-part{
-            z-index: 1000;
-        }
+        /*#nav-search-part{*/
+        /*    z-index: 1000;*/
+        /*}*/
 
         #nav-search-part #search-results {
             position: fixed;
