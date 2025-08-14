@@ -81,7 +81,7 @@ function watchUserLocation() {
 
                     console.log("ระยะห่างจากจุดหมาย:", distanceToEnd);
 
-                    if (distanceToEnd < 5 && !hasArrived) {
+                    if (distanceToEnd < 40 && !hasArrived) {
                         hasArrived = true;
                         showSuccessModal(); // แสดง modal แจ้งเตือน
                     }
