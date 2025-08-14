@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Get DOM elements
     const menuButton = document.getElementById('menuButton');
     const sideMenu = document.getElementById('sideMenu');
@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.style.overflow = '';
     isMenuOpen = false;
 
-    closeAllBuildingMenus();
-}
+        closeAllBuildingMenus();
+    }
 
 
     // Toggle building menu
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Main menu button click
     if (menuButton) {
-        menuButton.addEventListener('click', function(e) {
+        menuButton.addEventListener('click', function (e) {
             e.stopPropagation();
             toggleMainMenu();
         });
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     buildingMenus.forEach(buildingMenu => {
         const header = buildingMenu.querySelector('.building-menu-header');
         if (header) {
-            header.addEventListener('click', function(e) {
+            header.addEventListener('click', function (e) {
                 e.stopPropagation();
                 toggleBuildingMenu(buildingMenu);
             });
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Close menu when clicking outside (for desktop)
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         // Only close if menu is open and click is outside menu area
         if (isMenuOpen &&
             !sideMenu.contains(event.target) &&
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Handle keyboard navigation
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
         // Close menu on Escape key
         if (event.key === 'Escape' && isMenuOpen) {
             closeMainMenu();
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Smooth scrolling for menu links
     const menuLinks = document.querySelectorAll('.building-menu-content a');
     menuLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             // Add any navigation logic here if needed
             // For now, just close the menu when a link is clicked
             closeMainMenu();
@@ -152,12 +152,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let touchEndX = 0;
 
     // Touch start
-    document.addEventListener('touchstart', function(e) {
+    document.addEventListener('touchstart', function (e) {
         touchStartX = e.changedTouches[0].screenX;
     });
 
     // Touch end
-    document.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function (e) {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipeGesture();
     });

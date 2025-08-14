@@ -413,3 +413,83 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
+
+// ===== map.js: เพิ่มตัวแปรควบคุมบนสุด =====
+let outdoorTarget = null;       // เก็บ item จาก search.js ทั้ง building/room
+let geoWatchId = null;          // เก็บ watchPosition id เพื่อล้าง
+let arrivalGuard = false;       // กันทริกเกอร์ซ้ำตอนถึงอาคาร
+
+function startOutdoorNavigation(target) {
+  // เคลียร์ของเก่าให้หมดก่อน
+  if (geoWatchId !== null) {
+    navigator.geolocation.clearWatch(geoWatchId);
+    geoWatchId = null;
+  }
+  arrivalGuard = false;
+  outdoorTarget = target;
+
+  // ... โค้ดเดิมตั้ง route / modal outdoor ที่คุณมีอยู่ต่อไป ...
+
+  // ถ้าเป็น room ให้เริ่มติดตาม GPS เพื่อเช็คเข้าอาคาร
+  if (target.type === "room" && target.building_lat && target.building_lng) {
+    startArrivalWatcher(target);
+  }
+}
+
+function startArrivalWatcher(target) {
+  if (!navigator.geolocation) return;
+
+  const ARRIVAL_RADIUS_M = 30; // กำหนดรัศมีถึงอาคาร
+
+  geoWatchId = navigator.geolocation.watchPosition(
+    pos => {
+      if (arrivalGuard) return; // ป้องกันยิงซ้ำ
+      const userLat = pos.coords.latitude;
+      const userLng = pos.coords.longitude;
+
+      const d = calculateDistance(
+        userLat, userLng,
+        target.building_lat, target.building_lng
+      );
+
+      // ถึงอาคารแล้ว
+      if (d <= ARRIVAL_RADIUS_M) {
+        arrivalGuard = true;
+
+        // หยุดดูตำแหน่ง outdoor
+        if (geoWatchId !== null) {
+          navigator.geolocation.clearWatch(geoWatchId);
+          geoWatchId = null;
+        }
+
+        // ปิด/หยุดแอนิเมชัน outdoor ที่เกี่ยวข้องถ้ามี (routeLayer/animatedPath/animationFrame) — ใช้ของเดิมคุณ
+        try {
+          if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
+          // ถ้ามี layer/marker ที่ควรเคลียร์ ก็ดำเนินการตามของคุณตรงนี้
+        } catch (e) { console.warn(e); }
+
+        // ✅ จุดตัดสินใจ “ที่เดียว”
+        if (outdoorTarget?.type === 'room') {
+          // ไม่โชว์ success modal outdoor เพื่อกันซ้อน
+          if (typeof openIndoorNavigation === "function") {
+            openIndoorNavigation(outdoorTarget.building_id, outdoorTarget.floor);
+          } else {
+            console.warn("openIndoorNavigation() not found");
+          }
+        } else {
+          // กรณีปลายทางเป็น building ค่อยโชว์ success (พฤติกรรมเดิม)
+          showSuccessModal();
+        }
+
+        // กันการยิงซ้ำเพิ่มเติมช่วงสั้น ๆ
+        setTimeout(() => { arrivalGuard = false; }, 3000);
+      }
+    },
+    err => console.error("Geolocation error:", err),
+    { enableHighAccuracy: true, timeout: 5000, maximumAge: 3000 }
+  );
+}
+
+window.startOutdoorNavigation = startOutdoorNavigation;
+window.showMapForBuilding = showMapForBuilding;
+
