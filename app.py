@@ -187,6 +187,12 @@ def haversine(lat1, lon1, lat2, lon2):
 
 
 @app.route('/')
+def homepage():
+    return render_template('homePage.html')
+
+
+
+@app.route('/index')
 def index():
     return render_template('index.html')
 
@@ -547,6 +553,7 @@ def submit_rating():
     except Exception as e:
         print("🔥 Error:", str(e))  # จะพิมพ์ใน terminal
         return jsonify({'error': str(e)}), 500
+
 
 
 

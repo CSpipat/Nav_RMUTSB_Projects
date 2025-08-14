@@ -21,8 +21,13 @@
         <div class="main">
             <img src="/static/img/sciLogo.png" alt="">
             <h1>ระบบเเนะนำเส้นทาง</h1>
-            <input type="search" class="search-input" placeholder="ค้นหาสถานที่ที่คุณต้องการจะไป" >
-            <button class="map-btn">แผนผังมหาวิทยาลัย</button>
+            <input type="search" class="search-input" placeholder="ค้นหาสถานที่ที่คุณต้องการจะไป">
+            <a href="{{ url_for('index') }}" class="map-btn" target="_self" rel="noopener noreferrer">
+                แผนผังมหาวิทยาลัย
+            </a>
+
+            </a>
+
         </div>
         <div class="bottom-part">
             <img src="/static/img/sciLogo.png" alt="">
