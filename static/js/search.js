@@ -96,12 +96,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
-// ตัวอย่างฟังก์ชันสำรอง ปรับใช้ได้ตามระบบจริง
-function openBuildingModal(name) {
-    alert(`เปิดข้อมูลอาคาร: ${name}`);
-}
-
-function openIndoorNavigation(buildingId, floor) {
-    alert(`นำทางไปยัง อาคาร ID: ${buildingId}, ชั้น: ${floor}`);
-}
