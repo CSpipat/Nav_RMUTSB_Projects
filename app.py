@@ -427,7 +427,9 @@ def search_buildings(building_df, query_lower):
                     'name': safe_str_convert(row.get('Name')),
                     'detail': safe_str_convert(row.get('detail')),
                     'floor': safe_int_convert(row.get('Floor')),
-                    'keywords': parse_keywords(row.get('detail'))
+                    'keywords': parse_keywords(row.get('detail')),
+                    'latitude': row.get('latitude'),
+                    'longitude': row.get('longitude')
                 }
                 results.append(result)
             except Exception as e:
@@ -442,6 +444,12 @@ def search_rooms(nodes_df, query_lower):
     if nodes_df.empty:
         return []
 
+    # โหลดข้อมูลตึกเพื่อนำมาหา lat/lng ของ building
+    try:
+        building_df = pd.read_csv('Building.csv')
+    except FileNotFoundError:
+        building_df = pd.DataFrame()
+
     # Filter for Room and Toilet types only
     filtered_nodes = nodes_df[nodes_df['Type'].isin(['Room', 'Toilet'])].copy()
 
@@ -450,13 +458,29 @@ def search_rooms(nodes_df, query_lower):
     for _, row in filtered_nodes.iterrows():
         if matches_room(row, query_lower):
             try:
+                building_id = safe_int_convert(row.get('B_ID'))
+
+                # หา lat/lng + ชื่อตึก
+                building_lat = None
+                building_lng = None
+                building_name = None
+                if not building_df.empty:
+                    b_row = building_df[building_df['B_ID'] == building_id]
+                    if not b_row.empty:
+                        building_lat = b_row.iloc[0].get('latitude')
+                        building_lng = b_row.iloc[0].get('longitude')
+                        building_name = safe_str_convert(b_row.iloc[0].get('Name'))
+
                 result = {
                     'type': 'room',
                     'id': safe_str_convert(row.get('NodeID')),
                     'name': safe_str_convert(row.get('Detail')),
-                    'building_id': safe_int_convert(row.get('B_ID')),
+                    'building_id': building_id,
+                    'building_name': building_name,   # ✅ ส่งชื่ออาคารด้วย
                     'floor': safe_int_convert(row.get('floor')),
-                    'keywords': parse_keywords(row.get('keyword'))
+                    'keywords': parse_keywords(row.get('keyword')),
+                    'building_lat': building_lat,
+                    'building_lng': building_lng
                 }
                 results.append(result)
             except Exception as e:
@@ -464,6 +488,7 @@ def search_rooms(nodes_df, query_lower):
                 continue
 
     return results
+
 
 
 def matches_building(row, query_lower):
