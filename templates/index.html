@@ -24,7 +24,7 @@
       <!-- ส่วนที่ 1: โลโก้ -->
       <div class="col-12 col-sm-3 col-lg-2 box" id="logo-area">
         <a class="navbar-brand" href="#">
-          <img src="/static/img/Main_logo.png" alt="หน้าหลัก" id="nav-logo">
+           <a href="{{ url_for('homepage') }}" target="_blank" rel="noopener noreferrer"><img src="/static/img/Main_logo.png" alt="หน้าหลัก" id="nav-logo"></a>
         </a>
       </div>
 
@@ -528,20 +528,22 @@
               <option value="">🎯 เลือกห้องที่ต้องการไป</option>
             </select>
           </div>
+
           <div class="navigation-container" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
             <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
             <canvas id="pathCanvas" aria-hidden="true"></canvas>
           </div>
+
           <div id="distanceIndicator" class="distance-indicator" style="display: none;" aria-live="polite"></div>
-        </div>
-        <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
-        <div id="loadingIndicator" style="display: none;" class="text-center" role="status" aria-live="polite">
-          <div class="loading-animation" aria-hidden="true"></div>
-          <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
+
+          <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
+          <div id="loadingIndicator" style="display: none;" class="text-center" role="status" aria-live="polite">
+            <div class="loading-animation" aria-hidden="true"></div>
+            <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 
 

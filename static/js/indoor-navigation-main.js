@@ -87,29 +87,19 @@ function updateSideMenus() {
     });
 }
 
-let indoorOpening = false;
-
+// Main function to open indoor navigation
 function openIndoorNavigation(buildingId, floor) {
-    if (indoorOpening) return; // กันกดซ้ำ/เรียกซ้อน
-    indoorOpening = true;
+    console.log(`Opening indoor navigation for Building ${buildingId}, Floor ${floor}`);
 
     currentBuildingId = buildingId;
     currentFloor = floor;
 
-    // แทนที่จะปิดทุก modal ลองปิดเฉพาะที่เกี่ยว outdoor
-    const mapModal = document.getElementById('map-modal');
-    const backdrop = document.getElementById('modal-backdrop');
-    if (mapModal) mapModal.style.display = 'none';
-    if (backdrop) backdrop.style.display = 'none';
+    // Close any existing modals
+    closeAllModals();
 
+    // Load rooms and show indoor modal
     loadRoomsAndShowModal(buildingId, floor);
-
-    // ปลดล็อกหลังเปิดเสร็จเล็กน้อย
-    setTimeout(() => {
-        indoorOpening = false;
-    }, 500);
 }
-
 
 // Close all existing modals
 function closeAllModals() {
@@ -755,49 +745,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const indoorModal = document.getElementById('indoorModal');
     if (indoorModal) {
         indoorModal.addEventListener('hidden.bs.modal', function () {
-            setTimeout(() => {
-                location.reload();
-            }, 500)
+            setTimeout(() =>{
+            location.reload();
+            },500)
         });
     }
 });
-
-// เปิด Indoor แล้วเลือกห้องและหาเส้นทางอัตโนมัติ
-function openIndoorToRoom(buildingId, floor, nodeId) {
-    // เปิด indoor modal (โหลดแผนผัง + รายชื่อห้อง)
-    openIndoorNavigation(buildingId, floor);
-
-    // รอให้รายการห้องโหลดเสร็จ แล้วเลือกห้องและ findPath
-    let tries = 0;
-    const maxTries = 30; // ~4.5s (30 * 150ms)
-    const timer = setInterval(() => {
-        const select = document.getElementById('destinationSelect');
-        const img = document.getElementById('floorPlan');
-        if (select && img && img.complete && img.naturalWidth > 0) {
-            // มี option ห้องที่ต้องการหรือยัง?
-            const hasOption = Array.from(select.options).some(opt => opt.value === nodeId);
-            if (hasOption) {
-                select.value = nodeId;
-                // ให้ canvas/setup เสร็จจริงก่อน
-                setTimeout(() => {
-                    if (typeof findPath === 'function') {
-                        findPath();
-                    } else {
-                        console.warn('findPath() not found');
-                    }
-                }, 120);
-                clearInterval(timer);
-                return;
-            }
-        }
-        if (++tries > maxTries) {
-            console.warn('openIndoorToRoom: timeout waiting room list/canvas');
-            clearInterval(timer);
-        }
-    }, 150);
-}
-
-// เปิดให้เรียกจากไฟล์อื่น
-window.openIndoorToRoom = openIndoorToRoom;
-window.openIndoorNavigation = openIndoorNavigation;
-window.closeAllModals = closeAllModals;

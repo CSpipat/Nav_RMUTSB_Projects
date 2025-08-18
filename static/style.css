@@ -542,9 +542,38 @@ html {
     background-color: white;
     z-index: 101;
     border-radius: 10px;
-    overflow: hidden;
+    overflow: scroll;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
+/* .wrap-path-info {
+  background-color: transparent;
+  border: none;
+  border-radius: .5rem;
+  padding: 0;
+  margin-bottom: 1rem;
+  box-shadow: none;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all 0.3s ease;
+}
+
+/* เมื่อมีข้อมูล */
+.wrap-path-info.has-data {
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: .5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  opacity: 1;
+  transform: scale(1);
+} */
+
+
+/* ป้องกันเลื่อนซ้ายขวาในมือถือ */
+html, body {
+  overflow-x: hidden;
+}
+
 
 .modal-header {
     display: flex;
@@ -1265,6 +1294,7 @@ html {
 
         .modal-content{
             overflow: scroll;
+            padding: 10px;
         }
 
     }
