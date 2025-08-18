@@ -29,7 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 } else {
                     data.forEach(item => {
                         const div = document.createElement("div");
-                        div.textContent = `${item.name} (ชั้น ${item.floor ?? '-'})`;
+                        if (item.type === "building" ){
+                            div.textContent = `${item.name} ( ${item.floor ?? '-'} ชั้น)`;
+                        }else {
+                            div.textContent = `${item.name} (ชั้น ${item.floor ?? '-'})`;
+                        }
                         div.style.cursor = "pointer";
                         div.style.padding = "8px";
                         div.style.borderBottom = "1px solid #eee";
