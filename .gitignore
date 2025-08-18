@@ -1,0 +1,36 @@
+# --- Virtual envs ---
+venv/
+.venv/
+env/
+.python-version
+
+# --- Python caches ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Builds/Packaging ---
+build/
+dist/
+wheels/
+pip-wheel-metadata/
+*.manifest
+*.spec
+
+# --- Tools/IDEs ---
+.idea/
+.vscode/
+
+# --- Misc/OS ---
+.DS_Store
+
+# --- Env/secrets (ถ้ามี) ---
+.env
+.env.*
