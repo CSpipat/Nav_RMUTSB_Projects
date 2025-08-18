@@ -186,11 +186,9 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 
-@app.route('/homepage')
+@app.route('/')
 def homepage():
     return render_template('homePage.html')
-
-
 
 @app.route('/index')
 def index():
