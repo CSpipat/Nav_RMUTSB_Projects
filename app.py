@@ -32,8 +32,8 @@ def load_data():
     nodes_df = pd.read_csv('nodes.csv')
     connections_df = pd.read_csv('Connected_Node.csv')
     connections_df.columns = ['C_ID', 'NodeID', 'ConnectedTO', 'Type']
-
-    return building_df, nodes_df, connections_df
+    plan_df = pd.read_csv('Plan.csv')
+    return building_df, nodes_df, connections_df, plan_df
 
 
 # Create a graph for indoor navigation
