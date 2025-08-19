@@ -263,9 +263,9 @@ function setupCanvas() {
             const displayHeight = img.offsetHeight || img.clientHeight;
 
             console.log('Image dimensions:', {
-                natural: {width: img.naturalWidth, height: img.naturalHeight},
-                displayed: {width: displayWidth, height: displayHeight},
-                rect: {width: imgRect.width, height: imgRect.height}
+                natural: { width: img.naturalWidth, height: img.naturalHeight },
+                displayed: { width: displayWidth, height: displayHeight },
+                rect: { width: imgRect.width, height: imgRect.height }
             });
 
             // Set canvas dimensions to match exactly the displayed image
@@ -477,9 +477,9 @@ function scalePathToImageSize(pathCoords, originalWidth, originalHeight) {
     const scaleY = currentHeight / originalHeight;
 
     console.log('Scaling path coordinates:', {
-        original: {width: originalWidth, height: originalHeight},
-        current: {width: currentWidth, height: currentHeight},
-        scale: {x: scaleX, y: scaleY}
+        original: { width: originalWidth, height: originalHeight },
+        current: { width: currentWidth, height: currentHeight },
+        scale: { x: scaleX, y: scaleY }
     });
 
     const scaledCoords = pathCoords.map(point => ({
@@ -745,9 +745,72 @@ document.addEventListener('DOMContentLoaded', function () {
     const indoorModal = document.getElementById('indoorModal');
     if (indoorModal) {
         indoorModal.addEventListener('hidden.bs.modal', function () {
-            setTimeout(() =>{
-            location.reload();
-            },500)
+            setTimeout(() => {
+                location.reload();
+            }, 500)
         });
     }
 });
+
+// ====== ส่วนที่ 1: แก้ไขฟังก์ชันหลัก openIndoorToRoom() ======
+/**
+ * ฟังก์ชันสำหรับเปิดหน้าจอการนำทางภายในอาคารโดยตรงจากผลการค้นหา
+ * @param {number} buildingId - รหัสอาคารที่ต้องการ
+ * @param {number} floor - ชั้นที่ต้องการ
+ * @param {string} roomId - รหัสของห้องปลายทาง
+ */
+function openIndoorToRoom(buildingId, floor, roomId) {
+    console.log(`Opening indoor navigation for Building ${buildingId}, Floor ${floor}, Room ${roomId}`);
+
+    currentBuildingId = buildingId;
+    currentFloor = floor;
+
+    // เรียกฟังก์ชันที่ถูกแปลงเป็น Promise และใช้ .then()
+    loadRoomsAndShowModal(buildingId, floor)
+        .then(() => {
+            // เมื่อ modal เปิดและข้อมูลห้องโหลดเสร็จแล้ว
+            const select = document.getElementById('destinationSelect');
+            if (select) {
+                // ตั้งค่าค่าใน dropdown ให้ตรงกับ roomId
+                select.value = roomId;
+
+                // เรียกใช้ฟังก์ชัน findPath() เพื่อหาและแสดงเส้นทาง
+                // โดยใช้ setTimeout เล็กน้อยเพื่อให้แน่ใจว่า DOM อัพเดทแล้ว
+                setTimeout(() => {
+                    findPath();
+                }, 300); 
+            }
+        })
+        .catch(error => {
+            console.error('Error in openIndoorToRoom:', error);
+            alert('ไม่สามารถเปิดหน้าการนำทางได้ กรุณาลองใหม่อีกครั้ง');
+        });
+}
+
+// ====== ส่วนที่ 2: แก้ไขฟังก์ชัน loadRoomsAndShowModal() ให้เป็น Promise ======
+// ต้องปรับเปลี่ยน loadRoomsAndShowModal() ให้สามารถรับ Promise ได้
+function loadRoomsAndShowModal(buildingId, floor) {
+    return new Promise((resolve, reject) => {
+        showLoadingIndicator();
+        fetch(`/get_rooms/${buildingId}/${floor}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(rooms => {
+                hideLoadingIndicator();
+                populateRoomSelect(rooms);
+                loadFloorPlan(buildingId, floor);
+                showIndoorModal();
+                resolve(); // แจ้งว่าการทำงานเสร็จสมบูรณ์
+            })
+            .catch(error => {
+                hideLoadingIndicator();
+                console.error('Error loading rooms:', error);
+                alert('ไม่สามารถโหลดข้อมูลห้องได้ กรุณาลองใหม่อีกครั้ง');
+                reject(error); // แจ้งว่าเกิดข้อผิดพลาด
+            });
+    });
+}
