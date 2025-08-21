@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                                 searchInput.value = item.name;
                                 hideResults();
-                                return;
+
                             }
                         });
 

@@ -2,13 +2,10 @@ import heapq
 import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-import csv
 import math
-
 import networkx as nx
 import numpy as np
 import pandas as pd
-from flask import request
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -56,7 +53,7 @@ def create_graph(nodes_df, connections_df):
                     target_coords = target_node[['X', 'Y']].values[0]
 
                     distance = np.sqrt((source_coords[0] - target_coords[0]) ** 2 +
-                                    (source_coords[1] - target_coords[1]) ** 2)
+                                       (source_coords[1] - target_coords[1]) ** 2)
 
                     graph[source].append((target, distance))
                     graph[target].append((source, distance))
@@ -190,6 +187,7 @@ def haversine(lat1, lon1, lat2, lon2):
 def homepage():
     return render_template('homePage.html')
 
+
 @app.route('/index')
 def index():
     return render_template('index.html')
@@ -200,7 +198,7 @@ def indoor():
     _, nodes_df, _, plan_df = load_data()
     rooms = nodes_df[nodes_df['Type'].isin(['Room', 'Toilet'])]['NodeID'].tolist()
     floor_plan = plan_df['ImgPath'].iloc[0] if not plan_df.empty else 'default_plan.png'
-    
+
     if floor_plan.startswith('/'):
         floor_plan = floor_plan[1:]
 
@@ -272,7 +270,6 @@ def get_path():
         return jsonify({'error': f'No path found from {start_node} to {destination}'}), 404
 
 
-
 @app.route('/route', methods=['POST'])
 def route():
     try:
@@ -302,9 +299,9 @@ def route():
                 G.add_edge(node1, node2, weight=dist)
 
         start_node = min(nodes.keys(),
-                        key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0], nodes[node][1]))
+                         key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0], nodes[node][1]))
         end_node = min(nodes.keys(),
-                      key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
+                       key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
 
         if start_node not in G or end_node not in G:
             valid_nodes = [node for node in nodes.keys() if node in G]
@@ -313,12 +310,12 @@ def route():
 
             if start_node not in G:
                 start_node = min(valid_nodes,
-                               key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0],
-                                                        nodes[node][1]))
+                                 key=lambda node: haversine(start_coords[0], start_coords[1], nodes[node][0],
+                                                            nodes[node][1]))
 
             if end_node not in G:
                 end_node = min(valid_nodes,
-                             key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
+                               key=lambda node: haversine(end_coords[0], end_coords[1], nodes[node][0], nodes[node][1]))
 
         def heuristic(n1, n2):
             lat1, lon1 = nodes[n1]
@@ -474,7 +471,7 @@ def search_rooms(nodes_df, query_lower):
                     'id': safe_str_convert(row.get('NodeID')),
                     'name': safe_str_convert(row.get('Detail')),
                     'building_id': building_id,
-                    'building_name': building_name,   # ✅ ส่งชื่ออาคารด้วย
+                    'building_name': building_name,  # ✅ ส่งชื่ออาคารด้วย
                     'floor': safe_int_convert(row.get('floor')),
                     'keywords': parse_keywords(row.get('keyword')),
                     'building_lat': building_lat,
@@ -486,7 +483,6 @@ def search_rooms(nodes_df, query_lower):
                 continue
 
     return results
-
 
 
 def matches_building(row, query_lower):
@@ -545,11 +541,11 @@ def safe_int_convert(value):
         return None
 
 
-
 # ============================= Start Point feedBack=====================
 
 import csv
 from datetime import datetime
+
 
 def save_rating_to_csv(rating, rating_text, file_path='feedback.csv'):
     with open(file_path, mode='a', newline='', encoding='utf-8') as file:
@@ -576,9 +572,6 @@ def submit_rating():
     except Exception as e:
         print("🔥 Error:", str(e))  # จะพิมพ์ใน terminal
         return jsonify({'error': str(e)}), 500
-
-
-
 
 
 if __name__ == '__main__':
