@@ -81,7 +81,7 @@ function watchUserLocation() {
 
                     console.log("ระยะห่างจากจุดหมาย:", distanceToEnd);
 
-                    if (distanceToEnd < 10 && !hasArrived) {
+                    if (distanceToEnd < 30 && !hasArrived) {
                         hasArrived = true;
                         showSuccessModal(); // แสดง modal แจ้งเตือน
                     }
@@ -439,7 +439,7 @@ function startOutdoorNavigation(target) {
 function startArrivalWatcher(target) {
   if (!navigator.geolocation) return;
 
-  const ARRIVAL_RADIUS_M = 30; // กำหนดรัศมีถึงอาคาร
+  const ARRIVAL_RADIUS_M = 1000; // กำหนดรัศมีถึงอาคาร
 
   geoWatchId = navigator.geolocation.watchPosition(
     pos => {
