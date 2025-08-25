@@ -64,31 +64,36 @@ function updateStartMarker(coords) {
 /**
  * ติดตามตำแหน่งของผู้ใช้
  */
+let lastUpdate = 0;
+
 function watchUserLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
             (position) => {
+                const now = Date.now();
+                if (now - lastUpdate < 5000) {
+                    return; // ✅ ยังไม่ครบ 5 วิ ข้ามไป
+                }
+                lastUpdate = now;
+
                 console.log("Got position:", position.coords.latitude, position.coords.longitude);
                 const userCoords = [position.coords.latitude, position.coords.longitude];
                 updateStartMarker(userCoords);
-                // ตรวจสอบระยะห่างจากจุดหมาย
+
                 if (destinationMarker && destinationMarker.getLatLng) {
                     const endLatLng = destinationMarker.getLatLng();
                     const distanceToEnd = calculateDistance(
                         userCoords[0], userCoords[1],
                         endLatLng.lat, endLatLng.lng
                     );
-
                     console.log("ระยะห่างจากจุดหมาย:", distanceToEnd);
 
                     if (distanceToEnd < 30 && !hasArrived) {
                         hasArrived = true;
-                        showSuccessModal(); // แสดง modal แจ้งเตือน
+                        showSuccessModal();
                     }
-
                 }
 
-                // ถ้ามีเส้นทางแสดงอยู่แล้ว ให้คำนวณใหม่
                 if (selectedBuilding && routeLayer) {
                     findRoute();
                 }
@@ -96,12 +101,13 @@ function watchUserLocation() {
             (error) => {
                 console.error("Geolocation error:", error);
             },
-            {enableHighAccuracy: true, timeout: 5000, maximumAge: 3000}
+            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
     } else {
         console.log("Geolocation not supported");
     }
 }
+
 
 function showSuccessModal() {
   const modal = document.querySelector('.success-modal');
@@ -186,6 +192,8 @@ function closeModal() {
 /**
  * ค้นหาเส้นทางไปยังอาคารปลายทาง
  */
+let loadingShownOnce = false;
+
 function findRoute() {
     if (!selectedBuilding) {
         alert("กรุณาเลือกอาคารปลายทาง!");
@@ -197,9 +205,11 @@ function findRoute() {
         return;
     }
 
-    // แสดงตัวบ่งชี้กำลังโหลด
-    loadingIndicator.style.display = 'block';
-    distanceInfo.style.display = 'none';
+    if (!loadingShownOnce) {
+        loadingIndicator.style.display = 'block';
+        distanceInfo.style.display = 'none';
+        loadingShownOnce = true;
+    }
 
     fetch('/route', {
         method: 'POST',

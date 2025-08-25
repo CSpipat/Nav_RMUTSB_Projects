@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.6" generator="openstreetmap-cgimap 2.0.1 (3448755 spike-06.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
- <bounds minlat="13.8670960" minlon="100.4821640" maxlat="13.8692000" maxlon="100.4836230"/>
+<osm version="0.6" generator="openstreetmap-cgimap 2.1.0 (3595347 spike-07.openstreetmap.org)" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">
+ <bounds minlat="13.8671120" minlon="100.4821530" maxlat="13.8691060" maxlon="100.4835700"/>
  <node id="1713952896" visible="true" version="2" changeset="62295837" timestamp="2018-09-05T01:36:36Z" user="udaykiran3" uid="7671560" lat="13.8694746" lon="100.4833440"/>
  <node id="1713969683" visible="true" version="1" changeset="11284320" timestamp="2012-04-13T07:49:00Z" user="Russ McD" uid="346601" lat="13.8680516" lon="100.4832690"/>
  <node id="1713969760" visible="true" version="1" changeset="11284320" timestamp="2012-04-13T07:49:02Z" user="Russ McD" uid="346601" lat="13.8687781" lon="100.4833119"/>
@@ -21,6 +21,17 @@
  <node id="5883208612" visible="true" version="2" changeset="161660485" timestamp="2025-01-23T05:23:47Z" user="Cxqwkkk_" uid="22414081" lat="13.8673674" lon="100.4823140"/>
  <node id="5883208613" visible="true" version="1" changeset="62295837" timestamp="2018-09-05T01:36:32Z" user="udaykiran3" uid="7671560" lat="13.8673433" lon="100.4822257"/>
  <node id="5883208614" visible="true" version="1" changeset="62295837" timestamp="2018-09-05T01:36:32Z" user="udaykiran3" uid="7671560" lat="13.8673253" lon="100.4821467"/>
+ <node id="6403377447" visible="true" version="1" changeset="69192966" timestamp="2019-04-14T04:51:22Z" user="swpk" uid="8958842" lat="13.8682408" lon="100.4821603">
+  <tag k="bench" v="yes"/>
+  <tag k="bus" v="yes"/>
+  <tag k="highway" v="bus_stop"/>
+  <tag k="name" v="มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ"/>
+  <tag k="name:en" v="Rajamangala University of Technology Suvarnabhumi"/>
+  <tag k="name:th" v="มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ"/>
+  <tag k="public_transport" v="platform"/>
+  <tag k="shelter" v="yes"/>
+ </node>
+ <node id="7046044659" visible="true" version="1" changeset="78193630" timestamp="2019-12-10T08:27:29Z" user="swpk" uid="8958842" lat="13.8680944" lon="100.4819844"/>
  <node id="7046044660" visible="true" version="1" changeset="78193630" timestamp="2019-12-10T08:27:29Z" user="swpk" uid="8958842" lat="13.8680944" lon="100.4821532"/>
  <node id="7046044665" visible="true" version="1" changeset="78193630" timestamp="2019-12-10T08:27:29Z" user="swpk" uid="8958842" lat="13.8680658" lon="100.4821539"/>
  <node id="7046044666" visible="true" version="1" changeset="78193630" timestamp="2019-12-10T08:27:29Z" user="swpk" uid="8958842" lat="13.8680663" lon="100.4821739"/>
@@ -118,14 +129,10 @@
  <node id="12525686867" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081" lat="13.8676550" lon="100.4830761"/>
  <node id="12525686868" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081" lat="13.8676570" lon="100.4830375"/>
  <node id="12525686869" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081" lat="13.8676096" lon="100.4830314"/>
- <node id="12525686870" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081" lat="13.8674973" lon="100.4828789">
-  <tag k="entrance" v="yes"/>
-  <tag k="ref" v="ทางเข้าตึก16"/>
- </node>
  <node id="12525686871" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081" lat="13.8677941" lon="100.4828930"/>
- <node id="12525686872" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081" lat="13.8678941" lon="100.4830183">
+ <node id="12525686872" visible="true" version="2" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232" lat="13.8678941" lon="100.4830183">
   <tag k="entrance" v="yes"/>
-  <tag k="ref" v="ทางเข้าตึก 18"/>
+  <tag k="ref" v="ทางเข้าตึก 13"/>
  </node>
  <node id="12525687601" visible="true" version="1" changeset="161660613" timestamp="2025-01-23T05:33:41Z" user="Cxqwkkk_" uid="22414081" lat="13.8673013" lon="100.4823268"/>
  <node id="12525687602" visible="true" version="1" changeset="161660613" timestamp="2025-01-23T05:33:41Z" user="Cxqwkkk_" uid="22414081" lat="13.8671876" lon="100.4823289"/>
@@ -146,6 +153,13 @@
  <node id="12556819544" visible="true" version="1" changeset="162133348" timestamp="2025-02-04T16:33:18Z" user="PipatSUD" uid="22408232" lat="13.8676995" lon="100.4827420"/>
  <node id="12558863226" visible="true" version="1" changeset="162164742" timestamp="2025-02-05T13:05:57Z" user="PipatSUD" uid="22408232" lat="13.8674916" lon="100.4825191"/>
  <node id="12558863227" visible="true" version="1" changeset="162164742" timestamp="2025-02-05T13:05:57Z" user="PipatSUD" uid="22408232" lat="13.8673709" lon="100.4825229"/>
+ <node id="13091984145" visible="true" version="1" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232" lat="13.8674136" lon="100.4828603"/>
+ <node id="13091984146" visible="true" version="1" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232" lat="13.8674155" lon="100.4830357"/>
+ <node id="13091984147" visible="true" version="1" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232" lat="13.8674357" lon="100.4830357">
+  <tag k="door" v="ทางเข้าตึก12"/>
+  <tag k="entrance" v="main"/>
+ </node>
+ <node id="13091984148" visible="true" version="1" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232" lat="13.8674111" lon="100.4827902"/>
  <way id="159295473" visible="true" version="3" changeset="135916759" timestamp="2023-05-10T03:01:52Z" user="Sumittra_GrabTH" uid="18216682">
   <nd ref="1713969683"/>
   <nd ref="1713969760"/>
@@ -185,6 +199,13 @@
   <nd ref="5883208608"/>
   <nd ref="5883208607"/>
   <tag k="highway" v="service"/>
+ </way>
+ <way id="754194087" visible="true" version="1" changeset="78193630" timestamp="2019-12-10T08:27:29Z" user="swpk" uid="8958842">
+  <nd ref="7046044659"/>
+  <nd ref="7046044660"/>
+  <tag k="bridge" v="yes"/>
+  <tag k="highway" v="footway"/>
+  <tag k="layer" v="1"/>
  </way>
  <way id="754194089" visible="true" version="2" changeset="78795455" timestamp="2019-12-24T02:13:50Z" user="swpk" uid="8958842">
   <nd ref="7046044660"/>
@@ -283,7 +304,7 @@
   <nd ref="8058398302"/>
   <tag k="highway" v="service"/>
  </way>
- <way id="1353585715" visible="true" version="4" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081">
+ <way id="1353585715" visible="true" version="5" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232">
   <nd ref="12525396792"/>
   <nd ref="12525686871"/>
   <nd ref="12525396793"/>
@@ -297,7 +318,7 @@
   <nd ref="12525396792"/>
   <tag k="addr:place" v="มหาวิทยาลัยราชมงคลสุวรรณภูมิ ศูนย์ นนทบุรี"/>
   <tag k="building" v="university"/>
-  <tag k="name" v="ตึก 18"/>
+  <tag k="name" v="ตึก 13"/>
  </way>
  <way id="1353588575" visible="true" version="4" changeset="161662564" timestamp="2025-01-23T07:13:14Z" user="Kri_ttt" uid="13669494">
   <nd ref="12525738528"/>
@@ -339,10 +360,10 @@
   <tag k="fast_food" v="cafeteria"/>
   <tag k="name" v="โรงอาหาร"/>
  </way>
- <way id="1353590750" visible="true" version="1" changeset="161660704" timestamp="2025-01-23T05:39:50Z" user="Cxqwkkk_" uid="22414081">
+ <way id="1353590750" visible="true" version="2" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232">
   <nd ref="12525686862"/>
-  <nd ref="12525686870"/>
   <nd ref="12525686863"/>
+  <nd ref="13091984147"/>
   <nd ref="12525686864"/>
   <nd ref="12525686865"/>
   <nd ref="12525686866"/>
@@ -351,9 +372,9 @@
   <nd ref="12525686869"/>
   <nd ref="12525686862"/>
   <tag k="building" v="university"/>
-  <tag k="name" v="ตึก 16"/>
+  <tag k="name" v="ตึก 12"/>
  </way>
- <way id="1353596741" visible="true" version="2" changeset="162133348" timestamp="2025-02-04T16:33:18Z" user="PipatSUD" uid="22408232">
+ <way id="1353596741" visible="true" version="3" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232">
   <nd ref="12525682598"/>
   <nd ref="12525738523"/>
   <nd ref="12525738524"/>
@@ -361,6 +382,7 @@
   <nd ref="12525738525"/>
   <nd ref="12525738527"/>
   <nd ref="12525738526"/>
+  <nd ref="13091984148"/>
   <nd ref="12525682599"/>
   <tag k="highway" v="footway"/>
  </way>
@@ -390,11 +412,6 @@
   <nd ref="12525686872"/>
   <tag k="highway" v="footway"/>
  </way>
- <way id="1353596747" visible="true" version="1" changeset="161661539" timestamp="2025-01-23T06:27:40Z" user="PipatSUD" uid="22408232">
-  <nd ref="12525686870"/>
-  <nd ref="12525738531"/>
-  <tag k="highway" v="footway"/>
- </way>
  <way id="1353596748" visible="true" version="1" changeset="161661539" timestamp="2025-01-23T06:27:40Z" user="PipatSUD" uid="22408232">
   <nd ref="12525419329"/>
   <nd ref="12525738532"/>
@@ -405,7 +422,7 @@
   <nd ref="12525737646"/>
   <tag k="highway" v="footway"/>
  </way>
- <way id="1353602864" visible="true" version="3" changeset="162164742" timestamp="2025-02-05T13:05:57Z" user="PipatSUD" uid="22408232">
+ <way id="1353602864" visible="true" version="4" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232">
   <nd ref="12525419327"/>
   <nd ref="12525419334"/>
   <nd ref="12525419339"/>
@@ -414,6 +431,7 @@
   <nd ref="12525682599"/>
   <nd ref="12525419336"/>
   <nd ref="12525419337"/>
+  <nd ref="13091984145"/>
   <nd ref="12525738531"/>
   <nd ref="12525419338"/>
   <nd ref="12556819543"/>
@@ -439,4 +457,367 @@
   <nd ref="12558863227"/>
   <tag k="highway" v="footway"/>
  </way>
+ <way id="1424335806" visible="true" version="1" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232">
+  <nd ref="13091984145"/>
+  <nd ref="13091984146"/>
+  <nd ref="13091984147"/>
+  <tag k="highway" v="footway"/>
+ </way>
+ <way id="1424335807" visible="true" version="1" changeset="170863823" timestamp="2025-08-23T07:33:02Z" user="PipatSUD" uid="22408232">
+  <nd ref="13091984148"/>
+  <nd ref="13091984145"/>
+  <tag k="highway" v="footway"/>
+ </way>
+ <relation id="9159635" visible="true" version="81" changeset="165492007" timestamp="2025-04-27T07:06:16Z" user="Kri_ttt" uid="13669494">
+  <member type="node" ref="7234595864" role="stop_entry_only"/>
+  <member type="node" ref="7234595863" role="platform_entry_only"/>
+  <member type="node" ref="10599339447" role="stop"/>
+  <member type="node" ref="6398862706" role="platform"/>
+  <member type="node" ref="6416235007" role="stop"/>
+  <member type="node" ref="6390064164" role="platform"/>
+  <member type="node" ref="6654342829" role="stop"/>
+  <member type="node" ref="6654233084" role="platform"/>
+  <member type="node" ref="7021241661" role="stop"/>
+  <member type="node" ref="7015745604" role="platform"/>
+  <member type="node" ref="6579410060" role="platform"/>
+  <member type="node" ref="6654326285" role="stop"/>
+  <member type="node" ref="6322386138" role="platform"/>
+  <member type="node" ref="6654287138" role="stop"/>
+  <member type="node" ref="6162654294" role="platform"/>
+  <member type="node" ref="6654287139" role="stop"/>
+  <member type="node" ref="6579330269" role="platform"/>
+  <member type="node" ref="7021237832" role="stop"/>
+  <member type="node" ref="6741704246" role="platform"/>
+  <member type="node" ref="7234581843" role="stop"/>
+  <member type="node" ref="6741665128" role="platform"/>
+  <member type="node" ref="7234581844" role="stop"/>
+  <member type="node" ref="1094439007" role="platform"/>
+  <member type="node" ref="7234581845" role="stop"/>
+  <member type="node" ref="1517938686" role="platform"/>
+  <member type="node" ref="7234581846" role="stop"/>
+  <member type="node" ref="1094439003" role="platform"/>
+  <member type="node" ref="7234581847" role="stop"/>
+  <member type="node" ref="4505341893" role="platform"/>
+  <member type="node" ref="7234581848" role="stop"/>
+  <member type="node" ref="4505364689" role="platform"/>
+  <member type="node" ref="7234581849" role="stop"/>
+  <member type="node" ref="4505357492" role="platform"/>
+  <member type="node" ref="7234581850" role="stop"/>
+  <member type="node" ref="4505364789" role="platform"/>
+  <member type="node" ref="7234581851" role="stop"/>
+  <member type="node" ref="4505323205" role="platform"/>
+  <member type="node" ref="7234581852" role="stop"/>
+  <member type="node" ref="4505357493" role="platform"/>
+  <member type="node" ref="6849228239" role="stop"/>
+  <member type="node" ref="6203241971" role="platform"/>
+  <member type="node" ref="6849234485" role="stop"/>
+  <member type="node" ref="6203369673" role="platform"/>
+  <member type="node" ref="6849238138" role="stop"/>
+  <member type="node" ref="6846306432" role="platform"/>
+  <member type="node" ref="6849238139" role="stop"/>
+  <member type="node" ref="6846299083" role="platform"/>
+  <member type="node" ref="6403336721" role="stop"/>
+  <member type="node" ref="6403336722" role="platform"/>
+  <member type="node" ref="6403377448" role="stop"/>
+  <member type="node" ref="6403377447" role="platform"/>
+  <member type="node" ref="6653190228" role="stop"/>
+  <member type="node" ref="6170023732" role="platform"/>
+  <member type="node" ref="6849238140" role="stop"/>
+  <member type="node" ref="6844538558" role="platform"/>
+  <member type="node" ref="7021198084" role="stop"/>
+  <member type="node" ref="6842546252" role="platform"/>
+  <member type="node" ref="6420742624" role="stop_exit_only"/>
+  <member type="node" ref="6399709007" role="platform_exit_only"/>
+  <member type="way" ref="682095199" role=""/>
+  <member type="way" ref="324162415" role=""/>
+  <member type="way" ref="33074673" role=""/>
+  <member type="way" ref="300803480" role=""/>
+  <member type="way" ref="658691763" role=""/>
+  <member type="way" ref="658691765" role=""/>
+  <member type="way" ref="934540175" role=""/>
+  <member type="way" ref="933771712" role=""/>
+  <member type="way" ref="933771707" role=""/>
+  <member type="way" ref="355765691" role=""/>
+  <member type="way" ref="155339882" role=""/>
+  <member type="way" ref="300803455" role=""/>
+  <member type="way" ref="1227359679" role=""/>
+  <member type="way" ref="300803511" role=""/>
+  <member type="way" ref="1121723903" role=""/>
+  <member type="way" ref="750996768" role=""/>
+  <member type="way" ref="300803515" role=""/>
+  <member type="way" ref="752173105" role=""/>
+  <member type="way" ref="300803516" role=""/>
+  <member type="way" ref="230335373" role=""/>
+  <member type="way" ref="954799116" role=""/>
+  <member type="way" ref="948919833" role=""/>
+  <member type="way" ref="954799114" role=""/>
+  <member type="way" ref="948919831" role=""/>
+  <member type="way" ref="948919832" role=""/>
+  <member type="way" ref="95079247" role=""/>
+  <member type="way" ref="1120094243" role=""/>
+  <member type="way" ref="622194951" role=""/>
+  <member type="way" ref="746280827" role=""/>
+  <member type="way" ref="960005648" role=""/>
+  <member type="way" ref="731241518" role=""/>
+  <member type="way" ref="622194948" role=""/>
+  <member type="way" ref="1120094244" role=""/>
+  <member type="way" ref="1128190986" role=""/>
+  <member type="way" ref="908677529" role=""/>
+  <member type="way" ref="155339891" role=""/>
+  <member type="way" ref="908677528" role=""/>
+  <member type="way" ref="730968984" role=""/>
+  <member type="way" ref="622527649" role=""/>
+  <member type="way" ref="622527645" role=""/>
+  <member type="way" ref="152017886" role=""/>
+  <member type="way" ref="178807890" role=""/>
+  <member type="way" ref="178807889" role=""/>
+  <member type="way" ref="155339879" role=""/>
+  <member type="way" ref="877741880" role=""/>
+  <member type="way" ref="155339867" role=""/>
+  <member type="way" ref="155339862" role=""/>
+  <member type="way" ref="750995804" role=""/>
+  <member type="way" ref="750995805" role=""/>
+  <member type="way" ref="324162408" role=""/>
+  <member type="way" ref="155339869" role=""/>
+  <member type="way" ref="155339880" role=""/>
+  <member type="way" ref="731240904" role=""/>
+  <tag k="colour" v="#3cbbf2"/>
+  <tag k="interval" v="00:07"/>
+  <tag k="name" v="1-CCW วงกลม นนทบุรี - สนามบินน้ำ (วนซ้าย)"/>
+  <tag k="name:en" v="1-CCW Circle route Nonthaburi - Sanambin Nam (Left loop)"/>
+  <tag k="name:th" v="1-CCW วงกลม นนทบุรี - สนามบินน้ำ (วนซ้าย)"/>
+  <tag k="opening_hours" v="Mo-Su 05:30-20:00"/>
+  <tag k="operator" v="บริษัท สนามบินน้ำ จำกัด"/>
+  <tag k="public_transport:version" v="2"/>
+  <tag k="ref" v="1"/>
+  <tag k="route" v="bus"/>
+  <tag k="type" v="route"/>
+ </relation>
+ <relation id="9160023" visible="true" version="4" changeset="77180197" timestamp="2019-11-17T04:42:30Z" user="swpk" uid="8958842">
+  <member type="relation" ref="9159675" role=""/>
+  <member type="relation" ref="9159635" role=""/>
+  <tag k="name" v="1 Circle route Nonthaburi - Sanambin Nam Route Master"/>
+  <tag k="operator" v="บริษัท สนามบินน้ำ จำกัด"/>
+  <tag k="ref" v="1"/>
+  <tag k="route_master" v="bus"/>
+  <tag k="type" v="route_master"/>
+ </relation>
+ <relation id="9465463" visible="true" version="74" changeset="164468656" timestamp="2025-04-03T14:42:52Z" user="Kri_ttt" uid="13669494">
+  <member type="node" ref="6376031712" role="stop"/>
+  <member type="node" ref="2184393450" role="stop"/>
+  <member type="node" ref="1971354187" role="stop"/>
+  <member type="node" ref="1388399020" role="stop"/>
+  <member type="node" ref="1517938681" role="stop"/>
+  <member type="node" ref="4505337590" role="stop"/>
+  <member type="node" ref="5480820822" role="stop"/>
+  <member type="node" ref="6167683266" role="stop"/>
+  <member type="node" ref="6162660121" role="stop"/>
+  <member type="node" ref="1517938662" role="platform"/>
+  <member type="node" ref="6169989734" role="stop"/>
+  <member type="node" ref="6416335926" role="stop"/>
+  <member type="node" ref="6416335925" role="platform"/>
+  <member type="node" ref="6403336721" role="stop"/>
+  <member type="node" ref="6403336722" role="platform"/>
+  <member type="node" ref="6403377448" role="stop"/>
+  <member type="node" ref="6403377447" role="platform"/>
+  <member type="node" ref="6653190228" role="stop"/>
+  <member type="node" ref="6170023732" role="platform"/>
+  <member type="node" ref="6420742624" role="stop"/>
+  <member type="node" ref="6399709007" role="platform"/>
+  <member type="node" ref="6388595805" role="stop_exit_only"/>
+  <member type="node" ref="6399709006" role="platform_exit_only"/>
+  <member type="way" ref="682197224" role=""/>
+  <member type="way" ref="893207533" role=""/>
+  <member type="way" ref="893207532" role=""/>
+  <member type="way" ref="230335357" role=""/>
+  <member type="way" ref="1192564421" role=""/>
+  <member type="way" ref="1192564422" role=""/>
+  <member type="way" ref="200337231" role=""/>
+  <member type="way" ref="1192565122" role=""/>
+  <member type="way" ref="1192565121" role=""/>
+  <member type="way" ref="814758430" role=""/>
+  <member type="way" ref="117109912" role=""/>
+  <member type="way" ref="117109916" role=""/>
+  <member type="way" ref="814758431" role=""/>
+  <member type="way" ref="168739106" role=""/>
+  <member type="way" ref="168739105" role=""/>
+  <member type="way" ref="893207531" role=""/>
+  <member type="way" ref="893207530" role=""/>
+  <member type="way" ref="141204727" role=""/>
+  <member type="way" ref="200499032" role=""/>
+  <member type="way" ref="230335360" role=""/>
+  <member type="way" ref="117108759" role=""/>
+  <member type="way" ref="155607258" role=""/>
+  <member type="way" ref="1047147554" role=""/>
+  <member type="way" ref="1026067476" role=""/>
+  <member type="way" ref="141208545" role=""/>
+  <member type="way" ref="207797195" role=""/>
+  <member type="way" ref="155607288" role=""/>
+  <member type="way" ref="1194309869" role=""/>
+  <member type="way" ref="1062085561" role=""/>
+  <member type="way" ref="124809696" role=""/>
+  <member type="way" ref="124809673" role=""/>
+  <member type="way" ref="230335354" role=""/>
+  <member type="way" ref="1047147553" role=""/>
+  <member type="way" ref="1055907231" role=""/>
+  <member type="way" ref="246153006" role=""/>
+  <member type="way" ref="1055943373" role=""/>
+  <member type="way" ref="300803439" role=""/>
+  <member type="way" ref="168739080" role=""/>
+  <member type="way" ref="1243926988" role=""/>
+  <member type="way" ref="230328189" role=""/>
+  <member type="way" ref="156319979" role=""/>
+  <member type="way" ref="124874069" role=""/>
+  <member type="way" ref="1192377924" role=""/>
+  <member type="way" ref="1192377925" role=""/>
+  <member type="way" ref="175282256" role=""/>
+  <member type="way" ref="238733639" role=""/>
+  <member type="way" ref="124874068" role=""/>
+  <member type="way" ref="156319976" role=""/>
+  <member type="way" ref="300803436" role=""/>
+  <member type="way" ref="168739075" role=""/>
+  <member type="way" ref="300803437" role=""/>
+  <member type="way" ref="168739087" role=""/>
+  <member type="way" ref="1104449419" role=""/>
+  <member type="way" ref="616844012" role=""/>
+  <member type="way" ref="616844011" role=""/>
+  <member type="way" ref="258891484" role=""/>
+  <member type="way" ref="258891485" role=""/>
+  <member type="way" ref="258891483" role=""/>
+  <member type="way" ref="1192369407" role=""/>
+  <member type="way" ref="124812304" role=""/>
+  <member type="way" ref="230335362" role=""/>
+  <member type="way" ref="199988157" role=""/>
+  <member type="way" ref="199988156" role=""/>
+  <member type="way" ref="152933567" role=""/>
+  <member type="way" ref="1081549332" role=""/>
+  <member type="way" ref="617537909" role=""/>
+  <member type="way" ref="194755462" role=""/>
+  <member type="way" ref="151682722" role=""/>
+  <member type="way" ref="1177508134" role=""/>
+  <member type="way" ref="194755461" role=""/>
+  <member type="way" ref="151682723" role=""/>
+  <member type="way" ref="230335374" role=""/>
+  <member type="way" ref="300825129" role=""/>
+  <member type="way" ref="948919835" role=""/>
+  <member type="way" ref="948919834" role=""/>
+  <member type="way" ref="954799115" role=""/>
+  <member type="way" ref="300803514" role=""/>
+  <member type="way" ref="1050570871" role=""/>
+  <member type="way" ref="155339884" role=""/>
+  <member type="way" ref="300803499" role=""/>
+  <member type="way" ref="750671275" role=""/>
+  <member type="way" ref="720870692" role=""/>
+  <member type="way" ref="618144714" role=""/>
+  <member type="way" ref="618144713" role=""/>
+  <member type="way" ref="155339887" role=""/>
+  <member type="way" ref="675580125" role=""/>
+  <member type="way" ref="750669465" role=""/>
+  <member type="way" ref="675580124" role=""/>
+  <member type="way" ref="675579768" role=""/>
+  <member type="way" ref="750669466" role=""/>
+  <member type="way" ref="1106535242" role=""/>
+  <member type="way" ref="95079253" role=""/>
+  <member type="way" ref="155339879" role=""/>
+  <member type="way" ref="877741880" role=""/>
+  <member type="way" ref="155339867" role=""/>
+  <member type="way" ref="155339862" role=""/>
+  <member type="way" ref="750995804" role=""/>
+  <member type="way" ref="750995805" role=""/>
+  <member type="way" ref="324162408" role=""/>
+  <member type="way" ref="155339869" role=""/>
+  <member type="way" ref="155339880" role=""/>
+  <member type="way" ref="731240904" role=""/>
+  <tag k="colour" v="#3cbbf2"/>
+  <tag k="from" v="Wat Sali Kho Phitaram"/>
+  <tag k="interval" v="00:13"/>
+  <tag k="name" v="1053 วัดสาลีโขภิตาราม → นนทบุรี"/>
+  <tag k="name:en" v="1053 Wat Sali Kho Phitaram → Nonthaburi"/>
+  <tag k="name:th" v="1053 วัดสาลีโขภิตาราม → นนทบุรี"/>
+  <tag k="opening_hours" v="Mo-Su 05:30-20:00"/>
+  <tag k="operator" v="บริษัท สนามบินน้ำ จำกัด"/>
+  <tag k="public_transport:version" v="2"/>
+  <tag k="ref" v="1053"/>
+  <tag k="route" v="bus"/>
+  <tag k="to" v="Nonthaburi Pier"/>
+  <tag k="type" v="route"/>
+ </relation>
+ <relation id="9465582" visible="true" version="3" changeset="72719189" timestamp="2019-07-27T15:26:14Z" user="swpk" uid="8958842">
+  <member type="relation" ref="3088610" role=""/>
+  <member type="relation" ref="9465463" role=""/>
+  <tag k="name" v="1053 Nonthaburi-Wat Sali Kho Phitaram Route Master"/>
+  <tag k="ref" v="1053"/>
+  <tag k="route_master" v="bus"/>
+  <tag k="type" v="route_master"/>
+ </relation>
+ <relation id="10111137" visible="true" version="18" changeset="161817296" timestamp="2025-01-27T12:55:21Z" user="Russ McD" uid="346601">
+  <member type="node" ref="6849228239" role="stop_entry_only"/>
+  <member type="node" ref="6203241971" role="platform_entry_only"/>
+  <member type="node" ref="6849234485" role="stop"/>
+  <member type="node" ref="6203369673" role="platform"/>
+  <member type="node" ref="6849238138" role="stop"/>
+  <member type="node" ref="6846306432" role="platform"/>
+  <member type="node" ref="6849238139" role="stop"/>
+  <member type="node" ref="6846299083" role="platform"/>
+  <member type="node" ref="6403336721" role="stop"/>
+  <member type="node" ref="6403336722" role="platform"/>
+  <member type="node" ref="6403377448" role="stop"/>
+  <member type="node" ref="6403377447" role="platform"/>
+  <member type="node" ref="6653190228" role="stop"/>
+  <member type="node" ref="6170023732" role="platform"/>
+  <member type="node" ref="6849238140" role="stop"/>
+  <member type="node" ref="6844538558" role="platform"/>
+  <member type="node" ref="6420742624" role="stop_exit_only"/>
+  <member type="node" ref="6399709007" role="platform_exit_only"/>
+  <member type="node" ref="7708856922" role="marker"/>
+  <member type="way" ref="746280827" role=""/>
+  <member type="way" ref="960005648" role=""/>
+  <member type="way" ref="731241518" role=""/>
+  <member type="way" ref="622194948" role=""/>
+  <member type="way" ref="1120094244" role=""/>
+  <member type="way" ref="1128190986" role=""/>
+  <member type="way" ref="908677529" role=""/>
+  <member type="way" ref="155339891" role=""/>
+  <member type="way" ref="908677528" role=""/>
+  <member type="way" ref="730968984" role=""/>
+  <member type="way" ref="622527649" role=""/>
+  <member type="way" ref="622527645" role=""/>
+  <member type="way" ref="152017886" role=""/>
+  <member type="way" ref="178807890" role=""/>
+  <member type="way" ref="178807889" role=""/>
+  <member type="way" ref="155339879" role=""/>
+  <member type="way" ref="877741880" role=""/>
+  <member type="way" ref="155339867" role=""/>
+  <member type="way" ref="155339862" role=""/>
+  <member type="way" ref="750995804" role=""/>
+  <member type="way" ref="750995805" role=""/>
+  <member type="way" ref="324162408" role=""/>
+  <member type="way" ref="155339869" role=""/>
+  <member type="way" ref="155339880" role=""/>
+  <member type="way" ref="731240904" role=""/>
+  <tag k="colour" v="#3cbbf2"/>
+  <tag k="from" v="Wat Chomphu Wek"/>
+  <tag k="interval" v="00:05"/>
+  <tag k="name" v="1 (รถกะป๊อ) วัดชมภูเวก → นนทบุรี"/>
+  <tag k="name:en" v="1 (Kei truck) Wat Chomphu Wek → Nonthaburi"/>
+  <tag k="name:th" v="1 (รถกะป๊อ) วัดชมภูเวก → นนทบุรี"/>
+  <tag k="opening_hours" v="Mo-Su 05:00-21:00"/>
+  <tag k="operator" v="บริษัท สนามบินน้ำ จำกัด"/>
+  <tag k="public_transport:version" v="2"/>
+  <tag k="ref" v="1Kei"/>
+  <tag k="route" v="bus"/>
+  <tag k="to" v="Soi Nonthaburi 2/1"/>
+  <tag k="type" v="route"/>
+ </relation>
+ <relation id="10111151" visible="true" version="1" changeset="75260303" timestamp="2019-10-04T05:04:58Z" user="swpk" uid="8958842">
+  <member type="relation" ref="10111136" role=""/>
+  <member type="relation" ref="10111137" role=""/>
+  <tag k="name" v="1 (เสริม) นนทบุรี-วัดชมภูเวก Route Master"/>
+  <tag k="name:en" v="1 (Supplementary bus) Nonthaburi-Wat Chomphu Wek Route Master"/>
+  <tag k="name:th" v="1 (เสริม) นนทบุรี-วัดชมภูเวก Route Master"/>
+  <tag k="operator" v="บริษัท สนามบินน้ำ จำกัด"/>
+  <tag k="ref" v="1SUPP"/>
+  <tag k="route_master" v="bus"/>
+  <tag k="type" v="route_master"/>
+ </relation>
 </osm>
