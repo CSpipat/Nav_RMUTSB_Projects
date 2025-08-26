@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     const menuButton = document.getElementById('menuButton');
     const sideMenu = document.getElementById('sideMenu');
-    const overlay = document.getElementById('overlay');
+    // const overlay = document.getElementById('overlay');
     const buildingMenus = document.querySelectorAll('.building-menu');
     let isMenuOpen = false;
 
     function openMainMenu() {
         sideMenu.classList.add('active');
         menuButton.classList.add('active');
-        overlay.classList.add('active');
+        // overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         isMenuOpen = true;
     }
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function closeMainMenu() {
         sideMenu.classList.remove('active');
         menuButton.classList.remove('active');
-        overlay.classList.remove('active');
+        // overlay.classList.remove('active');
         document.body.style.overflow = '';
         isMenuOpen = false;
         closeAllBuildingMenus();
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleMainMenu();
     });
 
-    overlay?.addEventListener('click', closeMainMenu);
+    // overlay?.addEventListener('click', closeMainMenu);
 
     buildingMenus.forEach(menu => {
         menu.querySelector('.building-menu-header')?.addEventListener('click', e => {
