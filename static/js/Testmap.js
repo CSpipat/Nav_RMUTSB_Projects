@@ -449,7 +449,7 @@ function startOutdoorNavigation(target) {
 function startArrivalWatcher(target) {
   if (!navigator.geolocation) return;
 
-  const ARRIVAL_RADIUS_M = 1000; // กำหนดรัศมีถึงอาคาร
+  const ARRIVAL_RADIUS_M = 30; // กำหนดรัศมีถึงอาคาร
 
   geoWatchId = navigator.geolocation.watchPosition(
     pos => {
