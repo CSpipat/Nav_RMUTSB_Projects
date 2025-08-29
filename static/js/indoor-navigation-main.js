@@ -70,6 +70,7 @@ function updateDropdownMenus() {
 }
 
 // Update side menu items to include indoor navigation
+// อัปเดตฟังก์ชัน updateSideMenus()
 function updateSideMenus() {
     const sideMenuItems = document.querySelectorAll('.side-menu .dropdown-item[data-building][data-floor]');
     sideMenuItems.forEach(item => {
@@ -78,14 +79,19 @@ function updateSideMenus() {
         item.onclick = (e) => {
             e.preventDefault();
             openIndoorNavigation(buildingId, floor);
-            // Close side menu
-            const sideMenu = document.getElementById('sideMenu');
-            if (sideMenu) {
-                sideMenu.style.transform = 'translateX(-100%)';
-            }
+
+            // ปิด Side Menu ด้วยฟังก์ชันที่ถูกต้อง
+            // ใช้ setTimeout เพื่อให้แน่ใจว่าการคลิกเสร็จสมบูรณ์แล้ว
+            setTimeout(() => {
+                if (window.SlideMenu && window.SlideMenu.isOpen()) {
+                    window.SlideMenu.close();
+                }
+            }, 100);
         };
     });
 }
+
+
 
 // Main function to open indoor navigation
 function openIndoorNavigation(buildingId, floor) {
@@ -119,6 +125,10 @@ function closeAllModals() {
     const backdrop = document.getElementById('modal-backdrop');
     if (backdrop) {
         backdrop.style.display = 'none';
+    }
+
+    if (window.SlideMenu && window.SlideMenu.isOpen()) {
+        window.SlideMenu.close();
     }
 }
 
@@ -737,18 +747,6 @@ window.addEventListener('resize', function () {
 window.addEventListener('beforeunload', () => {
     if (animationId) {
         cancelAnimationFrame(animationId);
-    }
-});
-
-// ดักจับ event ปิด modal แล้ว reload
-document.addEventListener('DOMContentLoaded', function () {
-    const indoorModal = document.getElementById('indoorModal');
-    if (indoorModal) {
-        indoorModal.addEventListener('hidden.bs.modal', function () {
-            setTimeout(() => {
-                location.reload();
-            }, 500)
-        });
     }
 });
 
