@@ -191,6 +191,31 @@ function closeAllModals() {
     window.SlideMenu.close();
   }
 }
+function populateStartSelect(rooms, buildingId, floor) {
+  const select = document.getElementById('startSelect');
+  if (!select) return;
+
+  // เคลียร์
+  select.innerHTML = '';
+
+  // ตัวเลือกดีฟอลต์: ปล่อย value ว่าง เพื่อให้ backend auto-pick ลิฟต์ของชั้นนี้
+  const optDefault = document.createElement('option');
+  optDefault.value = '';
+  optDefault.textContent = `⬆️ ลิฟต์ชั้นนี้ (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
+  select.appendChild(optDefault);
+
+  // (ตัวเลือกเสริม) เติม node/ห้องบนชั้นนี้ให้เลือกเป็น start ได้
+  rooms.forEach(room => {
+    const option = document.createElement('option');
+    option.value = room.NodeID;
+    option.textContent = room.Detail;
+    select.appendChild(option);
+  });
+
+  // ตั้งค่าเริ่มต้น = ลิฟต์ชั้นนี้ (ปล่อยให้ backend เลือก NodeID จริง)
+  select.value = '';
+}
+
 
 // ===== Promise version ONLY (clean) =====
 function loadRoomsAndShowModal(buildingId, floor) {
@@ -203,6 +228,7 @@ function loadRoomsAndShowModal(buildingId, floor) {
       })
       .then(rooms => {
         hideLoadingIndicator();
+        populateStartSelect(rooms, buildingId, floor);  // ⬅️ เพิ่มบรรทัดนี้
         populateRoomSelect(rooms);
         loadFloorPlan(buildingId, floor);
         showIndoorModal();
@@ -216,6 +242,7 @@ function loadRoomsAndShowModal(buildingId, floor) {
       });
   });
 }
+
 
 // Populate room selection dropdown
 function populateRoomSelect(rooms) {
@@ -354,6 +381,8 @@ function setupCanvas() {
 // Find path to selected destination
 function findPath() {
   const destination = document.getElementById('destinationSelect').value;
+  const start = document.getElementById('startSelect') ? document.getElementById('startSelect').value : '';
+
   if (!destination) return;
 
   showLoadingIndicator();
@@ -363,6 +392,7 @@ function findPath() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      start: start || null,                  // ⬅️ เพิ่ม
       destination: destination,
       building_id: currentBuildingId,
       floor: currentFloor
@@ -372,24 +402,10 @@ function findPath() {
     if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
     return response.json();
   })
-  .then(data => handlePathData(data))
-  .catch(err => handleError(err, 'findPath'));
+  .then(data => window.handlePathData(data))
+  .catch(err => window.handleError(err, 'findPath'));
 }
 
-// Handle path data response
-function handlePathData(data) {
-  hideLoadingIndicator();
-  console.log('Path data received:', data);
-
-  if (data.path && data.path.length > 0) {
-    const scaledPath = scalePathToImageSize(data.path, data.img_width, data.img_height);
-    startGoogleMapsAnimation(scaledPath);
-    updatePathInfo(data.nodes || [], scaledPath);
-  } else {
-    document.getElementById('pathInfo').innerHTML =
-      '<h3>ข้อมูลเส้นทาง</h3><p class="error">ไม่พบเส้นทางไปยังห้องที่เลือก</p>';
-  }
-}
 
 // Enhanced clear path function
 function clearPath() {
@@ -693,3 +709,42 @@ function openIndoorToRoom(buildingId, floor, roomId) {
       alert('ไม่สามารถเปิดหน้าการนำทางได้ กรุณาลองใหม่อีกครั้ง');
     });
 }
+
+function handleError(err, where = '') {
+  hideLoadingIndicator();
+  console.error('Error at', where, err);
+  alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+}
+
+function onStartChange() {
+  const destination = document.getElementById('destinationSelect').value;
+  if (destination) {
+    setTimeout(() => {
+      setupCanvas();
+      findPath();
+    }, 100);
+  }
+}
+
+// === Global-safe helpers ===
+window.handleError = window.handleError || function(err, where = '') {
+  hideLoadingIndicator();
+  console.error('Error at', where, err);
+  alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+};
+
+window.handlePathData = window.handlePathData || function(data) {
+  hideLoadingIndicator();
+  console.log('Path data received:', data);
+
+  if (data && data.path && data.path.length > 0) {
+    const scaledPath = scalePathToImageSize(data.path, data.img_width, data.img_height);
+    startGoogleMapsAnimation(scaledPath);
+    updatePathInfo(data.nodes || [], scaledPath);
+  } else {
+    document.getElementById('pathInfo').innerHTML =
+      '<h3>ข้อมูลเส้นทาง</h3><p class="error">ไม่พบเส้นทางไปยังห้องที่เลือก</p>';
+  }
+};
+
+

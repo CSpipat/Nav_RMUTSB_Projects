@@ -182,31 +182,28 @@ def haversine(lat1, lon1, lat2, lon2):
 
     return R * c
 
-def pick_elevator_for_destination_floor(nodes_df, destination_node_id: str) -> str | None:
-    """เลือก NodeID ของลิฟต์ที่อยู่ 'ชั้นเดียวกัน' และ 'อาคารเดียวกัน' กับปลายทาง"""
-    dest_row = nodes_df.loc[nodes_df['NodeID'] == destination_node_id]
-    if dest_row.empty:
-        return None
+def pick_elevator_for_floor(nodes_df, building_id, floor):
+    try:
+        b = int(building_id) if building_id is not None else None
+        f = int(floor) if floor is not None else None
+    except ValueError:
+        b = building_id
+        f = floor
 
-    dest_floor = int(dest_row.iloc[0]['floor'])
-    dest_building = int(dest_row.iloc[0]['B_ID'])
-
-    # ลิฟต์ที่อยู่ชั้นเดียวกันและอาคารเดียวกัน
     cand = nodes_df[
         (nodes_df['Type'] == 'Elevator') &
-        (nodes_df['floor'] == dest_floor) &
-        (nodes_df['B_ID'] == dest_building)
+        (nodes_df['B_ID'] == b) &
+        (nodes_df['floor'] == f)
     ]
-
-    if not cand.empty:
-        return cand.iloc[0]['NodeID']  # เจอลิฟต์ตรงชั้น → ใช้ตัวแรก
-
-    # Fallback 1: ลิฟต์ไหนก็ได้ในอาคารเดียวกัน (เผื่อข้อมูลไม่ครบ)
-    cand = nodes_df[(nodes_df['Type'] == 'Elevator') & (nodes_df['B_ID'] == dest_building)]
     if not cand.empty:
         return cand.iloc[0]['NodeID']
 
-    # Fallback 2: ลิฟต์อะไรก็ได้
+    # เผื่อไม่มีข้อมูลครบ: หาในอาคารเดียวกันก่อน
+    cand = nodes_df[(nodes_df['Type'] == 'Elevator') & (nodes_df['B_ID'] == b)]
+    if not cand.empty:
+        return cand.iloc[0]['NodeID']
+
+    # สุดท้าย: ลิฟต์อะไรก็ได้
     cand = nodes_df[nodes_df['Type'] == 'Elevator']
     if not cand.empty:
         return cand.iloc[0]['NodeID']
@@ -226,18 +223,26 @@ def index():
 
 @app.route('/find_path', methods=['POST'])
 def get_path():
-    destination = request.json.get('destination')
+    payload = request.get_json(force=True) or {}
+    destination = payload.get('destination')
+    start = payload.get('start') or None
+    building_id = payload.get('building_id')
+    floor = payload.get('floor')
+
     if not destination:
         return jsonify({'error': 'No destination provided'}), 400
 
     _, nodes_df, connections_df, plan_df = load_data()
 
-    # 🔑 เลือก start_node = ลิฟต์ของ 'ชั้นปลายทาง'
-    start_node = pick_elevator_for_destination_floor(nodes_df, destination)
-    if not start_node:
-        return jsonify({'error': 'No elevator node found to start from'}), 404
+    # ถ้าไม่ส่ง start มา → ดีฟอลต์เป็นลิฟต์ของชั้นที่ผู้ใช้กำลังดู
+    if not start:
+        start_node = pick_elevator_for_floor(nodes_df, building_id, floor)
+        # (ทางเลือก) ถ้าอยาก fallback ไปใช้ลิฟต์ของ "ชั้นปลายทาง" ให้ใช้ฟังก์ชันเดิมของคุณ
+        # if not start_node:
+        #     start_node = pick_elevator_for_destination_floor(nodes_df, destination)
+    else:
+        start_node = start
 
-    # (ถ้าต้องการบังคับให้เดินบนชั้นปลายทางเท่านั้น แนะนำฟิลเตอร์ nodes/edges ตามคอมเมนต์ด้านล่าง)
     graph = create_graph(nodes_df, connections_df)
 
     if start_node not in graph:
@@ -246,29 +251,24 @@ def get_path():
         return jsonify({'error': f'Destination node {destination} not found in graph'}), 404
 
     path = find_shortest_path(graph, start_node, destination, nodes_df)
-
     if not path:
         return jsonify({'error': f'No path found from {start_node} to {destination}'}), 404
 
+    # แปลง path → จุดบนภาพ + รายละเอียด
     path_coords, img_width, img_height = get_path_coordinates_and_image_size(nodes_df, path, plan_df)
 
-    # แม็พ NodeID -> Detail
-    path_details = []
-    for node_id in path:
-        row = nodes_df[nodes_df['NodeID'] == node_id]
-        if not row.empty:
-            path_details.append({
-                "node_id": node_id,
-                "detail": str(row.iloc[0]['Detail']) if 'Detail' in row else node_id
-            })
-        else:
-            path_details.append({"node_id": node_id, "detail": node_id})
+    def detail_for(nid):
+        row = nodes_df[nodes_df['NodeID'] == nid]
+        return str(row.iloc[0]['Detail']) if (not row.empty and 'Detail' in row) else nid
 
     result = {
         'path': path_coords,
-        'nodes': path_details,
+        'nodes': [{'node_id': nid, 'detail': detail_for(nid)} for nid in path],
         'img_width': img_width,
-        'img_height': img_height
+        'img_height': img_height,
+        'start_node': start_node,
+        'start_detail': detail_for(start_node),
+        'destination_detail': detail_for(destination),
     }
 
     return app.response_class(
@@ -276,6 +276,7 @@ def get_path():
         status=200,
         mimetype='application/json'
     )
+
 
 @app.route('/route', methods=['POST'])
 def route():
