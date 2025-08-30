@@ -512,38 +512,41 @@
 
 
   <!-- Navigation Modal -->
-  <div class="modal fade" id="indoorModal" tabindex="-1" aria-labelledby="indoorModalLabel">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="indoorModalLabel">🗺️ แผนผังตึก</h2>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="ปิดหน้าต่าง"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="destinationSelect" class="form-label">เลือกห้องปลายทาง</label>
-            <select id="destinationSelect" class="form-select" onchange="onDestinationChange()"
-              aria-label="เลือกห้องที่ต้องการไป">
-              <option value="">🎯 เลือกห้องที่ต้องการไป</option>
-            </select>
-          </div>
+ <!-- Modal Root -->
+<div id="indoorModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="indoorModalLabel" hidden>
+  <!-- Backdrop -->
+  <div class="app-modal__backdrop" data-close="true" aria-hidden="true"></div>
 
-          <div class="navigation-container" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
-            <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
-            <canvas id="pathCanvas" aria-hidden="true"></canvas>
-          </div>
+  <!-- Dialog -->
+  <div class="app-modal__dialog" role="document" aria-describedby="indoorModalDesc">
+    <header class="app-modal__header">
+      <h2 class="app-modal__title" id="indoorModalLabel">🗺️ แผนผังตึก</h2>
+      <button type="button" class="app-modal__close" data-close="true" aria-label="ปิดหน้าต่าง">×</button>
+    </header>
 
-          <!-- <div id="distanceIndicator" class="distance-indicator" style="display: none;" aria-live="polite"></div> -->
+    <div class="app-modal__body" id="indoorModalDesc">
+      <div class="mb-3">
+        <label for="destinationSelect" class="form-label">เลือกห้องปลายทาง</label>
+        <select id="destinationSelect" class="form-select" onchange="onDestinationChange()" aria-label="เลือกห้องที่ต้องการไป">
+          <option value="">🎯 เลือกห้องที่ต้องการไป</option>
+        </select>
+      </div>
 
-          <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
-          <div id="loadingIndicator" style="display: none;" class="text-center" role="status" aria-live="polite">
-            <div class="loading-animation" aria-hidden="true"></div>
-            <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
-          </div>
-        </div>
+      <div class="navigation-container" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
+        <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
+        <canvas id="pathCanvas" aria-hidden="true"></canvas>
+      </div>
+
+      <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
+
+      <div id="loadingIndicator" class="text-center" role="status" aria-live="polite" hidden>
+        <div class="loading-animation" aria-hidden="true"></div>
+        <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
       </div>
     </div>
   </div>
+</div>
+
 
 
   <div class="success-modal hidden">
