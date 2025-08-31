@@ -1305,7 +1305,7 @@ body {
             /* สำหรับ animation */
             max-height: 0;
             opacity: 0;
-            overflow: hidden;
+            overflow: scroll;
             transition: max-height 1s ease, opacity 1s ease;
         }
 
