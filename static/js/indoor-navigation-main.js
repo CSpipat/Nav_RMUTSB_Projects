@@ -221,27 +221,52 @@ function populateStartSelect(rooms, buildingId, floor) {
 function loadRoomsAndShowModal(buildingId, floor) {
   return new Promise((resolve, reject) => {
     showLoadingIndicator();
-    fetch(`/get_rooms/${buildingId}/${floor}`)
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.json();
-      })
-      .then(rooms => {
-        hideLoadingIndicator();
-        populateStartSelect(rooms, buildingId, floor);  // ⬅️ เพิ่มบรรทัดนี้
-        populateRoomSelect(rooms);
-        loadFloorPlan(buildingId, floor);
+    // 1) ดึงห้องทุกชั้น เพื่อลิสต์ปลายทางแบบข้ามชั้นได้
+    fetch(`/get_rooms_all_floors/${buildingId}`)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(allByFloor => {
+        // สร้าง index NodeID -> {floor, detail}
+        allRoomsIndex = {};
+        Object.keys(allByFloor).forEach(fl => {
+          allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = { floor: Number(fl), detail: it.Detail });
+        });
+
+        // เติม startSelect = ห้องบน “ชั้นปัจจุบัน” + ค่าเริ่มต้นเป็น “ลิฟต์ชั้นนี้”
+        const roomsThisFloor = allByFloor[String(floor)] || [];
+        populateStartSelect(roomsThisFloor, buildingId, floor);
+
+        // เติม destinationSelect = ห้อง “ทุกชั้น” (optgroup)
+        const sel = document.getElementById('destinationSelect');
+        sel.innerHTML = '<option value="">🎯 เลือกห้องที่ต้องการไป</option>';
+        Object.keys(allByFloor).sort((a,b)=>Number(a)-Number(b)).forEach(fl => {
+          const og = document.createElement('optgroup');
+          og.label = `ชั้น ${fl}`;
+          allByFloor[fl].forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.NodeID;
+            opt.textContent = r.Detail;
+            opt.dataset.floor = fl;
+            og.appendChild(opt);
+          });
+          sel.appendChild(og);
+        });
+
+        // โหลดแผนผัง “ชั้นปัจจุบัน” เป็นดีฟอลต์ (โหมด single)
+        ensureSinglePanel();
+        loadFloorPlan(currentBuildingId, floor); // ใช้ตัวเดิม (single)
         showIndoorModal();
+        hideLoadingIndicator();
         resolve();
       })
-      .catch(error => {
+      .catch(err => {
         hideLoadingIndicator();
-        console.error('Error loading rooms:', error);
+        console.error('Error load all floors:', err);
         alert('ไม่สามารถโหลดข้อมูลห้องได้ กรุณาลองใหม่อีกครั้ง');
-        reject(error);
+        reject(err);
       });
   });
 }
+
 
 
 // Populate room selection dropdown
@@ -303,17 +328,37 @@ function hideLoadingIndicator() {
 
 // Handle destination selection change
 function onDestinationChange() {
-  const destination = document.getElementById('destinationSelect').value;
-  if (destination) {
-    setTimeout(() => {
-      setupCanvas();
-      findPath();
-    }, 100);
+  const dest = document.getElementById('destinationSelect').value;
+  if (!dest) { clearPath(); document.getElementById('pathInfo').innerHTML = ''; return; }
+
+  const info = allRoomsIndex[dest];
+  if (!info) { // ปลอดภัยไว้ก่อน
+    ensureSinglePanel();
+    setTimeout(() => { setupCanvas(); findPath(); }, 100);
+    return;
+  }
+
+  if (Number(info.floor) === Number(currentFloor)) {
+    // ชั้นเดียวกัน
+    ensureSinglePanel();
+    setTimeout(() => { setupCanvas(); findPath(); }, 100);
   } else {
-    clearPath();
-    document.getElementById('pathInfo').innerHTML = '';
+    // ข้ามชั้น → สลับเป็น dual panels และโหลดภาพทั้ง 2 ชั้น
+    ensureDualPanels();
+    const imgFrom = document.getElementById('floorPlan_from');
+    const imgTo   = document.getElementById('floorPlan_to');
+    imgFrom.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
+    imgTo.src   = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
+
+    // รอรูปขึ้นครบแล้วค่อยหาทาง
+    let loaded = 0;
+    [imgFrom, imgTo].forEach(im => {
+      im.onload = () => { if (++loaded === 2) findPath(); };
+      im.onerror = () => { if (++loaded === 2) findPath(); };
+    });
   }
 }
+
 
 // Setup canvas for path drawing
 function setupCanvas() {
@@ -382,27 +427,35 @@ function setupCanvas() {
 function findPath() {
   const destination = document.getElementById('destinationSelect').value;
   const start = document.getElementById('startSelect') ? document.getElementById('startSelect').value : '';
-
   if (!destination) return;
 
   showLoadingIndicator();
   clearPath();
 
-  fetch('/find_path', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      start: start || null,                  // ⬅️ เพิ่ม
-      destination: destination,
-      building_id: currentBuildingId,
-      floor: currentFloor
-    })
+  const destInfo = allRoomsIndex[destination];
+  const isCross = destInfo && Number(destInfo.floor) !== Number(currentFloor);
+
+  const url = isCross ? '/find_path_cross' : '/find_path';
+  const body = {
+    start: start || null,
+    destination: destination,
+    building_id: currentBuildingId,
+    floor: currentFloor
+  };
+
+  fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   })
-  .then(response => {
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    return response.json();
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => {
+    hideLoadingIndicator();
+    if (isCross) {
+      handlePathDataCross(data);
+    } else {
+      window.handlePathData(data); // เดิม
+    }
   })
-  .then(data => window.handlePathData(data))
   .catch(err => window.handleError(err, 'findPath'));
 }
 
@@ -746,5 +799,133 @@ window.handlePathData = window.handlePathData || function(data) {
       '<h3>ข้อมูลเส้นทาง</h3><p class="error">ไม่พบเส้นทางไปยังห้องที่เลือก</p>';
   }
 };
+
+function handlePathDataCross(data) {
+  try {
+    if (!data || data.mode !== 'cross') {
+      document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
+      return;
+    }
+    ensureDualPanels();
+
+    // FROM panel
+    const imgFrom = document.getElementById('floorPlan_from');
+    const cvsFrom = document.getElementById('pathCanvas_from');
+    setupCanvasFor(imgFrom, cvsFrom);
+    const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom,
+        data.origin.path, data.origin.img_width, data.origin.img_height);
+
+    // TO panel
+    const imgTo = document.getElementById('floorPlan_to');
+    const cvsTo = document.getElementById('pathCanvas_to');
+    setupCanvasFor(imgTo, cvsTo);
+    const scaledTo = scalePathToImageSizeFor(imgTo, cvsTo,
+        data.destination.path, data.destination.img_width, data.destination.img_height);
+
+    // ใช้ renderer เดิม ๆ: วาด path, nodes, arrows
+    drawBackgroundPath(cvsFrom.getContext('2d'), scaledFrom);
+    drawGoogleMapsPath(cvsFrom.getContext('2d'), scaledFrom, 1);
+    drawAnimatedNodes(cvsFrom.getContext('2d'), scaledFrom, 1);
+    drawDirectionArrows(cvsFrom.getContext('2d'), scaledFrom, 1);
+
+    drawBackgroundPath(cvsTo.getContext('2d'), scaledTo);
+    drawGoogleMapsPath(cvsTo.getContext('2d'), scaledTo, 1);
+    drawAnimatedNodes(cvsTo.getContext('2d'), scaledTo, 1);
+    drawDirectionArrows(cvsTo.getContext('2d'), scaledTo, 1);
+
+    // อัปเดตสรุปเส้นทาง
+    const nid = (x) => x?.node_id ?? x;
+    const steps = (data.nodes||[]).map((n,i) => {
+      const name = n.detail || n.node_id;
+      if (i===0) return `<li class="step-start">เริ่มจาก <strong>${name}</strong> (ชั้น ${data.origin.floor})</li>`;
+      if (i===data.nodes.length-1) return `<li class="step-end">ถึง <strong>${name}</strong> (ชั้น ${data.destination.floor})</li>`;
+      return `<li class="step-through">ผ่าน ${name}</li>`;
+    }).join('');
+
+    const liftNote = data.elevator_id ? `
+      <div class="summary-item">
+        <span class="icon">⬆️</span>
+        <span class="label">ลิฟต์:</span>
+        <span class="value">ID ${data.elevator_id} (ชั้น ${data.origin.floor} ➜ ${data.destination.floor})</span>
+      </div>` : '';
+
+    const totalLen = (arr)=> {
+      let s=0; for (let i=1;i<arr.length;i++){ const dx=arr[i].x-arr[i-1].x, dy=arr[i].y-arr[i-1].y; s+=Math.sqrt(dx*dx+dy*dy);}
+      return s;
+    };
+    const distM = Math.round((totalLen(scaledFrom)+totalLen(scaledTo)) * 0.1);
+    const timeMin = Math.max(1, Math.ceil(distM/60));
+
+    document.getElementById('pathInfo').innerHTML = `
+      <h3>🗺️ ข้อมูลเส้นทาง (ข้ามชั้น)</h3>
+      <ol class="path-steps">${steps}</ol>
+      <div class="path-summary">
+        <div class="summary-item"><span class="icon">📏</span><span class="label">ระยะทาง:</span><span class="value">${distM} เมตร</span></div>
+        <div class="summary-item"><span class="icon">⏱️</span><span class="label">เวลาโดยประมาณ:</span><span class="value">${timeMin} นาที</span></div>
+        ${liftNote}
+      </div>
+    `;
+  } catch (e) {
+    console.error(e);
+    document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
+  }
+}
+
+
+// NEW: index ข้อมูลห้องทั้งหมดในอาคาร -> ใช้รู้ว่า NodeID อยู่ชั้นไหน
+let allRoomsIndex = {}; // { NodeID: { floor, detail } }
+
+// NEW: โครงสร้าง panel 2 ฝั่ง เมื่อข้ามชั้น
+function ensureDualPanels() {
+  const container = document.querySelector('.navigation-container');
+  if (!container) return;
+  if (container.dataset.mode === 'dual') return;
+
+  container.innerHTML = `
+    <div id="navGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="panel" data-panel="from" style="position:relative;">
+        <img id="floorPlan_from" alt="แผนผังชั้นต้นทาง" style="width:100%;">
+        <canvas id="pathCanvas_from" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
+      </div>
+      <div class="panel" data-panel="to" style="position:relative;">
+        <img id="floorPlan_to" alt="แผนผังชั้นปลายทาง" style="width:100%;">
+        <canvas id="pathCanvas_to" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
+      </div>
+    </div>
+  `;
+  container.dataset.mode = 'dual';
+}
+
+function ensureSinglePanel() {
+  const container = document.querySelector('.navigation-container');
+  if (!container) return;
+  if (container.dataset.mode === 'single') return;
+
+  container.innerHTML = `
+    <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
+    <canvas id="pathCanvas" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
+  `;
+  container.dataset.mode = 'single';
+}
+
+// panel-aware helpers
+function setupCanvasFor(imgEl, canvasEl) {
+  if (!imgEl || !canvasEl) return;
+  const displayWidth  = imgEl.offsetWidth  || imgEl.clientWidth;
+  const displayHeight = imgEl.offsetHeight || imgEl.clientHeight;
+  canvasEl.width = displayWidth;
+  canvasEl.height = displayHeight;
+  canvasEl.style.width  = displayWidth + 'px';
+  canvasEl.style.height = displayHeight + 'px';
+  const ctx = canvasEl.getContext('2d');
+  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+}
+
+function scalePathToImageSizeFor(imgEl, canvasEl, pathCoords, originalWidth, originalHeight) {
+  const cw = canvasEl.width, ch = canvasEl.height;
+  const sx = cw / originalWidth, sy = ch / originalHeight;
+  return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
+}
+
 
 

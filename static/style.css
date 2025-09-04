@@ -1781,5 +1781,37 @@ html, body {
   animation: spin 1s linear infinite; display:inline-block;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
+}
+.split-plans {
+  display: none; /* เปิดเมื่อเป็นข้ามชั้น */
+  gap: 12px;
+}
+.split-plans .plan-side {
+  flex: 1;
+  min-width: 0;
+}
+.split-plans .plan-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.split-plans .navigation-container,
+.single-floor.navigation-container {
+  position: relative;
+}
+.split-plans img,
+.single-floor img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.split-plans canvas,
+.single-floor canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .split-plans { display: grid; grid-template-columns: 1fr 1fr; }
 }
