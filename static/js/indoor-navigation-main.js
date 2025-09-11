@@ -490,11 +490,11 @@ function startGoogleMapsAnimation(pathCoords) {
 
   const totalDistance = calculateTotalDistance(pathCoords);
 
-  const distanceIndicator = document.getElementById('distanceIndicator');
-  if (distanceIndicator) {
-    distanceIndicator.textContent = `📏 ${Math.round(totalDistance * 0.01)} เมตร`;
-    distanceIndicator.style.display = 'block';
-  }
+  // const distanceIndicator = document.getElementById('distanceIndicator');
+  // if (distanceIndicator) {
+  //   distanceIndicator.textContent = `📏 ${Math.round(totalDistance * 0.01)} เมตร`;
+  //   distanceIndicator.style.display = 'block';
+  // }
 
   function animate() {
     if (!isAnimating) return;
@@ -668,26 +668,26 @@ function updatePathInfo(path, pathCoords) {
       info += `<li class="step-through">ผ่าน ${name}</li>`;
     }
   });
-  info += '</ol>';
+  // info += '</ol>';
 
-  const totalDistance = calculateTotalDistance(pathCoords);
-  const estimatedTime = Math.ceil(totalDistance * 0.01);
+  // const totalDistance = calculateTotalDistance(pathCoords);
+  // const estimatedTime = Math.ceil(totalDistance * 0.01);
 
-  info += `
-    <div class="path-summary">
-      <div class="summary-item">
-        <span class="icon">📏</span>
-        <span class="label">ระยะทาง:</span>
-        <span class="value">${Math.round(totalDistance * 0.1)} เมตร</span>
-      </div>
-      <div class="summary-item">
-        <span class="icon">⏱️</span>
-        <span class="label">เวลาโดยประมาณ:</span>
-        <span class="value">${estimatedTime} นาที</span>
-      </div>
-    </div>
-  `;
-  document.getElementById('pathInfo').innerHTML = info;
+  // info += `
+  //   <div class="path-summary">
+  //     <div class="summary-item">
+  //       <span class="icon">📏</span>
+  //       <span class="label">ระยะทาง:</span>
+  //       <span class="value">${Math.round(totalDistance * 0.1)} เมตร</span>
+  //     </div>
+  //     <div class="summary-item">
+  //       <span class="icon">⏱️</span>
+  //       <span class="label">เวลาโดยประมาณ:</span>
+  //       <span class="value">${estimatedTime} นาที</span>
+  //     </div>
+  //   </div>
+  // `;
+  // document.getElementById('pathInfo').innerHTML = info;
 }
 
 // Simple resize handler
@@ -809,11 +809,6 @@ function handlePathDataCross(data) {
     document.getElementById('pathInfo').innerHTML = `
       <h3>🗺️ ข้อมูลเส้นทาง (ข้ามชั้น)</h3>
       <ol class="path-steps">${steps}</ol>
-      <div class="path-summary">
-        <div class="summary-item"><span class="icon">📏</span><span class="label">ระยะทาง:</span><span class="value">${distM} เมตร</span></div>
-        <div class="summary-item"><span class="icon">⏱️</span><span class="label">เวลาโดยประมาณ:</span><span class="value">${timeMin} นาที</span></div>
-        ${liftNote}
-      </div>
     `;
   } catch (e) {
     console.error(e);
