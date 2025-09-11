@@ -267,21 +267,6 @@ function loadRoomsAndShowModal(buildingId, floor) {
   });
 }
 
-
-
-// Populate room selection dropdown
-function populateRoomSelect(rooms) {
-  const select = document.getElementById('destinationSelect');
-  select.innerHTML = '<option value="">🎯 เลือกห้องที่ต้องการไป</option>';
-  rooms.forEach(room => {
-    const option = document.createElement('option');
-    option.value = room.NodeID;
-    option.textContent = room.Detail;
-    select.appendChild(option);
-  });
-}
-
-// Load floor plan image
 // Load floor plan image (เพิ่มพารามิเตอร์ afterLoaded)
 function loadFloorPlan(buildingId, floor, afterLoaded) {
   const floorPlan = document.getElementById('floorPlan');
@@ -460,33 +445,6 @@ function findPath() {
     }
   })
   .catch(err => window.handleError(err, 'findPath'));
-}
-
-
-// Enhanced clear path function
-function clearPath() {
-  if (animationId) {
-    cancelAnimationFrame(animationId);
-    animationId = null;
-  }
-
-  const canvas = document.getElementById('pathCanvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log('Canvas cleared');
-  }
-
-  // Reset animation variables
-  pulsePhase = 0;
-  pathProgress = 0;
-  isAnimating = false;
-
-  const distanceIndicator = document.getElementById('distanceIndicator');
-  if (distanceIndicator) distanceIndicator.style.display = 'none';
-
-  const pathInfo = document.getElementById('pathInfo');
-  if (pathInfo) pathInfo.innerHTML = '';
 }
 
 // Scale path coordinates to match current image size
@@ -980,22 +938,6 @@ function clearPath() {
 
   const info = document.getElementById('pathInfo');
   if (info) info.innerHTML = '';
-}
-
-// จัดขนาด canvas เฉพาะรูป (ใช้เดิม)
-function setupCanvasFor(imgEl, canvasEl) {
-  if (!imgEl || !canvasEl) return;
-  const w = imgEl.offsetWidth  || imgEl.clientWidth;
-  const h = imgEl.offsetHeight || imgEl.clientHeight;
-  canvasEl.width = w; canvasEl.height = h;
-  canvasEl.style.width = w+'px'; canvasEl.style.height = h+'px';
-  const ctx = canvasEl.getContext('2d'); ctx.clearRect(0,0,w,h);
-}
-
-function scalePathToImageSizeFor(imgEl, canvasEl, pathCoords, originalWidth, originalHeight) {
-  const cw = canvasEl.width, ch = canvasEl.height;
-  const sx = cw / originalWidth, sy = ch / originalHeight;
-  return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
 }
 
 // แอนิเมตแบบ cross-floor (ทีละสไลด์)
