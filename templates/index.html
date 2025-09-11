@@ -251,31 +251,25 @@
                 <span class="tw-name">อาคาร 20 &nbsp; อาคารเรียนรวมและปฏิบัติการคณะบริหารและเทคโนโลยีสารสนเทศ</span>
                 <span class="icons" onclick="openBuildingModal('อาคาร 20')"><i
                         class="fa-solid fa-magnifying-glass"></i></span>
-
-
             </div>
             <div class="list-tower-card">
                 <span class="tw-name">อาคาร 19 &nbsp;อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ</span>
                 <span class="icons" onclick="openBuildingModal('อาคาร 19')"><i
                         class="fa-solid fa-magnifying-glass"></i></span>
-
-            </div>
-            <div class="list-tower-card">
-                <span class="tw-name">อาคาร 18 &nbsp;อาคารคณะวิศวกรรมศาสตร์ <br>และสถาปัตยกรรมศาสตร์</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 18')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
-
             </div>
             <div class="list-tower-card">
                 <span class="tw-name" id="t17">อาคาร 17 &nbsp;อาคารเฉลิมพระเกียรติ <br>(ตึกคณะวิทยาศาสตร์เเละเทคโนโลยี)</span>
                 <span class="icons" onclick="openBuildingModal('อาคาร17')"><i class="fa-solid fa-magnifying-glass"></i></span>
-
             </div>
             <div class="list-tower-card">
-                <span class="tw-name">อาคาร 16 &nbsp;อาคารสาขาวิศวกรรมเครื่องกล</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 16')"><i
+                <span class="tw-name">อาคาร 13 &nbsp;อาคารคณะวิศวกรรมศาสตร์ <br>และสถาปัตยกรรมศาสตร์</span>
+                <span class="icons" onclick="openBuildingModal('อาคาร 13')"><i
                         class="fa-solid fa-magnifying-glass"></i></span>
-
+            </div>
+            <div class="list-tower-card">
+                <span class="tw-name">อาคาร 12 &nbsp;อาคารสาขาวิศวกรรมเครื่องกล</span>
+                <span class="icons" onclick="openBuildingModal('อาคาร 12')"><i
+                        class="fa-solid fa-magnifying-glass"></i></span>
             </div>
             <div class="list-tower-card">
                 <span class="tw-name">อาคาร โรงอาหาร </span>
@@ -400,34 +394,6 @@
     </div>
 </div>
 
-<!-- อาคาร 18 -->
-<div class="modal-container" id="building-modal-18">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 18</h2>
-            <div onclick="closeBuildingModal('building-modal-18')" class="btn-closed"></div>
-        </div>
-
-        <div class="container">
-            <div class="image">
-                <img src="https://via.placeholder.com/100?text=Building+18" alt="อาคาร 18"/>X
-            </div>
-            <div class="list">
-                <p>อาคารคณะวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</p>
-                <ul>
-                    <li>ชั้น 1: ห้องสำนักงาน</li>
-                    <li>ชั้น 2: ห้องเรียน</li>
-                    <li>ชั้น 3: ห้องปฏิบัติการ</li>
-                    <li>ชั้น 4: ห้องแขก</li>
-                </ul>
-                <span class="btn-nav" onclick="closeBuildingModal('building-modal-18'); showMapForBuilding('อาคาร13')">
-            <i class="fa-solid fa-location-dot"></i>
-          </span>
-
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- อาคาร 17 -->
 <div class="modal-container" id="building-modal-17">
@@ -458,17 +424,46 @@
     </div>
 </div>
 
-<!-- อาคาร 16 -->
-<div class="modal-container" id="building-modal-16">
+<!-- อาคาร 13 -->
+<div class="modal-container" id="building-modal-13">
     <div class="detail-building-modal">
         <div class="header">
-            <h2 class="name-building">อาคาร 16</h2>
-            <div onclick="closeBuildingModal('building-modal-16')" class="btn-closed">X</div>
+            <h2 class="name-building">อาคาร 13</h2>
+            <div onclick="closeBuildingModal('building-modal-13')" class="btn-closed">X</div>
         </div>
 
         <div class="container">
             <div class="image">
-                <img src="https://via.placeholder.com/100?text=Building+16" alt="อาคาร 16"/>
+                <img src="/static/img/outdoor/tower_13.jpg" alt="อาคาร 13"/>
+            </div>
+            <div class="list">
+                <p>อาคารคณะวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</p>
+                <ul>
+                    <li>ชั้น 1: ห้องสำนักงาน</li>
+                    <li>ชั้น 2: ห้องเรียน</li>
+                    <li>ชั้น 3: ห้องปฏิบัติการ</li>
+                    <li>ชั้น 4: ห้องแขก</li>
+                </ul>
+                <span class="btn-nav" onclick="closeBuildingModal('building-modal-13'); showMapForBuilding('อาคาร13')">
+            <i class="fa-solid fa-location-dot"></i>
+          </span>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- อาคาร 12 -->
+<div class="modal-container" id="building-modal-12">
+    <div class="detail-building-modal">
+        <div class="header">
+            <h2 class="name-building">อาคาร 12</h2>
+            <div onclick="closeBuildingModal('building-modal-12')" class="btn-closed">X</div>
+        </div>
+
+        <div class="container">
+            <div class="image">
+                <img src="/static/img/outdoor/tower_12.jpg" alt="อาคาร 12"/>
             </div>
             <div class="list">
                 <p>อาคารสาขาวิศวกรรมเครื่องกล</p>
@@ -477,7 +472,7 @@
                     <li>ชั้น 2: ห้องเรียน</li>
                     <li>ชั้น 3: ห้องสำนักงาน</li>
                 </ul>
-                <span class="btn-nav" onclick="closeBuildingModal('building-modal-16'); showMapForBuilding('อาคาร12')">
+                <span class="btn-nav" onclick="closeBuildingModal('building-modal-12'); showMapForBuilding('อาคาร12')">
             <i class="fa-solid fa-location-dot"></i>
           </span>
 
@@ -496,7 +491,7 @@
 
         <div class="container">
             <div class="image">
-                <img src="https://via.placeholder.com/100?text=Cafeteria" alt="โรงอาหาร"/>
+                <img src="/static/img/outdoor/cafeteria.jpg" alt="โรงอาหาร"/>
             </div>
             <div class="list">
                 <p>โรงอาหารของมหาวิทยาลัย</p>
@@ -539,29 +534,9 @@
                 </select>
             </div>
 
-            <!-- NEW: แผนผังคู่กัน -->
-            <div class="split-plans" role="group" aria-label="แผนผังชั้นต้นทางและปลายทาง">
-                <div class="plan-side" aria-label="ชั้นต้นทาง">
-                    <div class="plan-title">ชั้นต้นทาง</div>
-                    <div class="navigation-container">
-                        <img id="floorPlanStart" src="" alt="แผนผังชั้นต้นทาง"/>
-                        <canvas id="pathCanvasStart" aria-hidden="true"></canvas>
-                    </div>
-                </div>
-                <div class="plan-side" aria-label="ชั้นปลายทาง">
-                    <div class="plan-title">ชั้นปลายทาง</div>
-                    <div class="navigation-container">
-                        <img id="floorPlanDest" src="" alt="แผนผังชั้นปลายทาง"/>
-                        <canvas id="pathCanvasDest" aria-hidden="true"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- เก็บของเดิมไว้ใช้กับกรณีในชั้นเดียว -->
-            <div class="navigation-container single-floor" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
-                <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
-                <canvas id="pathCanvas" aria-hidden="true"></canvas>
-            </div>
+            <!-- ✅ Root เดียวให้ JS ใส่แผนผัง/แคนวาสเอง (single หรือ dual panels) -->
+            <div class="navigation-container" id="indoorNavRoot" role="img"
+                 aria-label="แผนผังอาคารและเส้นทางนำทาง"></div>
 
             <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
 
@@ -570,7 +545,6 @@
                 <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
             </div>
         </div>
-
     </div>
 </div>
 
