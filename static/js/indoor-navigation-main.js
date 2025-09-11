@@ -221,43 +221,54 @@ function populateStartSelect(rooms, buildingId, floor) {
 function loadRoomsAndShowModal(buildingId, floor) {
   return new Promise((resolve, reject) => {
     showLoadingIndicator();
-    fetch(`/get_rooms/${buildingId}/${floor}`)
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return response.json();
-      })
-      .then(rooms => {
-        hideLoadingIndicator();
-        populateStartSelect(rooms, buildingId, floor);  // ⬅️ เพิ่มบรรทัดนี้
-        populateRoomSelect(rooms);
-        loadFloorPlan(buildingId, floor);
+    // 1) ดึงห้องทุกชั้น เพื่อลิสต์ปลายทางแบบข้ามชั้นได้
+    fetch(`/get_rooms_all_floors/${buildingId}`)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(allByFloor => {
+        // สร้าง index NodeID -> {floor, detail}
+        allRoomsIndex = {};
+        Object.keys(allByFloor).forEach(fl => {
+          allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = { floor: Number(fl), detail: it.Detail });
+        });
+
+        // เติม startSelect = ห้องบน “ชั้นปัจจุบัน” + ค่าเริ่มต้นเป็น “ลิฟต์ชั้นนี้”
+        const roomsThisFloor = allByFloor[String(floor)] || [];
+        populateStartSelect(roomsThisFloor, buildingId, floor);
+
+        // เติม destinationSelect = ห้อง “ทุกชั้น” (optgroup)
+        const sel = document.getElementById('destinationSelect');
+        sel.innerHTML = '<option value="">🎯 เลือกห้องที่ต้องการไป</option>';
+        Object.keys(allByFloor).sort((a,b)=>Number(a)-Number(b)).forEach(fl => {
+          const og = document.createElement('optgroup');
+          og.label = `ชั้น ${fl}`;
+          allByFloor[fl].forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.NodeID;
+            opt.textContent = r.Detail;
+            opt.dataset.floor = fl;
+            og.appendChild(opt);
+          });
+          sel.appendChild(og);
+        });
+
+        // โหลดแผนผัง “ชั้นปัจจุบัน” เป็นดีฟอลต์ (โหมด single)
+        ensureSinglePanel();
+        loadFloorPlan(currentBuildingId, floor); // ใช้ตัวเดิม (single)
         showIndoorModal();
+        hideLoadingIndicator();
         resolve();
       })
-      .catch(error => {
+      .catch(err => {
         hideLoadingIndicator();
-        console.error('Error loading rooms:', error);
+        console.error('Error load all floors:', err);
         alert('ไม่สามารถโหลดข้อมูลห้องได้ กรุณาลองใหม่อีกครั้ง');
-        reject(error);
+        reject(err);
       });
   });
 }
 
-
-// Populate room selection dropdown
-function populateRoomSelect(rooms) {
-  const select = document.getElementById('destinationSelect');
-  select.innerHTML = '<option value="">🎯 เลือกห้องที่ต้องการไป</option>';
-  rooms.forEach(room => {
-    const option = document.createElement('option');
-    option.value = room.NodeID;
-    option.textContent = room.Detail;
-    select.appendChild(option);
-  });
-}
-
-// Load floor plan image
-function loadFloorPlan(buildingId, floor) {
+// Load floor plan image (เพิ่มพารามิเตอร์ afterLoaded)
+function loadFloorPlan(buildingId, floor, afterLoaded) {
   const floorPlan = document.getElementById('floorPlan');
   const modalTitle = document.getElementById('indoorModalLabel');
   const container = document.querySelector('.navigation-container');
@@ -275,15 +286,14 @@ function loadFloorPlan(buildingId, floor) {
   floorPlan.src = `/static/img/planTower${buildingId}Floor${floor}.png`;
 
   floorPlan.onload = function () {
-    console.log('Floor plan loaded successfully');
-    setTimeout(() => { setupCanvas(); }, 200);
+    setTimeout(() => { setupCanvas(); if (typeof afterLoaded === 'function') afterLoaded(); }, 200);
   };
-
   floorPlan.onerror = function () {
-    console.error('Failed to load floor plan image');
     floorPlan.src = '/static/img/null.png';
+    if (typeof afterLoaded === 'function') afterLoaded();
   };
 }
+
 
 // Show indoor navigation modal
 function showIndoorModal() {
@@ -303,17 +313,40 @@ function hideLoadingIndicator() {
 
 // Handle destination selection change
 function onDestinationChange() {
-  const destination = document.getElementById('destinationSelect').value;
-  if (destination) {
-    setTimeout(() => {
-      setupCanvas();
-      findPath();
-    }, 100);
+  const sel = document.getElementById('destinationSelect');
+  const dest = sel.value;
+  if (!dest) { clearPath(); document.getElementById('pathInfo').innerHTML = ''; return; }
+
+  const info = allRoomsIndex[dest];
+
+  // กรณีข้อมูลไม่ครบ ให้ fallback แบบชั้นเดียว
+  if (!info) {
+    ensureSinglePanel();
+    loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
+    return;
+  }
+
+  if (Number(info.floor) === Number(currentFloor)) {
+    // ✅ ชั้นเดียวกัน: ต้องโหลดรูปใหม่หลัง ensureSinglePanel()
+    ensureSinglePanel();
+    loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
   } else {
-    clearPath();
-    document.getElementById('pathInfo').innerHTML = '';
+    // ✅ ข้ามชั้น: ใช้ Carousel Mode
+    ensureCarouselMode(); // ใหม่
+    const imgFrom = document.getElementById('floorPlan_from');
+    const imgTo   = document.getElementById('floorPlan_to');
+    imgFrom.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
+    imgTo.src   = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
+
+    let loaded = 0;
+    [imgFrom, imgTo].forEach(im => {
+      im.onload  = () => { if (++loaded === 2) findPath(); };
+      im.onerror = () => { if (++loaded === 2) findPath(); };
+    });
   }
 }
+
+
 
 // Setup canvas for path drawing
 function setupCanvas() {
@@ -382,55 +415,36 @@ function setupCanvas() {
 function findPath() {
   const destination = document.getElementById('destinationSelect').value;
   const start = document.getElementById('startSelect') ? document.getElementById('startSelect').value : '';
-
   if (!destination) return;
 
   showLoadingIndicator();
   clearPath();
 
-  fetch('/find_path', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      start: start || null,                  // ⬅️ เพิ่ม
-      destination: destination,
-      building_id: currentBuildingId,
-      floor: currentFloor
-    })
+  const destInfo = allRoomsIndex[destination];
+  const isCross = destInfo && Number(destInfo.floor) !== Number(currentFloor);
+
+  const url = isCross ? '/find_path_cross' : '/find_path';
+  const body = {
+    start: start || null,
+    destination: destination,
+    building_id: currentBuildingId,
+    floor: currentFloor
+  };
+
+  fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
   })
-  .then(response => {
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    return response.json();
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => {
+    hideLoadingIndicator();
+    if (isCross) {
+      handlePathDataCross(data);
+    } else {
+      window.handlePathData(data); // เดิม
+    }
   })
-  .then(data => window.handlePathData(data))
   .catch(err => window.handleError(err, 'findPath'));
-}
-
-
-// Enhanced clear path function
-function clearPath() {
-  if (animationId) {
-    cancelAnimationFrame(animationId);
-    animationId = null;
-  }
-
-  const canvas = document.getElementById('pathCanvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log('Canvas cleared');
-  }
-
-  // Reset animation variables
-  pulsePhase = 0;
-  pathProgress = 0;
-  isAnimating = false;
-
-  const distanceIndicator = document.getElementById('distanceIndicator');
-  if (distanceIndicator) distanceIndicator.style.display = 'none';
-
-  const pathInfo = document.getElementById('pathInfo');
-  if (pathInfo) pathInfo.innerHTML = '';
 }
 
 // Scale path coordinates to match current image size
@@ -746,5 +760,250 @@ window.handlePathData = window.handlePathData || function(data) {
       '<h3>ข้อมูลเส้นทาง</h3><p class="error">ไม่พบเส้นทางไปยังห้องที่เลือก</p>';
   }
 };
+
+function handlePathDataCross(data) {
+  try {
+    if (!data || data.mode !== 'cross') {
+      document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
+      return;
+    }
+
+    // ✅ ใช้ Carousel (ถ้ายังไม่อยู่โหมดนี้)
+    ensureCarouselMode();
+
+    // เตรียม canvas ให้พอดีกับภาพ
+    const imgFrom = document.getElementById('floorPlan_from');
+    const imgTo   = document.getElementById('floorPlan_to');
+    const cvsFrom = document.getElementById('pathCanvas_from');
+    const cvsTo   = document.getElementById('pathCanvas_to');
+
+    setupCanvasFor(imgFrom, cvsFrom);
+    setupCanvasFor(imgTo,   cvsTo);
+
+    // สเกลพาธให้ตรงกับขนาดรูปปัจจุบัน
+    const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path,      data.origin.img_width,      data.origin.img_height);
+    const scaledTo   = scalePathToImageSizeFor(imgTo,   cvsTo,   data.destination.path, data.destination.img_width, data.destination.img_height);
+
+    // 🔄 แอนิเมชัน: วาดทีละสไลด์
+    startCrossFloorAnimation(scaledFrom, scaledTo);
+
+    // อัปเดตสรุปเส้นทาง
+    const steps = (data.nodes||[]).map((n,i) => {
+      const name = n.detail || n.node_id;
+      if (i===0) return `<li class="step-start">เริ่มจาก <strong>${name}</strong> (ชั้น ${data.origin.floor})</li>`;
+      if (i===data.nodes.length-1) return `<li class="step-end">ถึง <strong>${name}</strong> (ชั้น ${data.destination.floor})</li>`;
+      return `<li class="step-through">ผ่าน ${name}</li>`;
+    }).join('');
+
+    const liftNote = data.elevator_id ? `
+      <div class="summary-item">
+        <span class="icon">⬆️</span>
+        <span class="label">ลิฟต์:</span>
+        <span class="value">ID ${data.elevator_id} (ชั้น ${data.origin.floor} ➜ ${data.destination.floor})</span>
+      </div>` : '';
+
+    const len = arr => arr.reduce((s,p,i)=> i? s + Math.hypot(p.x-arr[i-1].x, p.y-arr[i-1].y) : 0, 0);
+    const distM = Math.round((len(scaledFrom)+len(scaledTo)) * 0.1);
+    const timeMin = Math.max(1, Math.ceil(distM/60));
+
+    document.getElementById('pathInfo').innerHTML = `
+      <h3>🗺️ ข้อมูลเส้นทาง (ข้ามชั้น)</h3>
+      <ol class="path-steps">${steps}</ol>
+      <div class="path-summary">
+        <div class="summary-item"><span class="icon">📏</span><span class="label">ระยะทาง:</span><span class="value">${distM} เมตร</span></div>
+        <div class="summary-item"><span class="icon">⏱️</span><span class="label">เวลาโดยประมาณ:</span><span class="value">${timeMin} นาที</span></div>
+        ${liftNote}
+      </div>
+    `;
+  } catch (e) {
+    console.error(e);
+    document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
+  }
+}
+
+// NEW: index ข้อมูลห้องทั้งหมดในอาคาร -> ใช้รู้ว่า NodeID อยู่ชั้นไหน
+let allRoomsIndex = {}; // { NodeID: { floor, detail } }
+
+// NEW: โครงสร้าง panel 2 ฝั่ง เมื่อข้ามชั้น
+function ensureDualPanels() {
+  const container = document.querySelector('.navigation-container');
+  if (!container) return;
+  if (container.dataset.mode === 'dual') return;
+
+  container.innerHTML = `
+    <div id="navGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="panel" data-panel="from" style="position:relative;">
+        <img id="floorPlan_from" alt="แผนผังชั้นต้นทาง" style="width:100%;">
+        <canvas id="pathCanvas_from" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
+      </div>
+      <div class="panel" data-panel="to" style="position:relative;">
+        <img id="floorPlan_to" alt="แผนผังชั้นปลายทาง" style="width:100%;">
+        <canvas id="pathCanvas_to" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
+      </div>
+    </div>
+  `;
+  container.dataset.mode = 'dual';
+}
+
+function ensureSinglePanel() {
+  const container = document.querySelector('.navigation-container');
+  if (!container) return;
+  if (container.dataset.mode === 'single') return;
+
+  container.innerHTML = `
+    <img id="floorPlan" src="" alt="แผนผังชั้นของอาคาร" style="width: 100%;">
+    <canvas id="pathCanvas" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
+  `;
+  container.dataset.mode = 'single';
+}
+
+// ===== Carousel (ข้ามชั้น) =====
+function ensureCarouselMode() {
+  const container = document.querySelector('.navigation-container');
+  if (!container) return;
+  if (container.dataset.mode === 'carousel') return;
+
+  container.innerHTML = `
+    <div class="indoor-carousel" id="indoorCarousel" data-index="0">
+      <div class="indoor-carousel__track" id="indoorCarouselTrack">
+        <div class="indoor-carousel__slide" data-role="from">
+          <img id="floorPlan_from" alt="ชั้นต้นทาง">
+          <canvas id="pathCanvas_from"></canvas>
+        </div>
+        <div class="indoor-carousel__slide" data-role="to">
+          <img id="floorPlan_to" alt="ชั้นปลายทาง">
+          <canvas id="pathCanvas_to"></canvas>
+        </div>
+      </div>
+      <div class="indoor-carousel__nav">
+        <button class="indoor-carousel__btn" id="indoorPrev">‹</button>
+        <button class="indoor-carousel__btn" id="indoorNext">›</button>
+      </div>
+      <div class="indoor-carousel__dots">
+        <div class="indoor-carousel__dot is-active" data-dot="0"></div>
+        <div class="indoor-carousel__dot" data-dot="1"></div>
+      </div>
+    </div>
+  `;
+  container.dataset.mode = 'carousel';
+
+  bindCarouselControls();
+}
+
+function bindCarouselControls() {
+  const wrap  = document.getElementById('indoorCarousel');
+  const track = document.getElementById('indoorCarouselTrack');
+  const dots  = Array.from(wrap.querySelectorAll('.indoor-carousel__dot'));
+  const prev  = document.getElementById('indoorPrev');
+  const next  = document.getElementById('indoorNext');
+
+  const go = (idx) => {
+    idx = Math.max(0, Math.min(1, idx));
+    wrap.dataset.index = String(idx);
+    track.style.transform = `translateX(${idx * -100}%)`;
+    dots.forEach((d,i)=>d.classList.toggle('is-active', i===idx));
+
+    // เมื่อเปลี่ยนสไลด์ ให้รีสตาร์ทแอนิเมชันของสไลด์นั้น
+    if (window.__crossAnim && typeof window.__crossAnim.restart === 'function') {
+      window.__crossAnim.restart(idx);
+    }
+  };
+
+  prev.onclick = () => go(Number(wrap.dataset.index||0) - 1);
+  next.onclick = () => go(Number(wrap.dataset.index||0) + 1);
+
+  // รองรับปัดซ้าย/ขวา
+  let sx=0;
+  track.addEventListener('touchstart', e => { sx = e.changedTouches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (dx > 50) prev.click();
+    else if (dx < -50) next.click();
+  }, {passive:true});
+}
+
+// เคลียร์ทั้ง single และ cross-floor canvases
+function clearPath() {
+  if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+  const ids = ['pathCanvas','pathCanvas_from','pathCanvas_to'];
+  ids.forEach(id => {
+    const c = document.getElementById(id);
+    if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); }
+  });
+
+  pulsePhase = 0; pathProgress = 0; isAnimating = false;
+
+  const di = document.getElementById('distanceIndicator');
+  if (di) di.style.display = 'none';
+
+  const info = document.getElementById('pathInfo');
+  if (info) info.innerHTML = '';
+}
+
+// แอนิเมตแบบ cross-floor (ทีละสไลด์)
+function startCrossFloorAnimation(scaledFrom, scaledTo) {
+  const imgFrom = document.getElementById('floorPlan_from');
+  const imgTo   = document.getElementById('floorPlan_to');
+  const cvsFrom = document.getElementById('pathCanvas_from');
+  const cvsTo   = document.getElementById('pathCanvas_to');
+
+  const ctxFrom = cvsFrom.getContext('2d');
+  const ctxTo   = cvsTo.getContext('2d');
+
+  let progressFrom = 0, progressTo = 0, phase = 0;
+  let active = Number((document.getElementById('indoorCarousel')?.dataset.index)||0);
+
+  function drawSlide(ctx, coords, progress) {
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    drawBackgroundPath(ctx, coords);
+    drawGoogleMapsPath(ctx, coords, progress);
+    pulsePhase = phase; // reuse
+    drawAnimatedNodes(ctx, coords, progress);
+    drawDirectionArrows(ctx, coords, progress);
+  }
+
+  function tick() {
+    phase += 0.15;
+    if (active === 0 && progressFrom < 1) progressFrom += 0.02;
+    if (active === 1 && progressTo   < 1) progressTo   += 0.02;
+
+    drawSlide(ctxFrom, scaledFrom, progressFrom);
+    drawSlide(ctxTo,   scaledTo,   progressTo);
+
+    animationId = requestAnimationFrame(tick);
+  }
+
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(tick);
+
+  window.__crossAnim = {
+    restart: (idx) => {
+      active = idx;
+      if (idx === 0) { progressFrom = 0; }
+      else           { progressTo   = 0; }
+    }
+  };
+}
+
+
+// panel-aware helpers
+function setupCanvasFor(imgEl, canvasEl) {
+  if (!imgEl || !canvasEl) return;
+  const displayWidth  = imgEl.offsetWidth  || imgEl.clientWidth;
+  const displayHeight = imgEl.offsetHeight || imgEl.clientHeight;
+  canvasEl.width = displayWidth;
+  canvasEl.height = displayHeight;
+  canvasEl.style.width  = displayWidth + 'px';
+  canvasEl.style.height = displayHeight + 'px';
+  const ctx = canvasEl.getContext('2d');
+  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+}
+
+function scalePathToImageSizeFor(imgEl, canvasEl, pathCoords, originalWidth, originalHeight) {
+  const cw = canvasEl.width, ch = canvasEl.height;
+  const sx = cw / originalWidth, sy = ch / originalHeight;
+  return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
+}
+
 
 

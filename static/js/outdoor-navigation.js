@@ -296,8 +296,6 @@ function findRoute() {
                 detailModal.classList.add('show');
             }, 10);
         }
-    } else {
-        console.warn(`ไม่พบ modal: building-modal-${id}`);
     }
 }
 

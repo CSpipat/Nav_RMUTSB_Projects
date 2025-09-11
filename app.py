@@ -57,8 +57,42 @@ def create_graph(nodes_df, connections_df):
 
                     graph[source].append((target, distance))
                     graph[target].append((source, distance))
-
+    augment_graph_with_elevators(graph, nodes_df)
     return graph
+
+# ===== NEW: vertical edges via elevators (same ElevatorID) =====
+def augment_graph_with_elevators(graph, nodes_df, vertical_cost_per_floor=100.0):
+    # ป้องกัน column case ต่างๆ
+    cols = {c.lower(): c for c in nodes_df.columns}
+    type_col = cols.get('type', 'Type')
+    floor_col = cols.get('floor', 'floor')
+    bid_col = cols.get('b_id', 'B_ID')
+    elev_col = cols.get('elevatorid', 'ElevatorID')
+    node_col = cols.get('nodeid', 'NodeID')
+
+    if elev_col not in nodes_df.columns:
+        # ถ้าไม่มี ElevatorID จริง ๆ จะข้ามการเชื่อมข้ามชั้น
+        return graph
+
+    elev_df = nodes_df[nodes_df[type_col].astype(str).str.lower() == 'elevator'].copy()
+    if elev_df.empty:
+        return graph
+
+    # group ตามอาคาร + ElevatorID แล้วเชื่อมชั้นติด ๆ กัน
+    for (b_id, eid), g in elev_df.groupby([bid_col, elev_col]):
+        g = g.sort_values(by=floor_col)
+        prev = None
+        for _, row in g.iterrows():
+            cur = row[node_col]
+            if prev is not None:
+                fprev = int(nodes_df.loc[nodes_df[node_col]==prev, floor_col].iloc[0])
+                fcur  = int(row[floor_col])
+                w = abs(fcur - fprev) * float(vertical_cost_per_floor)
+                graph[prev].append((cur, w))
+                graph[cur].append((prev, w))
+            prev = cur
+    return graph
+
 
 
 def heuristic(node_a, node_b, nodes_df):
@@ -210,6 +244,37 @@ def pick_elevator_for_floor(nodes_df, building_id, floor):
 
     return None
 
+def get_plan_size_for(plan_df, building_id, floor, default=(800, 600)):
+    try:
+        cols = {c.lower(): c for c in plan_df.columns}
+        bid_col  = cols.get('b_id', 'B_ID')
+        floor_col = cols.get('floor', 'floor')
+        width_col = cols.get('width', 'Width')
+        height_col = cols.get('height', 'Height')
+        if all(c in plan_df.columns for c in [bid_col, floor_col, width_col, height_col]):
+            sub = plan_df[(plan_df[bid_col] == building_id) & (plan_df[floor_col] == floor)]
+            if not sub.empty:
+                return int(sub.iloc[0][width_col]), int(sub.iloc[0][height_col])
+    except Exception:
+        pass
+    return default
+
+def path_coords_for_segment(nodes_df, path_segment, plan_df, building_id, floor):
+    coords = []
+    if not path_segment:
+        w, h = get_plan_size_for(plan_df, building_id, floor)
+        return coords, w, h
+
+    w, h = get_plan_size_for(plan_df, building_id, floor)
+    for nid in path_segment:
+        row = nodes_df[nodes_df['NodeID'] == nid]
+        if not row.empty:
+            x = float(row['X'].values[0]); y = float(row['Y'].values[0])
+            x = max(0, min(x, w)); y = max(0, min(y, h))
+            coords.append({'x': int(x), 'y': int(y), 'node_id': str(nid)})
+    return coords, w, h
+
+
 
 
 @app.route('/')
@@ -276,6 +341,122 @@ def get_path():
         status=200,
         mimetype='application/json'
     )
+
+@app.route('/find_path_cross', methods=['POST'])
+def find_path_cross():
+    payload = request.get_json(force=True) or {}
+    dest = payload.get('destination')
+    start = payload.get('start') or None
+    building_id = payload.get('building_id')
+    cur_floor = payload.get('floor')
+
+    if not dest:
+        return jsonify({'error': 'No destination provided'}), 400
+
+    _, nodes_df, connections_df, plan_df = load_data()
+
+    # เลือก start: ถ้าไม่ได้ส่งมา ใช้ “ลิฟต์ของชั้นปัจจุบัน”
+    if not start:
+        start_node = pick_elevator_for_floor(nodes_df, building_id, cur_floor)
+    else:
+        start_node = start
+
+    # สร้างกราฟ + ขอบลิฟต์ข้ามชั้น
+    graph = create_graph(nodes_df, connections_df)
+
+    if start_node not in graph:
+        return jsonify({'error': f'Start node {start_node} not found in graph'}), 404
+    if dest not in graph:
+        return jsonify({'error': f'Destination node {dest} not found in graph'}), 404
+
+    path = find_shortest_path(graph, start_node, dest, nodes_df)
+    if not path:
+        return jsonify({'error': f'No path found from {start_node} to {dest}'}), 404
+
+    # หาชั้นของต้นทางและปลายทาง
+    sf = int(nodes_df.loc[nodes_df['NodeID']==path[0], 'floor'].iloc[0])
+    ef = int(nodes_df.loc[nodes_df['NodeID']==path[-1], 'floor'].iloc[0])
+    bid = nodes_df.loc[nodes_df['NodeID']==path[0], 'B_ID'].iloc[0]
+
+    # ถ้าอยู่ชั้นเดียวกัน -> ใช้โครงเดิม (single)
+    if sf == ef:
+        coords, w, h = path_coords_for_segment(nodes_df, path, plan_df, bid, sf)
+        return app.response_class(
+            response=json.dumps({
+                'mode': 'single',
+                'single': {
+                    'floor': sf,
+                    'img_width': w, 'img_height': h,
+                    'path': coords
+                },
+                'nodes': [{'node_id': nid,
+                           'detail': str(nodes_df.loc[nodes_df['NodeID']==nid, 'Detail'].iloc[0])
+                                     if not nodes_df.loc[nodes_df['NodeID']==nid].empty else nid}
+                          for nid in path],
+                'start_node': start_node, 'destination_node': dest
+            }, cls=NumpyEncoder),
+            status=200, mimetype='application/json'
+        )
+
+    # ข้ามชั้น → หา “จุดต่อลิฟต์คู่” (สอง node ติดกันที่เป็นลิฟต์ ElevatorID เดียวกัน)
+    elev_col = 'ElevatorID' if 'ElevatorID' in nodes_df.columns else None
+    type_col = 'Type'
+    floor_col = 'floor'
+
+    elev_start = elev_end = elev_id = None
+    split_idx = None
+    for i in range(len(path)-1):
+        a, b = path[i], path[i+1]
+        ra = nodes_df[nodes_df['NodeID']==a].iloc[0]
+        rb = nodes_df[nodes_df['NodeID']==b].iloc[0]
+        if str(ra[type_col]).lower()=='elevator' and str(rb[type_col]).lower()=='elevator':
+            if elev_col and ra[elev_col]==rb[elev_col] and ra[floor_col]!=rb[floor_col]:
+                elev_start, elev_end = a, b
+                elev_id = ra[elev_col]
+                split_idx = i
+                break
+    # fallback: หากไม่พบคู่ลิฟต์ชัดเจน ให้ split เมื่อ floor เปลี่ยนครั้งแรก
+    if split_idx is None:
+        for i in range(len(path)-1):
+            fa = int(nodes_df.loc[nodes_df['NodeID']==path[i], floor_col].iloc[0])
+            fb = int(nodes_df.loc[nodes_df['NodeID']==path[i+1], floor_col].iloc[0])
+            if fa != fb:
+                split_idx = i
+                elev_start, elev_end = path[i], path[i+1]
+                elev_id = nodes_df.loc[nodes_df['NodeID']==elev_start, elev_col].iloc[0] if elev_col else None
+                break
+
+    origin_seg = path[:split_idx+1]
+    dest_seg   = path[split_idx+1:]
+
+    of = int(nodes_df.loc[nodes_df['NodeID']==origin_seg[0], floor_col].iloc[0])
+    df = int(nodes_df.loc[nodes_df['NodeID']==dest_seg[-1],   floor_col].iloc[0])
+
+    origin_coords, ow, oh = path_coords_for_segment(nodes_df, origin_seg, plan_df, bid, of)
+    dest_coords,   dw, dh = path_coords_for_segment(nodes_df, dest_seg,   plan_df, bid, df)
+
+    def detail(nid):
+        row = nodes_df[nodes_df['NodeID']==nid]
+        return str(row.iloc[0]['Detail']) if not row.empty and 'Detail' in row else str(nid)
+
+    return app.response_class(
+        response=json.dumps({
+            'mode': 'cross',
+            'origin': {
+                'floor': of, 'img_width': ow, 'img_height': oh,
+                'path': origin_coords, 'elevator_node': elev_start
+            },
+            'destination': {
+                'floor': df, 'img_width': dw, 'img_height': dh,
+                'path': dest_coords, 'elevator_node': elev_end
+            },
+            'elevator_id': elev_id,
+            'nodes': [{'node_id': nid, 'detail': detail(nid)} for nid in path],
+            'start_node': start_node, 'destination_node': dest
+        }, cls=NumpyEncoder),
+        status=200, mimetype='application/json'
+    )
+
 
 
 @app.route('/route', methods=['POST'])
@@ -373,6 +554,17 @@ def get_rooms(b_id, floor):
         ]
     rooms = filtered_df[['NodeID', 'Detail']].to_dict(orient='records')
     return jsonify(rooms)
+
+@app.route('/get_rooms_all_floors/<int:b_id>', methods=['GET'])
+def get_rooms_all_floors(b_id):
+    nodes_df = pd.read_csv('nodes.csv')
+    sub = nodes_df[(nodes_df['B_ID'] == b_id) & (nodes_df['Type'].isin(['Room','Toilet']))]
+    out = {}
+    for fl, g in sub.groupby('floor'):
+        out[int(fl)] = [{'NodeID': r['NodeID'], 'Detail': r['Detail'], 'floor': int(r['floor'])}
+                        for _, r in g.iterrows()]
+    return jsonify(out)
+
 
 
 @app.route('/search', methods=['GET'])
