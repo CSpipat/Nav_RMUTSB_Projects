@@ -1869,3 +1869,16 @@ html, body {
         grid-template-columns: 1fr 1fr;
     }
 }
+
+/* ===== Indoor cross-floor carousel ===== */
+.indoor-carousel{position:relative;overflow:hidden;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+.indoor-carousel__track{display:flex;transition:transform .3s ease}
+.indoor-carousel__slide{min-width:100%;position:relative}
+.indoor-carousel__slide img{display:block;width:100%;height:auto}
+.indoor-carousel__slide canvas{position:absolute;inset:0;pointer-events:none}
+.indoor-carousel__nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+.indoor-carousel__btn{border:0;background:rgba(0,0,0,.5);color:#fff;border-radius:50%;width:36px;height:36px;font-size:20px;line-height:36px;text-align:center;cursor:pointer}
+.indoor-carousel__dots{position:absolute;left:0;right:0;bottom:8px;display:flex;gap:6px;justify-content:center}
+.indoor-carousel__dot{width:8px;height:8px;border-radius:50%;background:#ddd;opacity:.8}
+.indoor-carousel__dot.is-active{background:#4285F4;opacity:1}
+

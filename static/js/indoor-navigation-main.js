@@ -282,7 +282,8 @@ function populateRoomSelect(rooms) {
 }
 
 // Load floor plan image
-function loadFloorPlan(buildingId, floor) {
+// Load floor plan image (เพิ่มพารามิเตอร์ afterLoaded)
+function loadFloorPlan(buildingId, floor, afterLoaded) {
   const floorPlan = document.getElementById('floorPlan');
   const modalTitle = document.getElementById('indoorModalLabel');
   const container = document.querySelector('.navigation-container');
@@ -300,15 +301,14 @@ function loadFloorPlan(buildingId, floor) {
   floorPlan.src = `/static/img/planTower${buildingId}Floor${floor}.png`;
 
   floorPlan.onload = function () {
-    console.log('Floor plan loaded successfully');
-    setTimeout(() => { setupCanvas(); }, 200);
+    setTimeout(() => { setupCanvas(); if (typeof afterLoaded === 'function') afterLoaded(); }, 200);
   };
-
   floorPlan.onerror = function () {
-    console.error('Failed to load floor plan image');
     floorPlan.src = '/static/img/null.png';
+    if (typeof afterLoaded === 'function') afterLoaded();
   };
 }
+
 
 // Show indoor navigation modal
 function showIndoorModal() {
@@ -328,36 +328,39 @@ function hideLoadingIndicator() {
 
 // Handle destination selection change
 function onDestinationChange() {
-  const dest = document.getElementById('destinationSelect').value;
+  const sel = document.getElementById('destinationSelect');
+  const dest = sel.value;
   if (!dest) { clearPath(); document.getElementById('pathInfo').innerHTML = ''; return; }
 
   const info = allRoomsIndex[dest];
-  if (!info) { // ปลอดภัยไว้ก่อน
+
+  // กรณีข้อมูลไม่ครบ ให้ fallback แบบชั้นเดียว
+  if (!info) {
     ensureSinglePanel();
-    setTimeout(() => { setupCanvas(); findPath(); }, 100);
+    loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
     return;
   }
 
   if (Number(info.floor) === Number(currentFloor)) {
-    // ชั้นเดียวกัน
+    // ✅ ชั้นเดียวกัน: ต้องโหลดรูปใหม่หลัง ensureSinglePanel()
     ensureSinglePanel();
-    setTimeout(() => { setupCanvas(); findPath(); }, 100);
+    loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
   } else {
-    // ข้ามชั้น → สลับเป็น dual panels และโหลดภาพทั้ง 2 ชั้น
-    ensureDualPanels();
+    // ✅ ข้ามชั้น: ใช้ Carousel Mode
+    ensureCarouselMode(); // ใหม่
     const imgFrom = document.getElementById('floorPlan_from');
     const imgTo   = document.getElementById('floorPlan_to');
     imgFrom.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
     imgTo.src   = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
 
-    // รอรูปขึ้นครบแล้วค่อยหาทาง
     let loaded = 0;
     [imgFrom, imgTo].forEach(im => {
-      im.onload = () => { if (++loaded === 2) findPath(); };
+      im.onload  = () => { if (++loaded === 2) findPath(); };
       im.onerror = () => { if (++loaded === 2) findPath(); };
     });
   }
 }
+
 
 
 // Setup canvas for path drawing
@@ -806,35 +809,27 @@ function handlePathDataCross(data) {
       document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
       return;
     }
-    ensureDualPanels();
 
-    // FROM panel
+    // ✅ ใช้ Carousel (ถ้ายังไม่อยู่โหมดนี้)
+    ensureCarouselMode();
+
+    // เตรียม canvas ให้พอดีกับภาพ
     const imgFrom = document.getElementById('floorPlan_from');
+    const imgTo   = document.getElementById('floorPlan_to');
     const cvsFrom = document.getElementById('pathCanvas_from');
+    const cvsTo   = document.getElementById('pathCanvas_to');
+
     setupCanvasFor(imgFrom, cvsFrom);
-    const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom,
-        data.origin.path, data.origin.img_width, data.origin.img_height);
+    setupCanvasFor(imgTo,   cvsTo);
 
-    // TO panel
-    const imgTo = document.getElementById('floorPlan_to');
-    const cvsTo = document.getElementById('pathCanvas_to');
-    setupCanvasFor(imgTo, cvsTo);
-    const scaledTo = scalePathToImageSizeFor(imgTo, cvsTo,
-        data.destination.path, data.destination.img_width, data.destination.img_height);
+    // สเกลพาธให้ตรงกับขนาดรูปปัจจุบัน
+    const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path,      data.origin.img_width,      data.origin.img_height);
+    const scaledTo   = scalePathToImageSizeFor(imgTo,   cvsTo,   data.destination.path, data.destination.img_width, data.destination.img_height);
 
-    // ใช้ renderer เดิม ๆ: วาด path, nodes, arrows
-    drawBackgroundPath(cvsFrom.getContext('2d'), scaledFrom);
-    drawGoogleMapsPath(cvsFrom.getContext('2d'), scaledFrom, 1);
-    drawAnimatedNodes(cvsFrom.getContext('2d'), scaledFrom, 1);
-    drawDirectionArrows(cvsFrom.getContext('2d'), scaledFrom, 1);
-
-    drawBackgroundPath(cvsTo.getContext('2d'), scaledTo);
-    drawGoogleMapsPath(cvsTo.getContext('2d'), scaledTo, 1);
-    drawAnimatedNodes(cvsTo.getContext('2d'), scaledTo, 1);
-    drawDirectionArrows(cvsTo.getContext('2d'), scaledTo, 1);
+    // 🔄 แอนิเมชัน: วาดทีละสไลด์
+    startCrossFloorAnimation(scaledFrom, scaledTo);
 
     // อัปเดตสรุปเส้นทาง
-    const nid = (x) => x?.node_id ?? x;
     const steps = (data.nodes||[]).map((n,i) => {
       const name = n.detail || n.node_id;
       if (i===0) return `<li class="step-start">เริ่มจาก <strong>${name}</strong> (ชั้น ${data.origin.floor})</li>`;
@@ -849,11 +844,8 @@ function handlePathDataCross(data) {
         <span class="value">ID ${data.elevator_id} (ชั้น ${data.origin.floor} ➜ ${data.destination.floor})</span>
       </div>` : '';
 
-    const totalLen = (arr)=> {
-      let s=0; for (let i=1;i<arr.length;i++){ const dx=arr[i].x-arr[i-1].x, dy=arr[i].y-arr[i-1].y; s+=Math.sqrt(dx*dx+dy*dy);}
-      return s;
-    };
-    const distM = Math.round((totalLen(scaledFrom)+totalLen(scaledTo)) * 0.1);
+    const len = arr => arr.reduce((s,p,i)=> i? s + Math.hypot(p.x-arr[i-1].x, p.y-arr[i-1].y) : 0, 0);
+    const distM = Math.round((len(scaledFrom)+len(scaledTo)) * 0.1);
     const timeMin = Math.max(1, Math.ceil(distM/60));
 
     document.getElementById('pathInfo').innerHTML = `
@@ -870,7 +862,6 @@ function handlePathDataCross(data) {
     document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
   }
 }
-
 
 // NEW: index ข้อมูลห้องทั้งหมดในอาคาร -> ใช้รู้ว่า NodeID อยู่ชั้นไหน
 let allRoomsIndex = {}; // { NodeID: { floor, detail } }
@@ -907,6 +898,151 @@ function ensureSinglePanel() {
   `;
   container.dataset.mode = 'single';
 }
+
+// ===== Carousel (ข้ามชั้น) =====
+function ensureCarouselMode() {
+  const container = document.querySelector('.navigation-container');
+  if (!container) return;
+  if (container.dataset.mode === 'carousel') return;
+
+  container.innerHTML = `
+    <div class="indoor-carousel" id="indoorCarousel" data-index="0">
+      <div class="indoor-carousel__track" id="indoorCarouselTrack">
+        <div class="indoor-carousel__slide" data-role="from">
+          <img id="floorPlan_from" alt="ชั้นต้นทาง">
+          <canvas id="pathCanvas_from"></canvas>
+        </div>
+        <div class="indoor-carousel__slide" data-role="to">
+          <img id="floorPlan_to" alt="ชั้นปลายทาง">
+          <canvas id="pathCanvas_to"></canvas>
+        </div>
+      </div>
+      <div class="indoor-carousel__nav">
+        <button class="indoor-carousel__btn" id="indoorPrev">‹</button>
+        <button class="indoor-carousel__btn" id="indoorNext">›</button>
+      </div>
+      <div class="indoor-carousel__dots">
+        <div class="indoor-carousel__dot is-active" data-dot="0"></div>
+        <div class="indoor-carousel__dot" data-dot="1"></div>
+      </div>
+    </div>
+  `;
+  container.dataset.mode = 'carousel';
+
+  bindCarouselControls();
+}
+
+function bindCarouselControls() {
+  const wrap  = document.getElementById('indoorCarousel');
+  const track = document.getElementById('indoorCarouselTrack');
+  const dots  = Array.from(wrap.querySelectorAll('.indoor-carousel__dot'));
+  const prev  = document.getElementById('indoorPrev');
+  const next  = document.getElementById('indoorNext');
+
+  const go = (idx) => {
+    idx = Math.max(0, Math.min(1, idx));
+    wrap.dataset.index = String(idx);
+    track.style.transform = `translateX(${idx * -100}%)`;
+    dots.forEach((d,i)=>d.classList.toggle('is-active', i===idx));
+
+    // เมื่อเปลี่ยนสไลด์ ให้รีสตาร์ทแอนิเมชันของสไลด์นั้น
+    if (window.__crossAnim && typeof window.__crossAnim.restart === 'function') {
+      window.__crossAnim.restart(idx);
+    }
+  };
+
+  prev.onclick = () => go(Number(wrap.dataset.index||0) - 1);
+  next.onclick = () => go(Number(wrap.dataset.index||0) + 1);
+
+  // รองรับปัดซ้าย/ขวา
+  let sx=0;
+  track.addEventListener('touchstart', e => { sx = e.changedTouches[0].clientX; }, {passive:true});
+  track.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (dx > 50) prev.click();
+    else if (dx < -50) next.click();
+  }, {passive:true});
+}
+
+// เคลียร์ทั้ง single และ cross-floor canvases
+function clearPath() {
+  if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+  const ids = ['pathCanvas','pathCanvas_from','pathCanvas_to'];
+  ids.forEach(id => {
+    const c = document.getElementById(id);
+    if (c) { const ctx = c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); }
+  });
+
+  pulsePhase = 0; pathProgress = 0; isAnimating = false;
+
+  const di = document.getElementById('distanceIndicator');
+  if (di) di.style.display = 'none';
+
+  const info = document.getElementById('pathInfo');
+  if (info) info.innerHTML = '';
+}
+
+// จัดขนาด canvas เฉพาะรูป (ใช้เดิม)
+function setupCanvasFor(imgEl, canvasEl) {
+  if (!imgEl || !canvasEl) return;
+  const w = imgEl.offsetWidth  || imgEl.clientWidth;
+  const h = imgEl.offsetHeight || imgEl.clientHeight;
+  canvasEl.width = w; canvasEl.height = h;
+  canvasEl.style.width = w+'px'; canvasEl.style.height = h+'px';
+  const ctx = canvasEl.getContext('2d'); ctx.clearRect(0,0,w,h);
+}
+
+function scalePathToImageSizeFor(imgEl, canvasEl, pathCoords, originalWidth, originalHeight) {
+  const cw = canvasEl.width, ch = canvasEl.height;
+  const sx = cw / originalWidth, sy = ch / originalHeight;
+  return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
+}
+
+// แอนิเมตแบบ cross-floor (ทีละสไลด์)
+function startCrossFloorAnimation(scaledFrom, scaledTo) {
+  const imgFrom = document.getElementById('floorPlan_from');
+  const imgTo   = document.getElementById('floorPlan_to');
+  const cvsFrom = document.getElementById('pathCanvas_from');
+  const cvsTo   = document.getElementById('pathCanvas_to');
+
+  const ctxFrom = cvsFrom.getContext('2d');
+  const ctxTo   = cvsTo.getContext('2d');
+
+  let progressFrom = 0, progressTo = 0, phase = 0;
+  let active = Number((document.getElementById('indoorCarousel')?.dataset.index)||0);
+
+  function drawSlide(ctx, coords, progress) {
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    drawBackgroundPath(ctx, coords);
+    drawGoogleMapsPath(ctx, coords, progress);
+    pulsePhase = phase; // reuse
+    drawAnimatedNodes(ctx, coords, progress);
+    drawDirectionArrows(ctx, coords, progress);
+  }
+
+  function tick() {
+    phase += 0.15;
+    if (active === 0 && progressFrom < 1) progressFrom += 0.02;
+    if (active === 1 && progressTo   < 1) progressTo   += 0.02;
+
+    drawSlide(ctxFrom, scaledFrom, progressFrom);
+    drawSlide(ctxTo,   scaledTo,   progressTo);
+
+    animationId = requestAnimationFrame(tick);
+  }
+
+  cancelAnimationFrame(animationId);
+  animationId = requestAnimationFrame(tick);
+
+  window.__crossAnim = {
+    restart: (idx) => {
+      active = idx;
+      if (idx === 0) { progressFrom = 0; }
+      else           { progressTo   = 0; }
+    }
+  };
+}
+
 
 // panel-aware helpers
 function setupCanvasFor(imgEl, canvasEl) {
