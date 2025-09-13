@@ -189,7 +189,6 @@ function openIndoorNavigation(buildingId, floor) {
     currentFloor = floor;
 
     closeAllModals();
-    // Use the Promise version; no need to .then() here unlessต้องทำต่อ
     loadRoomsAndShowModal(buildingId, floor);
 }
 
@@ -227,7 +226,6 @@ function populateStartSelect(rooms, buildingId, floor) {
     select.value = '';
 }
 
-
 // ===== Promise version ONLY (clean) =====
 function loadRoomsAndShowModal(buildingId, floor) {
     return new Promise((resolve, reject) => {
@@ -245,11 +243,11 @@ function loadRoomsAndShowModal(buildingId, floor) {
                     allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = {floor: Number(fl), detail: it.Detail});
                 });
 
-                // เติม startSelect = ห้องบน “ชั้นปัจจุบัน” + ค่าเริ่มต้นเป็น “ลิฟต์ชั้นนี้”
+                // เติม startSelect = ห้องบน "ชั้นปัจจุบัน" + ค่าเริ่มต้นเป็น "ลิฟต์ชั้นนี้"
                 const roomsThisFloor = allByFloor[String(floor)] || [];
                 populateStartSelect(roomsThisFloor, buildingId, floor);
 
-                // เติม destinationSelect = ห้อง “ทุกชั้น” (optgroup)
+                // เติม destinationSelect = ห้อง "ทุกชั้น" (optgroup)
                 const sel = document.getElementById('destinationSelect');
                 sel.innerHTML = '<option value="">🎯 เลือกห้องที่ต้องการไป</option>';
                 Object.keys(allByFloor).sort((a, b) => Number(a) - Number(b)).forEach(fl => {
@@ -265,9 +263,9 @@ function loadRoomsAndShowModal(buildingId, floor) {
                     sel.appendChild(og);
                 });
 
-                // โหลดแผนผัง “ชั้นปัจจุบัน” เป็นดีฟอลต์ (โหมด single)
+                // โหลดแผนผัง "ชั้นปัจจุบัน" เป็นดีฟอลต์ (โหมด single)
                 ensureSinglePanel();
-                loadFloorPlan(currentBuildingId, floor); // ใช้ตัวเดิม (single)
+                loadFloorPlan(currentBuildingId, floor);
                 showIndoorModal();
                 hideLoadingIndicator();
                 resolve();
@@ -311,7 +309,6 @@ function loadFloorPlan(buildingId, floor, afterLoaded) {
     };
 }
 
-
 // Show indoor navigation modal
 function showIndoorModal() {
     const modalEl = document.getElementById('indoorModal');
@@ -331,44 +328,42 @@ function hideLoadingIndicator() {
 
 // Handle destination selection change
 function onDestinationChange() {
-  const sel = document.getElementById('destinationSelect');
-  const dest = sel.value;
-  if (!dest) { clearPath(); document.getElementById('pathInfo').innerHTML = ''; return; }
+    const sel = document.getElementById('destinationSelect');
+    const dest = sel.value;
+    if (!dest) { clearPath(); document.getElementById('pathInfo').innerHTML = ''; return; }
 
-  const info = allRoomsIndex[dest];
+    const info = allRoomsIndex[dest];
 
-  // ข้อมูลไม่ครบ → โหมดชั้นเดียว
-  if (!info) {
-    ensureSinglePanel();
-    loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
-    return; // ✅ สำคัญ
-  }
+    // ข้อมูลไม่ครบ → โหมดชั้นเดียว
+    if (!info) {
+        ensureSinglePanel();
+        loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
+        return;
+    }
 
-  if (Number(info.floor) === Number(currentFloor)) {
-    // ✅ ชั้นเดียวกัน
-    ensureSinglePanel();
-    loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
-    return; // ✅ สำคัญ: หยุดที่นี่ ไม่ให้หลุดเข้าโหมด stack
-  } else {
-    // ✅ ข้ามชั้น
-    ensureStackMode();
-    window.__navTargetFloor = Number(info.floor);
+    if (Number(info.floor) === Number(currentFloor)) {
+        // ✅ ชั้นเดียวกัน
+        ensureSinglePanel();
+        loadFloorPlan(currentBuildingId, currentFloor, () => findPath());
+        return;
+    } else {
+        // ✅ ข้ามชั้น
+        ensureStackMode();
+        window.__navTargetFloor = Number(info.floor);
 
-    const imgFrom = document.getElementById('floorPlan_from');
-    const imgTo   = document.getElementById('floorPlan_to');
-    imgFrom.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
-    imgTo.src   = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
+        const imgFrom = document.getElementById('floorPlan_from');
+        const imgTo   = document.getElementById('floorPlan_to');
+        imgFrom.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
+        imgTo.src   = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
 
-    let loaded = 0;
-    const tryDraw = () => {
-      if (++loaded === 2) { initStackCanvasSizing(); findPath(); }
-    };
-    imgFrom.onload = tryDraw; imgFrom.onerror = tryDraw;
-    imgTo.onload   = tryDraw; imgTo.onerror   = tryDraw;
-  }
+        let loaded = 0;
+        const tryDraw = () => {
+            if (++loaded === 2) { initStackCanvasSizing(); findPath(); }
+        };
+        imgFrom.onload = tryDraw; imgFrom.onerror = tryDraw;
+        imgTo.onload   = tryDraw; imgTo.onerror   = tryDraw;
+    }
 }
-
-
 
 // Setup canvas for path drawing
 function setupCanvas() {
@@ -392,7 +387,6 @@ function setupCanvas() {
     setTimeout(() => {
         try {
             const imgRect = img.getBoundingClientRect();
-
             const displayWidth = img.offsetWidth || img.clientWidth;
             const displayHeight = img.offsetHeight || img.clientHeight;
 
@@ -407,7 +401,6 @@ function setupCanvas() {
 
             canvas.style.width = displayWidth + 'px';
             canvas.style.height = displayHeight + 'px';
-
             canvas.style.position = 'absolute';
             canvas.style.top = '0px';
             canvas.style.left = '0px';
@@ -468,7 +461,7 @@ function findPath() {
             if (isCross) {
                 handlePathDataCross(data);
             } else {
-                window.handlePathData(data); // เดิม
+                window.handlePathData(data);
             }
         })
         .catch(err => window.handleError(err, 'findPath'));
@@ -485,7 +478,6 @@ function scalePathToImageSize(pathCoords, originalWidth, originalHeight) {
 
     const currentWidth = canvas.width;
     const currentHeight = canvas.height;
-
     const scaleX = currentWidth / originalWidth;
     const scaleY = currentHeight / originalHeight;
 
@@ -506,67 +498,68 @@ function scalePathToImageSize(pathCoords, originalWidth, originalHeight) {
 
 // Start Google Maps-like animation
 function startGoogleMapsAnimation(pathCoords) {
-  if (!pathCoords || pathCoords.length < 2) return;
+    if (!pathCoords || pathCoords.length < 2) return;
 
-  const canvas = document.getElementById('pathCanvas');
-  const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('pathCanvas');
+    const ctx = canvas.getContext('2d');
 
-  pathProgress = 0;
-  pulsePhase = 0;
-  isAnimating = true;
+    pathProgress = 0;
+    pulsePhase = 0;
+    isAnimating = true;
 
-  // metrics & runner state
-  let last = performance.now();
-  let runnerDist = 0;
-  let metricsAll = buildPathMetrics(pathCoords);
-  const SPEED_PX_PER_SEC = 220; // ↔ ปรับความเร็วไฟวิ่งได้
+    // metrics & runner state
+    let last = performance.now();
+    let runnerDist = 0;
+    let metricsAll = buildPathMetrics(pathCoords);
+    const SPEED_PX_PER_SEC = 80;
 
-  // total distance (สำหรับตัวแสดงผลเดิมของคุณ)
-  const totalDistance = calculateTotalDistance(pathCoords);
-  const distanceIndicator = document.getElementById('distanceIndicator');
-  if (distanceIndicator) {
-    distanceIndicator.textContent = `📏 ${Math.round(totalDistance * 0.01)} เมตร`;
-    distanceIndicator.style.display = 'block';
-  }
+    // total distance
+    const totalDistance = calculateTotalDistance(pathCoords);
+    const distanceIndicator = document.getElementById('distanceIndicator');
+    if (distanceIndicator) {
+        distanceIndicator.textContent = `📏 ${Math.round(totalDistance * 0.01)} เมตร`;
+        distanceIndicator.style.display = 'block';
+    }
 
-  function animate(now){
-    if (!isAnimating) return;
+    function animate(now){
+        if (!isAnimating) return;
 
-    // dt (ms) และอัปเดตไฟวิ่ง
-    const dt = Math.min(50, now - last); // cap เพื่อความนิ่ง
-    last = now;
-    runnerDist = (runnerDist + SPEED_PX_PER_SEC * (dt / 1000)) % (metricsAll.total || 1);
+        const dt = Math.min(50, now - last);
+        last = now;
+        runnerDist = (runnerDist + SPEED_PX_PER_SEC * (dt / 1000)) % (metricsAll.total || 1);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pulsePhase += 0.15;
-    if (pathProgress < 1) pathProgress += 0.02;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pulsePhase += 0.15;
+        if (pathProgress < 1) pathProgress += 0.02;
 
-    // เผยทีละส่วนตาม progress
-    const visible = subPathByProgress(pathCoords, pathProgress);
-    const mVis = buildPathMetrics(visible);
+        const visible = subPathByProgress(pathCoords, pathProgress);
+        const mVis = buildPathMetrics(visible);
 
-    // พื้นหลัง + เส้นหลัก
-    drawBackgroundPath(ctx, visible);
-    drawGoogleMapsPath(ctx, visible, 1);          // วาดเต็มส่วนที่มองเห็น
-    drawRunningLights(ctx, visible, mVis, runnerDist, { width: 6 }); // 🔥 ไฟวิ่ง
-    drawAnimatedNodes(ctx, visible, 1);
-    drawDirectionArrows(ctx, visible, 1);
+        // วาดเส้นทางแบบ Google Maps สีสดใส
+        drawGoogleMapsPath(ctx, visible, 1);
+        drawRunningLights(ctx, visible, mVis, runnerDist, { width: 6 });
+        drawAnimatedNodes(ctx, visible, 1);
 
+        animationId = requestAnimationFrame(animate);
+    }
+
+    cancelAnimationFrame(animationId);
     animationId = requestAnimationFrame(animate);
-  }
-
-  cancelAnimationFrame(animationId);
-  animationId = requestAnimationFrame(animate);
 }
 
-
-// Drawing functions
-function drawBackgroundPath(ctx, pathCoords) {
+// ปรับปรุงการวาดเส้นทางให้สีสดใสเหมือน Google Maps
+function drawGoogleMapsPath(ctx, pathCoords, progress) {
     if (pathCoords.length < 2) return;
 
+    const visiblePoints = Math.floor(pathCoords.length * progress);
+    if (visiblePoints < 2) return;
+
+    ctx.save();
+
+    // วาดเส้นพื้นหลังสีเข้ม (เงา)
     ctx.beginPath();
     ctx.moveTo(pathCoords[0].x, pathCoords[0].y);
-    for (let i = 1; i < pathCoords.length; i++) {
+    for (let i = 1; i < visiblePoints; i++) {
         ctx.lineTo(pathCoords[i].x, pathCoords[i].y);
     }
 
@@ -576,41 +569,31 @@ function drawBackgroundPath(ctx, pathCoords) {
     ctx.lineJoin = 'round';
     ctx.stroke();
 
-    ctx.lineWidth = 8;
+    // วาดเส้นหลักสีขาวใส
+    ctx.lineWidth = 10;
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.stroke();
-}
 
-function drawGoogleMapsPath(ctx, pathCoords, progress) {
-    const visiblePoints = Math.floor(pathCoords.length * progress);
-    if (visiblePoints < 2) return;
+    // วาดเส้นทางหลักสีฟ้าสด Google Maps
+    const gradient = ctx.createLinearGradient(
+        pathCoords[0].x, pathCoords[0].y,
+        pathCoords[visiblePoints - 1].x, pathCoords[visiblePoints - 1].y
+    );
+    gradient.addColorStop(0, '#1976D2');    // น้ำเงินเข้ม
+    gradient.addColorStop(0.3, '#2196F3');  // น้ำเงิน Google
+    gradient.addColorStop(0.7, '#03A9F4');  // ฟ้าสด
+    gradient.addColorStop(1, '#00BCD4');    // ฟ้าอมเขียว
 
-    const gradient = createPathGradient(ctx, pathCoords, visiblePoints);
-
-    ctx.beginPath();
-    ctx.moveTo(pathCoords[0].x, pathCoords[0].y);
-    for (let i = 1; i < visiblePoints; i++) {
-        ctx.lineTo(pathCoords[i].x, pathCoords[i].y);
-    }
-
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 8;
     ctx.strokeStyle = gradient;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.shadowColor = '#2196F3';
+    ctx.shadowBlur = 8;
     ctx.stroke();
+
+    ctx.restore();
 }
 
-function createPathGradient(ctx, pathCoords, visiblePoints) {
-    if (visiblePoints < 2) return '#4285F4';
-    const startPoint = pathCoords[0];
-    const endPoint = pathCoords[visiblePoints - 1];
-    const gradient = ctx.createLinearGradient(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-    gradient.addColorStop(0, '#4285F4');
-    gradient.addColorStop(0.5, '#34A853');
-    gradient.addColorStop(1, '#FBBC05');
-    return gradient;
-}
-
+// ปรับปรุงการวาดจุดเริ่มต้นและปลายทาง
 function drawAnimatedNodes(ctx, pathCoords, progress) {
     const visiblePoints = Math.floor(pathCoords.length * progress);
 
@@ -624,68 +607,52 @@ function drawAnimatedNodes(ctx, pathCoords, progress) {
         ctx.save();
 
         if (isStart) {
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, 8 + pulseSize, 0, Math.PI * 2);
-            ctx.fillStyle = '#4285F4';
-            ctx.shadowColor = '#4285F4';
-            ctx.shadowBlur = 10;
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
-            ctx.fillStyle = 'white';
-            ctx.shadowBlur = 0;
-            ctx.fill();
-        } else if (isEnd && index < visiblePoints) {
+            // จุดเริ่มต้นสีเขียวสด
             ctx.beginPath();
             ctx.arc(point.x, point.y, 10 + pulseSize, 0, Math.PI * 2);
-            ctx.fillStyle = '#EA4335';
-            ctx.shadowColor = '#EA4335';
-            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#4CAF50';  // เขียว Google
+            ctx.shadowColor = '#4CAF50';
+            ctx.shadowBlur = 12;
             ctx.fill();
 
+            // วงกลมขาวด้านใน
             ctx.beginPath();
             ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
             ctx.fillStyle = 'white';
             ctx.shadowBlur = 0;
             ctx.fill();
+
+            // จุดตรงกลาง
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#4CAF50';
+            ctx.fill();
+
+        } else if (isEnd && index < visiblePoints) {
+            // จุดปลายทางสีแดงสด
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 10 + pulseSize, 0, Math.PI * 2);
+            ctx.fillStyle = '#F44336';  // แดง Google
+            ctx.shadowColor = '#F44336';
+            ctx.shadowBlur = 15;
+            ctx.fill();
+
+            // วงกลมขาวด้านใน
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'white';
+            ctx.shadowBlur = 0;
+            ctx.fill();
+
+            // จุดตรงกลาง
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#F44336';
+            ctx.fill();
         }
 
         ctx.restore();
     });
-}
-
-function drawDirectionArrows(ctx, pathCoords, progress) {
-    const visiblePoints = Math.floor(pathCoords.length * progress);
-    if (visiblePoints < 2) return;
-
-    ctx.save();
-    for (let i = 0; i < visiblePoints - 1; i += 3) {
-        if (i + 1 >= pathCoords.length) break;
-
-        const start = pathCoords[i];
-        const end = pathCoords[i + 1];
-        const angle = Math.atan2(end.y - start.y, end.x - start.x);
-        const midX = (start.x + end.x) / 2;
-        const midY = (start.y + end.y) / 2;
-
-        ctx.translate(midX, midY);
-        ctx.rotate(angle);
-
-        ctx.beginPath();
-        ctx.moveTo(-5, -3);
-        ctx.lineTo(5, 0);
-        ctx.lineTo(-5, 3);
-        ctx.closePath();
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 3;
-        ctx.fill();
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-    }
-    ctx.restore();
 }
 
 function calculateTotalDistance(pathCoords) {
@@ -816,10 +783,8 @@ function handlePathDataCross(data) {
             return;
         }
 
-        // ✅ ใช้ Carousel (ถ้ายังไม่อยู่โหมดนี้)
         ensureStackMode();
 
-        // เตรียม canvas ให้พอดีกับภาพ
         const imgFrom = document.getElementById('floorPlan_from');
         const imgTo = document.getElementById('floorPlan_to');
         const cvsFrom = document.getElementById('pathCanvas_from');
@@ -828,14 +793,11 @@ function handlePathDataCross(data) {
         setupCanvasFor(imgFrom, cvsFrom);
         setupCanvasFor(imgTo, cvsTo);
 
-        // สเกลพาธให้ตรงกับขนาดรูปปัจจุบัน
         const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path, data.origin.img_width, data.origin.img_height);
         const scaledTo = scalePathToImageSizeFor(imgTo, cvsTo, data.destination.path, data.destination.img_width, data.destination.img_height);
 
-        // 🔄 แอนิเมชัน: วาดทีละสไลด์
         startCrossFloorAnimation(scaledFrom, scaledTo);
 
-        // อัปเดตสรุปเส้นทาง
         const steps = (data.nodes || []).map((n, i) => {
             const name = n.detail || n.node_id;
             if (i === 0) return `<li class="step-start">เริ่มจาก <strong>${name}</strong> (ชั้น ${data.origin.floor})</li>`;
@@ -869,29 +831,8 @@ function handlePathDataCross(data) {
     }
 }
 
-// NEW: index ข้อมูลห้องทั้งหมดในอาคาร -> ใช้รู้ว่า NodeID อยู่ชั้นไหน
-let allRoomsIndex = {}; // { NodeID: { floor, detail } }
-
-// NEW: โครงสร้าง panel 2 ฝั่ง เมื่อข้ามชั้น
-function ensureDualPanels() {
-    const container = document.querySelector('.navigation-container');
-    if (!container) return;
-    if (container.dataset.mode === 'dual') return;
-
-    container.innerHTML = `
-    <div id="navGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="panel" data-panel="from" style="position:relative;">
-        <img id="floorPlan_from" alt="แผนผังชั้นต้นทาง" style="width:100%;">
-        <canvas id="pathCanvas_from" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
-      </div>
-      <div class="panel" data-panel="to" style="position:relative;">
-        <img id="floorPlan_to" alt="แผนผังชั้นปลายทาง" style="width:100%;">
-        <canvas id="pathCanvas_to" aria-hidden="true" style="position:absolute;top:0;left:0;"></canvas>
-      </div>
-    </div>
-  `;
-    container.dataset.mode = 'dual';
-}
+// NEW: index ข้อมูลห้องทั้งหมดในอาคาร
+let allRoomsIndex = {};
 
 function ensureSinglePanel() {
     const container = document.querySelector('.navigation-container');
@@ -905,7 +846,6 @@ function ensureSinglePanel() {
     container.dataset.mode = 'single';
 }
 
-// ===== Two-panel (ข้ามชั้นแบบสองรูปบน-ล่าง) =====
 function ensureStackMode() {
     const container = document.querySelector('.navigation-container');
     if (!container) return;
@@ -932,76 +872,7 @@ function ensureStackMode() {
     </div>
   `;
     container.dataset.mode = 'stack';
-
-    // ✅ สำคัญ: ให้แคนวาสตรงขนาดรูป
     initStackCanvasSizing();
-}
-
-// ===== Carousel (ข้ามชั้น) =====
-function ensureCarouselMode() {
-    const container = document.querySelector('.navigation-container');
-    if (!container) return;
-    if (container.dataset.mode === 'carousel') return;
-
-    container.innerHTML = `
-    <div class="indoor-carousel" id="indoorCarousel" data-index="0">
-      <div class="indoor-carousel__track" id="indoorCarouselTrack">
-        <div class="indoor-carousel__slide" data-role="from">
-          <img id="floorPlan_from" alt="ชั้นต้นทาง">
-          <canvas id="pathCanvas_from"></canvas>
-        </div>
-        <div class="indoor-carousel__slide" data-role="to">
-          <img id="floorPlan_to" alt="ชั้นปลายทาง">
-          <canvas id="pathCanvas_to"></canvas>
-        </div>
-      </div>
-      <div class="indoor-carousel__nav">
-        <button class="indoor-carousel__btn" id="indoorPrev">‹</button>
-        <button class="indoor-carousel__btn" id="indoorNext">›</button>
-      </div>
-      <div class="indoor-carousel__dots">
-        <div class="indoor-carousel__dot is-active" data-dot="0"></div>
-        <div class="indoor-carousel__dot" data-dot="1"></div>
-      </div>
-    </div>
-  `;
-    container.dataset.mode = 'carousel';
-
-    bindCarouselControls();
-}
-
-function bindCarouselControls() {
-    const wrap = document.getElementById('indoorCarousel');
-    const track = document.getElementById('indoorCarouselTrack');
-    const dots = Array.from(wrap.querySelectorAll('.indoor-carousel__dot'));
-    const prev = document.getElementById('indoorPrev');
-    const next = document.getElementById('indoorNext');
-
-    const go = (idx) => {
-        idx = Math.max(0, Math.min(1, idx));
-        wrap.dataset.index = String(idx);
-        track.style.transform = `translateX(${idx * -100}%)`;
-        dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
-
-        // เมื่อเปลี่ยนสไลด์ ให้รีสตาร์ทแอนิเมชันของสไลด์นั้น
-        if (window.__crossAnim && typeof window.__crossAnim.restart === 'function') {
-            window.__crossAnim.restart(idx);
-        }
-    };
-
-    prev.onclick = () => go(Number(wrap.dataset.index || 0) - 1);
-    next.onclick = () => go(Number(wrap.dataset.index || 0) + 1);
-
-    // รองรับปัดซ้าย/ขวา
-    let sx = 0;
-    track.addEventListener('touchstart', e => {
-        sx = e.changedTouches[0].clientX;
-    }, {passive: true});
-    track.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - sx;
-        if (dx > 50) prev.click();
-        else if (dx < -50) next.click();
-    }, {passive: true});
 }
 
 // เคลียร์ทั้ง single และ cross-floor canvases
@@ -1030,78 +901,47 @@ function clearPath() {
     if (info) info.innerHTML = '';
 }
 
-// แอนิเมตแบบ cross-floor (ทีละสไลด์)
+// แอนิเมตแบบ cross-floor
 function startCrossFloorAnimation(scaledFrom, scaledTo) {
-  const cvsFrom = document.getElementById('pathCanvas_from');
-  const cvsTo   = document.getElementById('pathCanvas_to');
-  const ctxFrom = cvsFrom.getContext('2d');
-  const ctxTo   = cvsTo.getContext('2d');
+    const cvsFrom = document.getElementById('pathCanvas_from');
+    const cvsTo = document.getElementById('pathCanvas_to');
+    const ctxFrom = cvsFrom.getContext('2d');
+    const ctxTo = cvsTo.getContext('2d');
 
-  let progressFrom = 0, progressTo = 0, phase = 0;
-  let last = performance.now();
-  const SPEED_PX_PER_SEC = 100;
+    let progressFrom = 0, progressTo = 0, phase = 0;
+    let last = performance.now();
+    const SPEED_PX_PER_SEC = 80;
 
-  // โหมดปัจจุบัน
-  const container = document.querySelector('.navigation-container');
-  const mode = container?.dataset.mode || 'stack'; // 'stack' | 'carousel'
-  let active = 0;
-  if (mode === 'carousel') {
-    const wrap = document.getElementById('indoorCarousel');
-    active = Number(wrap?.dataset.index || 0);
-  }
+    let distFrom = 0, distTo = 0;
 
-  let distFrom = 0, distTo = 0;
+    function drawSlide(ctx, coords, progress, runnerDist){
+        const visible = subPathByProgress(coords, progress);
+        const mVis = buildPathMetrics(visible);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        drawGoogleMapsPath(ctx, visible, 1);
+        drawRunningLights(ctx, visible, mVis, runnerDist, { width: 6 });
+        pulsePhase = phase;
+        drawAnimatedNodes(ctx, visible, 1);
+    }
 
-  function drawSlide(ctx, coords, progress, runnerDist){
-    const visible = subPathByProgress(coords, progress);
-    const mVis = buildPathMetrics(visible);
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    drawBackgroundPath(ctx, visible);
-    drawGoogleMapsPath(ctx, visible, 1);
-    drawRunningLights(ctx, visible, mVis, runnerDist, { width: 6 }); // 🔥 ไฟวิ่ง
-    pulsePhase = phase;
-    drawAnimatedNodes(ctx, visible, 1);
-    drawDirectionArrows(ctx, visible, 1);
-  }
+    function tick(now){
+        phase += 0.15;
+        const dt = Math.min(50, now - last);
+        last = now;
 
-  function tick(now){
-    phase += 0.15;
-    const dt = Math.min(50, now - last);
-    last = now;
-
-    if (mode === 'carousel') {
-      if (active === 0) {
         distFrom = (distFrom + SPEED_PX_PER_SEC * (dt / 1000)) % Math.max(1, buildPathMetrics(scaledFrom).total);
-        if (progressFrom < 1) progressFrom += 0.02;
-      } else {
         distTo = (distTo + SPEED_PX_PER_SEC * (dt / 1000)) % Math.max(1, buildPathMetrics(scaledTo).total);
+        if (progressFrom < 1) progressFrom += 0.02;
         if (progressTo < 1) progressTo += 0.02;
-      }
-    } else {
-      // STACK: เดินพร้อมกันทั้งสองผืน
-      distFrom = (distFrom + SPEED_PX_PER_SEC * (dt / 1000)) % Math.max(1, buildPathMetrics(scaledFrom).total);
-      distTo   = (distTo   + SPEED_PX_PER_SEC * (dt / 1000)) % Math.max(1, buildPathMetrics(scaledTo).total);
-      if (progressFrom < 1) progressFrom += 0.02;
-      if (progressTo   < 1) progressTo   += 0.02;
+
+        drawSlide(ctxFrom, scaledFrom, progressFrom, distFrom);
+        drawSlide(ctxTo, scaledTo, progressTo, distTo);
+
+        animationId = requestAnimationFrame(tick);
     }
 
-    drawSlide(ctxFrom, scaledFrom, progressFrom, distFrom);
-    drawSlide(ctxTo,   scaledTo,   progressTo,   distTo);
-
+    cancelAnimationFrame(animationId);
     animationId = requestAnimationFrame(tick);
-  }
-
-  cancelAnimationFrame(animationId);
-  animationId = requestAnimationFrame(tick);
-
-  // รองรับเฉพาะ carousel
-  window.__crossAnim = {
-    restart: (idx) => {
-      if (mode !== 'carousel') return;
-      active = idx;
-      if (idx === 0) progressFrom = 0; else progressTo = 0;
-    }
-  };
 }
 
 // panel-aware helpers
@@ -1118,15 +958,14 @@ function setupCanvasFor(imgEl, canvasEl) {
 }
 
 function scalePathToImageSizeFor(imgEl, canvasEl, pathCoords, originalWidth, originalHeight) {
-  const cw = canvasEl.width, ch = canvasEl.height;
-  const ow = originalWidth  || imgEl.naturalWidth  || cw || 1;
-  const oh = originalHeight || imgEl.naturalHeight || ch || 1;
-  const sx = cw / ow, sy = ch / oh;
-  return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
+    const cw = canvasEl.width, ch = canvasEl.height;
+    const ow = originalWidth || imgEl.naturalWidth || cw || 1;
+    const oh = originalHeight || imgEl.naturalHeight || ch || 1;
+    const sx = cw / ow, sy = ch / oh;
+    return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
 }
 
 function syncCanvasToImage(imgEl, canvasEl) {
-    // ใช้ขนาดที่แสดงจริงบนหน้าจอ
     const rect = imgEl.getBoundingClientRect();
     canvasEl.width = Math.max(1, Math.round(rect.width));
     canvasEl.height = Math.max(1, Math.round(rect.height));
@@ -1143,111 +982,114 @@ function initStackCanvasSizing() {
         if (imgTo && cvTo && imgTo.complete) syncCanvasToImage(imgTo, cvTo);
     };
 
-    // ซิงก์เมื่อรูปโหลดและเมื่อรีไซซ์หน้าต่าง
     imgFrom?.addEventListener('load', doSync);
     imgTo?.addEventListener('load', doSync);
     window.addEventListener('resize', doSync);
-
-    // เรียกครั้งแรกทันที
     doSync();
 }
 
 // === Running-light utilities ===
 function buildPathMetrics(coords){
-  if (!coords || coords.length < 2) return { total: 0, segLengths: [], cum: [0] };
-  const segLengths = [];
-  let total = 0;
-  for (let i = 1; i < coords.length; i++){
-    const dx = coords[i].x - coords[i-1].x;
-    const dy = coords[i].y - coords[i-1].y;
-    const len = Math.hypot(dx, dy);
-    segLengths.push(len);
-    total += len;
-  }
-  const cum = [0];
-  for (const l of segLengths) cum.push(cum[cum.length - 1] + l);
-  return { total, segLengths, cum };
+    if (!coords || coords.length < 2) return { total: 0, segLengths: [], cum: [0] };
+    const segLengths = [];
+    let total = 0;
+    for (let i = 1; i < coords.length; i++){
+        const dx = coords[i].x - coords[i-1].x;
+        const dy = coords[i].y - coords[i-1].y;
+        const len = Math.hypot(dx, dy);
+        segLengths.push(len);
+        total += len;
+    }
+    const cum = [0];
+    for (const l of segLengths) cum.push(cum[cum.length - 1] + l);
+    return { total, segLengths, cum };
 }
 
 function pointAtDistance(coords, metrics, d){
-  const { total, cum } = metrics;
-  if (!coords || coords.length === 0) return { x: 0, y: 0 };
-  if (total === 0) return coords[0];
-  d = Math.max(0, Math.min(d, total));
-  let i = 1;
-  while (i < cum.length && cum[i] < d) i++;
-  const i0 = Math.max(1, i) - 1;
-  const a = coords[i0], b = coords[i0 + 1] || coords[i0];
-  const segLen = metrics.segLengths[i0] || 1;
-  const t = segLen ? (d - cum[i0]) / segLen : 0;
-  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    const { total, cum } = metrics;
+    if (!coords || coords.length === 0) return { x: 0, y: 0 };
+    if (total === 0) return coords[0];
+    d = Math.max(0, Math.min(d, total));
+    let i = 1;
+    while (i < cum.length && cum[i] < d) i++;
+    const i0 = Math.max(1, i) - 1;
+    const a = coords[i0], b = coords[i0 + 1] || coords[i0];
+    const segLen = metrics.segLengths[i0] || 1;
+    const t = segLen ? (d - cum[i0]) / segLen : 0;
+    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 }
 
+// ปรับปรุงไฟวิ่งให้สีสดใสขึ้น
 function drawRunningLights(ctx, coords, metrics, headDist, opts = {}){
-  if (!coords || coords.length < 2 || metrics.total === 0) return;
+    if (!coords || coords.length < 2 || metrics.total === 0) return;
 
-  const dash  = opts.dash  ?? 18;
-  const gap   = opts.gap   ?? 12;
-  const width = opts.width ?? 6;
+    const dash = opts.dash ?? 18;
+    const gap = opts.gap ?? 12;
+    const width = opts.width ?? 6;
 
-  ctx.save();
-  ctx.setLineDash([dash, gap]);
-  ctx.lineDashOffset = - (headDist % (dash + gap));
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.globalCompositeOperation = 'lighter';
+    ctx.save();
+    ctx.setLineDash([dash, gap]);
+    ctx.lineDashOffset = - (headDist % (dash + gap));
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalCompositeOperation = 'source-over';
 
-  // glow underlay
-  ctx.lineWidth   = width;
-  ctx.shadowColor = opts.glowColor   ?? 'rgba(250, 204, 21, 0.9)'; // amber
-  ctx.shadowBlur  = opts.shadowBlur  ?? 12;
-  ctx.strokeStyle = opts.strokeColor ?? 'rgba(250, 204, 21, 0.85)';
+    // glow underlay - สีทองสดใส
+    ctx.lineWidth = width + 2;
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 15;
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
 
-  ctx.beginPath();
-  ctx.moveTo(coords[0].x, coords[0].y);
-  for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i].x, coords[i].y);
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(coords[0].x, coords[0].y);
+    for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i].x, coords[i].y);
+    ctx.stroke();
 
-  // bright core
-  ctx.shadowBlur  = 0;
-  ctx.lineWidth   = Math.max(2, width - 2);
-  ctx.strokeStyle = opts.coreColor ?? '#fde047';
-  ctx.stroke();
-  ctx.restore();
+    // bright core - สีเหลืองสด
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.max(2, width - 2);
+    ctx.strokeStyle = '#FFFF00';
+    ctx.stroke();
+    ctx.restore();
 
-  // comet head + short tail
-  const head = pointAtDistance(coords, metrics, headDist);
-  const tail = pointAtDistance(coords, metrics, Math.max(0, headDist - (opts.tailLen ?? 40)));
+    // comet head + short tail
+    const head = pointAtDistance(coords, metrics, headDist);
+    const tail = pointAtDistance(coords, metrics, Math.max(0, headDist - (opts.tailLen ?? 40)));
 
-  ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
 
-  // tail segment
-  ctx.beginPath();
-  ctx.lineWidth   = width + 2;
-  ctx.strokeStyle = opts.tailColor ?? 'rgba(253, 224, 71, 0.9)';
-  ctx.moveTo(tail.x, tail.y);
-  ctx.lineTo(head.x, head.y);
-  ctx.stroke();
+    // tail segment - ไล่สีจากทองไปขาว
+    const tailGrad = ctx.createLinearGradient(tail.x, tail.y, head.x, head.y);
+    tailGrad.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
+    tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
 
-  // head glow
-  const R = opts.headRadius ?? 10;
-  const g = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, R);
-  g.addColorStop(0, '#fff7ed'); // warm white
-  g.addColorStop(1, 'rgba(251, 191, 36, 0)');
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(head.x, head.y, R, 0, Math.PI * 2);
-  ctx.fill();
+    ctx.beginPath();
+    ctx.lineWidth = width + 2;
+    ctx.strokeStyle = tailGrad;
+    ctx.moveTo(tail.x, tail.y);
+    ctx.lineTo(head.x, head.y);
+    ctx.stroke();
 
-  ctx.restore();
+    // head glow - สีขาวสดใส
+    const R = opts.headRadius ?? 12;
+    const g = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, R);
+    g.addColorStop(0, '#FFFFFF');
+    g.addColorStop(0.5, 'rgba(255, 215, 0, 0.6)');
+    g.addColorStop(1, 'rgba(255, 215, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(head.x, head.y, R, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
 }
 
 function subPathByProgress(coords, progress){
-  if (!coords || coords.length < 2) return coords || [];
-  if (progress >= 1) return coords;
-  const n = Math.max(2, Math.ceil(coords.length * progress));
-  return coords.slice(0, n);
+    if (!coords || coords.length < 2) return coords || [];
+    if (progress >= 1) return coords;
+    const n = Math.max(2, Math.ceil(coords.length * progress));
+    return coords.slice(0, n);
 }
 
 
