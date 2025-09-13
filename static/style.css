@@ -1882,3 +1882,7 @@ html, body {
 .indoor-carousel__dot{width:8px;height:8px;border-radius:50%;background:#ddd;opacity:.8}
 .indoor-carousel__dot.is-active{background:#4285F4;opacity:1}
 
+.indoor-stack__panel { margin-bottom: 12px; }
+.indoor-stack__media { position: relative; }
+
+
