@@ -30,7 +30,7 @@ const Modal = (() => {
         trapFocus(modalEl);
 
         // custom event (แทน shown.bs.modal)
-        modalEl.dispatchEvent(new CustomEvent('modal:shown', {bubbles: true}));
+        modalEl.dispatchEvent(new CustomEvent('modal:shown', { bubbles: true }));
     }
 
     function close(modalEl) {
@@ -52,7 +52,7 @@ const Modal = (() => {
         releaseFocus();
 
         // custom event
-        modalEl.dispatchEvent(new CustomEvent('modal:hidden', {bubbles: true}));
+        modalEl.dispatchEvent(new CustomEvent('modal:hidden', { bubbles: true }));
 
         // restore focus
         if (lastFocused && lastFocused.focus) {
@@ -102,7 +102,7 @@ const Modal = (() => {
         }
     }
 
-    return {open, close};
+    return { open, close };
 })();
 
 // Global variables for indoor navigation
@@ -240,7 +240,7 @@ function loadRoomsAndShowModal(buildingId, floor) {
                 // สร้าง index NodeID -> {floor, detail}
                 allRoomsIndex = {};
                 Object.keys(allByFloor).forEach(fl => {
-                    allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = {floor: Number(fl), detail: it.Detail});
+                    allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = { floor: Number(fl), detail: it.Detail });
                 });
 
                 // เติม startSelect = ห้องบน "ชั้นปัจจุบัน" + ค่าเริ่มต้นเป็น "ลิฟต์ชั้นนี้"
@@ -352,19 +352,20 @@ function onDestinationChange() {
         window.__navTargetFloor = Number(info.floor);
 
         const imgFrom = document.getElementById('floorPlan_from');
-        const imgTo   = document.getElementById('floorPlan_to');
+        const imgTo = document.getElementById('floorPlan_to');
         imgFrom.src = `/static/img/planTower${currentBuildingId}Floor${currentFloor}.png`;
-        imgTo.src   = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
+        imgTo.src = `/static/img/planTower${currentBuildingId}Floor${info.floor}.png`;
 
         let loaded = 0;
         const tryDraw = () => {
             if (++loaded === 2) { initStackCanvasSizing(); findPath(); }
         };
         imgFrom.onload = tryDraw; imgFrom.onerror = tryDraw;
-        imgTo.onload   = tryDraw; imgTo.onerror   = tryDraw;
+        imgTo.onload = tryDraw; imgTo.onerror = tryDraw;
     }
 }
 
+// Setup canvas for path drawing
 // Setup canvas for path drawing
 function setupCanvas() {
     const canvas = document.getElementById('pathCanvas');
@@ -386,24 +387,24 @@ function setupCanvas() {
 
     setTimeout(() => {
         try {
+            // ใช้ rect → ขนาดจริงที่แสดงบนจอ
             const imgRect = img.getBoundingClientRect();
-            const displayWidth = img.offsetWidth || img.clientWidth;
-            const displayHeight = img.offsetHeight || img.clientHeight;
+            const displayWidth = imgRect.width;
+            const displayHeight = imgRect.height;
 
             console.log('Image dimensions:', {
-                natural: {width: img.naturalWidth, height: img.naturalHeight},
-                displayed: {width: displayWidth, height: displayHeight},
-                rect: {width: imgRect.width, height: imgRect.height}
+                natural: { width: img.naturalWidth, height: img.naturalHeight },
+                displayed: { width: displayWidth, height: displayHeight }
             });
 
+            // sync canvas กับรูป
             canvas.width = displayWidth;
             canvas.height = displayHeight;
-
             canvas.style.width = displayWidth + 'px';
             canvas.style.height = displayHeight + 'px';
             canvas.style.position = 'absolute';
-            canvas.style.top = '0px';
-            canvas.style.left = '0px';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
             canvas.style.zIndex = '10';
             canvas.style.pointerEvents = 'none';
 
@@ -428,6 +429,7 @@ function setupCanvas() {
     }, 50);
 }
 
+
 // Find path to selected destination
 function findPath() {
     const destination = document.getElementById('destinationSelect').value;
@@ -449,7 +451,7 @@ function findPath() {
     };
 
     fetch(url, {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
     })
         .then(r => {
@@ -482,9 +484,9 @@ function scalePathToImageSize(pathCoords, originalWidth, originalHeight) {
     const scaleY = currentHeight / originalHeight;
 
     console.log('Scaling path coordinates:', {
-        original: {width: originalWidth, height: originalHeight},
-        current: {width: currentWidth, height: currentHeight},
-        scale: {x: scaleX, y: scaleY}
+        original: { width: originalWidth, height: originalHeight },
+        current: { width: currentWidth, height: currentHeight },
+        scale: { x: scaleX, y: scaleY }
     });
 
     const scaledCoords = pathCoords.map(point => ({
@@ -521,7 +523,7 @@ function startGoogleMapsAnimation(pathCoords) {
         distanceIndicator.style.display = 'block';
     }
 
-    function animate(now){
+    function animate(now) {
         if (!isAnimating) return;
 
         const dt = Math.min(50, now - last);
@@ -805,25 +807,11 @@ function handlePathDataCross(data) {
             return `<li class="step-through">ผ่าน ${name}</li>`;
         }).join('');
 
-        const liftNote = data.elevator_id ? `
-      <div class="summary-item">
-        <span class="icon">⬆️</span>
-        <span class="label">ลิฟต์:</span>
-        <span class="value">ID ${data.elevator_id} (ชั้น ${data.origin.floor} ➜ ${data.destination.floor})</span>
-      </div>` : '';
-
         const len = arr => arr.reduce((s, p, i) => i ? s + Math.hypot(p.x - arr[i - 1].x, p.y - arr[i - 1].y) : 0, 0);
-        const distM = Math.round((len(scaledFrom) + len(scaledTo)) * 0.1);
-        const timeMin = Math.max(1, Math.ceil(distM / 60));
 
         document.getElementById('pathInfo').innerHTML = `
       <h3>🗺️ ข้อมูลเส้นทาง (ข้ามชั้น)</h3>
       <ol class="path-steps">${steps}</ol>
-      <div class="path-summary">
-        <div class="summary-item"><span class="icon">📏</span><span class="label">ระยะทาง:</span><span class="value">${distM} เมตร</span></div>
-        <div class="summary-item"><span class="icon">⏱️</span><span class="label">เวลาโดยประมาณ:</span><span class="value">${timeMin} นาที</span></div>
-        ${liftNote}
-      </div>
     `;
     } catch (e) {
         console.error(e);
@@ -855,7 +843,7 @@ function ensureStackMode() {
     <div class="indoor-stack" id="indoorStack">
       <section class="indoor-stack__panel" data-role="from">
         <header class="indoor-stack__label">ชั้นต้นทาง</header>
-        <div class="indoor-stack__media" style="position:relative">
+        <div class="indoor-stack__media" id="first-media" style="position:relative">
           <img id="floorPlan_from" alt="ชั้นต้นทาง" style="display:block;width:100%;height:auto;">
           <canvas id="pathCanvas_from"
                   style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
@@ -863,7 +851,7 @@ function ensureStackMode() {
       </section>
       <section class="indoor-stack__panel" data-role="to">
         <header class="indoor-stack__label">ชั้นปลายทาง</header>
-        <div class="indoor-stack__media" style="position:relative">
+        <div class="indoor-stack__media" id="second-media" style="position:relative">
           <img id="floorPlan_to" alt="ชั้นปลายทาง" style="display:block;width:100%;height:auto;">
           <canvas id="pathCanvas_to"
                   style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
@@ -914,7 +902,7 @@ function startCrossFloorAnimation(scaledFrom, scaledTo) {
 
     let distFrom = 0, distTo = 0;
 
-    function drawSlide(ctx, coords, progress, runnerDist){
+    function drawSlide(ctx, coords, progress, runnerDist) {
         const visible = subPathByProgress(coords, progress);
         const mVis = buildPathMetrics(visible);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -924,7 +912,7 @@ function startCrossFloorAnimation(scaledFrom, scaledTo) {
         drawAnimatedNodes(ctx, visible, 1);
     }
 
-    function tick(now){
+    function tick(now) {
         phase += 0.15;
         const dt = Math.min(50, now - last);
         last = now;
@@ -943,16 +931,27 @@ function startCrossFloorAnimation(scaledFrom, scaledTo) {
     cancelAnimationFrame(animationId);
     animationId = requestAnimationFrame(tick);
 }
-
-// panel-aware helpers
 function setupCanvasFor(imgEl, canvasEl) {
     if (!imgEl || !canvasEl) return;
+
+    const container = imgEl.closest('.indoor-stack__media') || imgEl.parentElement;
+    const style = container ? getComputedStyle(container) : null;
+    const paddingLeft = style ? parseFloat(style.paddingLeft) || 0 : 0;
+    const paddingTop = style ? parseFloat(style.paddingTop) || 0 : 0;
+
     const displayWidth = imgEl.offsetWidth || imgEl.clientWidth;
     const displayHeight = imgEl.offsetHeight || imgEl.clientHeight;
+
     canvasEl.width = displayWidth;
     canvasEl.height = displayHeight;
     canvasEl.style.width = displayWidth + 'px';
     canvasEl.style.height = displayHeight + 'px';
+
+    // ปรับตำแหน่ง canvas ตาม padding
+    canvasEl.style.position = 'absolute';
+    canvasEl.style.top = paddingTop + 'px';
+    canvasEl.style.left = paddingLeft + 'px';
+
     const ctx = canvasEl.getContext('2d');
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 }
@@ -989,13 +988,13 @@ function initStackCanvasSizing() {
 }
 
 // === Running-light utilities ===
-function buildPathMetrics(coords){
+function buildPathMetrics(coords) {
     if (!coords || coords.length < 2) return { total: 0, segLengths: [], cum: [0] };
     const segLengths = [];
     let total = 0;
-    for (let i = 1; i < coords.length; i++){
-        const dx = coords[i].x - coords[i-1].x;
-        const dy = coords[i].y - coords[i-1].y;
+    for (let i = 1; i < coords.length; i++) {
+        const dx = coords[i].x - coords[i - 1].x;
+        const dy = coords[i].y - coords[i - 1].y;
         const len = Math.hypot(dx, dy);
         segLengths.push(len);
         total += len;
@@ -1005,7 +1004,7 @@ function buildPathMetrics(coords){
     return { total, segLengths, cum };
 }
 
-function pointAtDistance(coords, metrics, d){
+function pointAtDistance(coords, metrics, d) {
     const { total, cum } = metrics;
     if (!coords || coords.length === 0) return { x: 0, y: 0 };
     if (total === 0) return coords[0];
@@ -1020,7 +1019,7 @@ function pointAtDistance(coords, metrics, d){
 }
 
 // ปรับปรุงไฟวิ่งให้สีสดใสขึ้น
-function drawRunningLights(ctx, coords, metrics, headDist, opts = {}){
+function drawRunningLights(ctx, coords, metrics, headDist, opts = {}) {
     if (!coords || coords.length < 2 || metrics.total === 0) return;
 
     const dash = opts.dash ?? 18;
@@ -1085,7 +1084,7 @@ function drawRunningLights(ctx, coords, metrics, headDist, opts = {}){
     ctx.restore();
 }
 
-function subPathByProgress(coords, progress){
+function subPathByProgress(coords, progress) {
     if (!coords || coords.length < 2) return coords || [];
     if (progress >= 1) return coords;
     const n = Math.max(2, Math.ceil(coords.length * progress));
