@@ -531,7 +531,7 @@
         <!-- Dialog -->
         <div class="app-modal__dialog" role="document" aria-describedby="indoorModalDesc">
             <header class="app-modal__header">
-                <h2 class="app-modal__title" id="indoorModalLabel">🗺️ แผนผังตึก</h2>
+                <h2 class="app-modal__title" id="indoorModalLabel">แผนผังตึก</h2>
                 <button type="button" class="app-modal__close" data-close="true" aria-label="ปิดหน้าต่าง">×</button>
             </header>
 
@@ -544,13 +544,12 @@
                     <label for="destinationSelect" class="form-label mt-2">เลือกห้องปลายทาง (ข้ามชั้นได้)</label>
                     <select id="destinationSelect" class="form-select" onchange="onDestinationChange()"
                         aria-label="เลือกห้องที่ต้องการไป">
-                        <option value="">🎯 เลือกห้องที่ต้องการไป</option>
+                        <option value="">เลือกห้องที่ต้องการไป</option>
                     </select>
                 </div>
 
                 <div class="navigation-container" id="indoorNavRoot" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
                 </div>
-                <div id="distanceIndicator" class="distance-indicator" aria-live="polite" hidden></div>
 
                 <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
 
