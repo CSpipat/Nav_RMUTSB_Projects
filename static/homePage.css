@@ -14,42 +14,15 @@ body {
   box-sizing: border-box;
 }
 
-.body-content {
-  display: grid;
-  grid-template-rows: 20% 60% 20%;
-  height: 100%;
-  width: 100%;
-}
 
-
-.top-part {
-  background-color: aqua;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #F9B508;
-  width: auto;
-  height: auto;
-}
-
-.top-part img {
-  max-width: 100%;
-  height: auto;
-  width: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 /* Responsive for mobile */
 @media screen and (min-width: 275px) and (max-width: 1000px) {
 
   .body-content {
     display: grid;
-    grid-template-rows: 13% 75% 12%;
-    height: 100%;
-    width: 100%;
-    /* ให้กว้างเต็ม */
+    grid-template-rows: 1fr 4fr 1fr;
+    /* แทน % */
   }
 
   .main {
@@ -69,61 +42,69 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #F9B508;
     width: 100%;
-    height: 100%;
   }
+
 
   .top-part img {
+    max-width: 90%;
+    /* ป้องกันล้น */
     height: auto;
-    padding: 20px;
-    justify-content: center;
-    align-items: center;
+    display: block;
+    object-fit: contain;
+    margin: 0 auto;
+    padding: 10px;
   }
 
-  /* ====================================== */
+  /* ==================main part ==================== */
 
-   .body-content {
+  .body-content {
     display: grid;
     grid-template-rows: 13% 75% 12%;
     height: 100%;
     width: 100%;
   }
 
-  /* ส่วนนี้สำคัญ: จัดการ .main ด้วย Flexbox */
+
   .main {
     display: flex;
-    flex-direction: column; /* จัดเรียงองค์ประกอบในแนวตั้ง */
+    flex-direction: column;
     background-image: url(/static/img/homepage/20250213_143920.jpg);
     background-size: cover;
-    background-position: center; /* เปลี่ยน background-position ให้เป็น center */
+    background-position: center;
     background-repeat: no-repeat;
     background-color: rgba(0, 0, 0, 0.7);
     background-blend-mode: multiply;
-    justify-content: center; /* จัดให้อยู่ตรงกลางตามแนวตั้ง */
-    align-items: center; /* จัดให้อยู่ตรงกลางตามแนวนอน */
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
-    /* ลบ position: relative ออกจาก .main */
+    min-height: 100%;
   }
 
-  /* ลบการใช้ position: absolute ออกจาก .main img และใช้ margin แทน */
+
+  /* =============== main part ============== */
   .main img {
-    height: 140px;
-    width: 140px;
+    width: 30vw;
+    max-width: 140px;
+    height: auto;
     background-color: white;
     border-radius: 50%;
     padding: 20px;
     margin-bottom: 20px;
-    /* ลบ position: absolute และ top ออก */
+    object-fit: contain;
   }
 
-  /* ลบการใช้ position: absolute ออกจาก .main h1 และใช้ margin แทน */
+
+
   .main h1 {
     font-family: "Prompt", sans-serif;
     font-weight: 500;
     color: white;
-    margin-bottom: 20px; /* เพิ่ม margin เพื่อเว้นระยะจากองค์ประกอบถัดไป */
-    /* ลบ position: absolute และ top ออก */
+    margin-bottom: 20px;
+    text-align: center;
+    word-wrap: break-word;
   }
 
   #nav-search-part {
@@ -132,7 +113,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    width: 100%
+    width: 100%;
+    max-width: 400px;
   }
 
   #nav-search {
@@ -141,7 +123,7 @@ body {
     appearance: none;
     border-radius: 10px;
     width: 70%;
-    max-width: auto ;
+    max-width: auto;
     height: 40px;
     border: none;
     background-color: #F9B508;
@@ -171,18 +153,17 @@ body {
     border: rgb(230, 228, 228) solid 1px;
   }
 
-#nav-search-part {
+  #nav-search-part {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
     padding: 20px;
-    /* ลบ position: relative และ top ออก */
   }
-  
+
   #nav-search-part #search-results {
-    width: 70%; /* ปรับขนาดให้เท่ากับ input */
+    width: 70%;
     background: white;
     border: 1px solid #ccc;
     border-radius: 10px;
@@ -190,19 +171,18 @@ body {
     z-index: 1000;
     justify-content: center;
     padding-left: 20px;
-    /* สำหรับ animation */
     max-height: 0;
     opacity: 0;
     overflow: scroll;
     transition: max-height 1s ease, opacity 1s ease;
   }
-  
+
   #nav-search-part #search-results.show {
-    max-height: 300px; /* ความสูงตอนแสดง */
+    max-height: 300px;
     opacity: 1;
   }
-  
-  /* ปรับปุ่มแผนที่ให้เข้ากับโฟลว์ของ Flexbox */
+
+
   .map-btn {
     padding: 8px 20px;
     font-family: "Prompt", sans-serif;
@@ -214,12 +194,12 @@ body {
     color: white;
     cursor: pointer;
     text-decoration: none;
-    margin-top: 20px; /* เพิ่ม margin เพื่อเว้นระยะจากองค์ประกอบด้านบน */
-    /* ลบ position: relative และ top ออก */
+    margin-top: 20px;
+
   }
 
 
-  /* ============================================= */
+
 
   .bottom-part {
     display: flex;
@@ -228,18 +208,24 @@ body {
     justify-content: center;
     background-color: #F9B508;
     width: 100%;
-    height: 100%;
+    height: auto;
     font-family: "Prompt", sans-serif;
     font-weight: 700;
     font-size: 12px;
     color: rgba(0, 0, 0, 0.637);
+    text-align: center;
+    word-wrap: break-word;
+
   }
 
   .bottom-part img {
-    width: 45px;
+    width: 15vw;
+    max-width: 55px;
+    height: auto;
     background-color: white;
-    border-radius: 50%;
+    border-radius: 50%;     
     padding: 5px;
-    margin-top: 20px;
+    margin-top: 10px;
+    object-fit: contain;
   }
 }
