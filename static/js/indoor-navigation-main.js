@@ -211,14 +211,14 @@ function populateStartSelect(rooms, buildingId, floor) {
     // ตัวเลือกดีฟอลต์: ปล่อย value ว่าง เพื่อให้ backend auto-pick ลิฟต์ของชั้นนี้
     const optDefault = document.createElement('option');
     optDefault.value = '';
-    optDefault.textContent = `⬆️ ลิฟต์ชั้นนี้ (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
+    optDefault.textContent = `ลิฟต์ชั้นนี้ (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
     select.appendChild(optDefault);
 
     // (ตัวเลือกเสริม) เติม node/ห้องบนชั้นนี้ให้เลือกเป็น start ได้
     rooms.forEach(room => {
         const option = document.createElement('option');
         option.value = room.NodeID;
-        option.textContent = room.Detail;
+        option.textContent = `${room.Detail} (ชั้น ${room.floor})`;
         select.appendChild(option);
     });
 
@@ -249,7 +249,7 @@ function loadRoomsAndShowModal(buildingId, floor) {
 
                 // เติม destinationSelect = ห้อง "ทุกชั้น" (optgroup)
                 const sel = document.getElementById('destinationSelect');
-                sel.innerHTML = '<option value="">🎯 เลือกห้องที่ต้องการไป</option>';
+                sel.innerHTML = '<option value="">เลือกห้องที่ต้องการไป</option>';
                 Object.keys(allByFloor).sort((a, b) => Number(a) - Number(b)).forEach(fl => {
                     const og = document.createElement('optgroup');
                     og.label = `ชั้น ${fl}`;
@@ -670,7 +670,7 @@ function calculateTotalDistance(pathCoords) {
 function updatePathInfo(path, pathCoords) {
     if (!path || path.length === 0) return;
 
-    let info = '<h3>🗺️ ข้อมูลเส้นทาง</h3><ol class="path-steps">';
+    let info = '<h3>ข้อมูลเส้นทาง</h3><ol class="path-steps">';
     path.forEach((node, i) => {
         const name = node.detail || node.node_id;
         if (i === 0) {
@@ -682,24 +682,6 @@ function updatePathInfo(path, pathCoords) {
         }
     });
     info += '</ol>';
-
-    const totalDistance = calculateTotalDistance(pathCoords);
-    const estimatedTime = Math.ceil(totalDistance * 0.01);
-
-    info += `
-    <div class="path-summary">
-      <div class="summary-item">
-        <span class="icon">📏</span>
-        <span class="label">ระยะทาง:</span>
-        <span class="value">${Math.round(totalDistance * 0.1)} เมตร</span>
-      </div>
-      <div class="summary-item">
-        <span class="icon">⏱️</span>
-        <span class="label">เวลาโดยประมาณ:</span>
-        <span class="value">${estimatedTime} นาที</span>
-      </div>
-    </div>
-  `;
     document.getElementById('pathInfo').innerHTML = info;
 }
 
@@ -810,7 +792,7 @@ function handlePathDataCross(data) {
         const len = arr => arr.reduce((s, p, i) => i ? s + Math.hypot(p.x - arr[i - 1].x, p.y - arr[i - 1].y) : 0, 0);
 
         document.getElementById('pathInfo').innerHTML = `
-      <h3>🗺️ ข้อมูลเส้นทาง (ข้ามชั้น)</h3>
+      <h3>ข้อมูลเส้นทาง</h3>
       <ol class="path-steps">${steps}</ol>
     `;
     } catch (e) {
