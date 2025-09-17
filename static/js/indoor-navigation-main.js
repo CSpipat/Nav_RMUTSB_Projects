@@ -513,7 +513,7 @@ function startGoogleMapsAnimation(pathCoords) {
     let last = performance.now();
     let runnerDist = 0;
     let metricsAll = buildPathMetrics(pathCoords);
-    const SPEED_PX_PER_SEC = 80;
+    const SPEED_PX_PER_SEC = 60;
 
     // total distance
     const totalDistance = calculateTotalDistance(pathCoords);
@@ -880,7 +880,7 @@ function startCrossFloorAnimation(scaledFrom, scaledTo) {
 
     let progressFrom = 0, progressTo = 0, phase = 0;
     let last = performance.now();
-    const SPEED_PX_PER_SEC = 80;
+    const SPEED_PX_PER_SEC = 60;
 
     let distFrom = 0, distTo = 0;
 
@@ -1001,6 +1001,10 @@ function pointAtDistance(coords, metrics, d) {
 }
 
 // ปรับปรุงไฟวิ่งให้สีสดใสขึ้น
+// โหลดรูปตัวละคร (แค่โหลดครั้งเดียวก่อนใช้ drawRunningLights)
+const runnerImg = new Image();
+runnerImg.src = "/static/img/student.png"; // ใส่ path รูปที่คุณอัปโหลดไว้
+
 function drawRunningLights(ctx, coords, metrics, headDist, opts = {}) {
     if (!coords || coords.length < 2 || metrics.total === 0) return;
 
@@ -1010,41 +1014,39 @@ function drawRunningLights(ctx, coords, metrics, headDist, opts = {}) {
 
     ctx.save();
     ctx.setLineDash([dash, gap]);
-    ctx.lineDashOffset = - (headDist % (dash + gap));
+    ctx.lineDashOffset = -(headDist % (dash + gap));
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.globalCompositeOperation = 'source-over';
 
-    // glow underlay - สีทองสดใส
+    // เส้นไฟ (เหลืองทอง)
     ctx.lineWidth = width + 2;
     ctx.shadowColor = '#FFD700';
     ctx.shadowBlur = 15;
     ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
-
     ctx.beginPath();
     ctx.moveTo(coords[0].x, coords[0].y);
     for (let i = 1; i < coords.length; i++) ctx.lineTo(coords[i].x, coords[i].y);
     ctx.stroke();
 
-    // bright core - สีเหลืองสด
     ctx.shadowBlur = 0;
     ctx.lineWidth = Math.max(2, width - 2);
     ctx.strokeStyle = '#FFFF00';
     ctx.stroke();
     ctx.restore();
 
-    // comet head + short tail
+    // คำนวณตำแหน่ง head / tail
     const head = pointAtDistance(coords, metrics, headDist);
     const tail = pointAtDistance(coords, metrics, Math.max(0, headDist - (opts.tailLen ?? 40)));
 
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
 
-    // tail segment - ไล่สีจากทองไปขาว
+    // เส้นหาง
+   // tail effect
     const tailGrad = ctx.createLinearGradient(tail.x, tail.y, head.x, head.y);
     tailGrad.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
     tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
-
     ctx.beginPath();
     ctx.lineWidth = width + 2;
     ctx.strokeStyle = tailGrad;
@@ -1052,17 +1054,13 @@ function drawRunningLights(ctx, coords, metrics, headDist, opts = {}) {
     ctx.lineTo(head.x, head.y);
     ctx.stroke();
 
-    // head glow - สีขาวสดใส
-    const R = opts.headRadius ?? 12;
-    const g = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, R);
-    g.addColorStop(0, '#FFFFFF');
-    g.addColorStop(0.5, 'rgba(255, 215, 0, 0.6)');
-    g.addColorStop(1, 'rgba(255, 215, 0, 0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(head.x, head.y, R, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.restore();
 
+    // ===== วาดไอคอน "บนสุด" =====
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over"; // บังคับอยู่บนสุด
+    const size = opts.headSize ?? 32;
+    ctx.drawImage(runnerImg, head.x - size / 2, head.y - size / 2, size, size);
     ctx.restore();
 }
 
