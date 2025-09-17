@@ -9,614 +9,609 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-            href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Mitr:wght@200;300;400;500;600;700&display=swap"
-            rel="stylesheet">
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
 <body>
-<div class="content-wrapper">
-    <div class="row">
-        <!-- ส่วนที่ 1: โลโก้ -->
-        <div class="col-12 col-sm-3 col-lg-2 box" id="logo-area">
+    <div class="content-wrapper">
+        <div class="row">
+            <!-- ส่วนที่ 1: โลโก้ -->
+            <div class="col-12 col-sm-3 col-lg-2 box" id="logo-area">
 
-<<<<<<< HEAD
                 <a href="{{ url_for('homepage') }}" target="_self" rel="noopener noreferrer"><img
                         src="/static/img/Main_logo.png" alt="หน้าหลัก" id="nav-logo"></a>
-=======
-            <a href="{{ url_for('homepage') }}" target="_blank" rel="noopener noreferrer"><img
-                    src="/static/img/Main_logo.png" alt="หน้าหลัก" id="nav-logo"></a>
->>>>>>> df57d8293deaeeb52fe48d450bf2108d651fecd4
 
-        </div>
-
-        <!-- ส่วนที่ 2: เมนู -->
-        <div class="col-12 col-sm-5 col-lg-7" id="menu-area">
-            <ul class="d-flex flex-wrap justify-content-center align-items-center mt-3 p-4" id="menu-desk-form">
-                <!-- อาคาร 16 -->
-                <li class="nav-item dropdown me-3">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
-                        16</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
-                    </ul>
-                </li>
-
-                <!-- อาคาร 17 -->
-                <li class="nav-item dropdown me-3">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
-                        17</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
-                    </ul>
-                </li>
-
-                <!-- อาคาร 18 -->
-                <li class="nav-item dropdown me-3">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
-                        18</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
-                    </ul>
-                </li>
-
-                <!-- อาคาร 19 -->
-                <li class="nav-item dropdown me-3">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
-                        19</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
-                    </ul>
-                </li>
-
-                <!-- อาคาร 20 -->
-                <li class="nav-item dropdown me-3">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
-                        20</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
-                    </ul>
-                </li>
-
-                <!-- อาคาร 21 -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
-                        21</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
-                        <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-
-        <!-- ส่วนที่ 3: เวลา -->
-        <div class="col-12 col-sm-4 col-lg-3 box" id="clock-part">
-            เวลา (col-4 col-lg-3)
-        </div>
-    </div>
-</div>
-
-<!-- Updated Side Menu with proper data attributes -->
-<div class="side-menu" id="sideMenu">
-    <div class="side-menu-header">
-        <img src="/static/img/sciLogo.png" alt="Logo">
-        <span class="title-menu">รายชื่ออาคาร</span>
-    </div>
-    <div class="side-menu-content">
-        <!-- Building 16 -->
-        <div class="building-menu">
-            <div class="building-menu-header">
-                <span>อาคาร 12</span>
-                <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
             </div>
-            <div class="building-menu-content">
-                <ul>
-                    <li><a class="dropdown-item" href="#" data-building="16" data-floor="1">ชั้น 1</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="16" data-floor="2">ชั้น 2</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="16" data-floor="3">ชั้น 3</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="16" data-floor="4">ชั้น 4</a></li>
+
+            <!-- ส่วนที่ 2: เมนู -->
+            <div class="col-12 col-sm-5 col-lg-7" id="menu-area">
+                <ul class="d-flex flex-wrap justify-content-center align-items-center mt-3 p-4" id="menu-desk-form">
+                    <!-- อาคาร 16 -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
+                            16</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- อาคาร 17 -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
+                            17</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- อาคาร 18 -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
+                            18</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- อาคาร 19 -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
+                            19</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- อาคาร 20 -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
+                            20</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- อาคาร 21 -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">อาคาร
+                            21</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">ชั้น 1</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 2</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 3</a></li>
+                            <li><a class="dropdown-item" href="#">ชั้น 4</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
-        </div>
-        <hr>
-        <div class="building-menu">
-            <div class="building-menu-header">
-                <span>อาคาร 13</span>
-                <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
-            </div>
-            <div class="building-menu-content">
-                <ul>
-                    <li><a class="dropdown-item" href="#" data-building="18" data-floor="1">ชั้น 1</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="18" data-floor="2">ชั้น 2</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="18" data-floor="3">ชั้น 3</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="18" data-floor="4">ชั้น 4</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr>
-        <!-- Building 17 -->
-        <div class="building-menu">
-            <div class="building-menu-header">
-                <span>อาคาร 17</span>
-                <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
-            </div>
-            <div class="building-menu-content">
-                <ul>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="1">ชั้น 1</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="2">ชั้น 2</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="3">ชั้น 3</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="4">ชั้น 4</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="5">ชั้น 5</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="6">ชั้น 6</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="7">ชั้น 7</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="8">ชั้น 8</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="9">ชั้น 9</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="17" data-floor="10">ชั้น 10</a></li>
-                </ul>
-            </div>
-        </div>
-        <!-- Building 18 -->
-        <hr>
-        <!-- Building 19 -->
-        <div class="building-menu">
-            <div class="building-menu-header">
-                <span>อาคาร 19</span>
-                <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
-            </div>
-            <div class="building-menu-content">
-                <ul>
-                    <li><a class="dropdown-item" href="#" data-building="19" data-floor="1">ชั้น 1</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="19" data-floor="2">ชั้น 2</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="19" data-floor="3">ชั้น 3</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="19" data-floor="4">ชั้น 4</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr>
-        <!-- Building 20 -->
-        <div class="building-menu">
-            <div class="building-menu-header">
-                <span>อาคาร 20</span>
-                <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
-            </div>
-            <div class="building-menu-content">
-                <ul>
-                    <li><a class="dropdown-item" href="#" data-building="20" data-floor="1">ชั้น 1</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="20" data-floor="2">ชั้น 2</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="20" data-floor="3">ชั้น 3</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="20" data-floor="4">ชั้น 4</a></li>
-                </ul>
-            </div>
-        </div>
-        <hr>
-        <!-- Building 21 -->
-        <div class="building-menu">
-            <div class="building-menu-header">
-                <span>อาคาร 21</span>
-                <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
-            </div>
-            <div class="building-menu-content">
-                <ul>
-                    <li><a class="dropdown-item" href="#" data-building="21" data-floor="1">ชั้น 1</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="21" data-floor="2">ชั้น 2</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="21" data-floor="3">ชั้น 3</a></li>
-                    <li><a class="dropdown-item" href="#" data-building="21" data-floor="4">ชั้น 4</a></li>
-                </ul>
+
+            <!-- ส่วนที่ 3: เวลา -->
+            <div class="col-12 col-sm-4 col-lg-3 box" id="clock-part">
+                เวลา (col-4 col-lg-3)
             </div>
         </div>
     </div>
-</div>
 
-<!-- Overlay -->
-<div class="overlay" id="overlay"></div>
-
-<!-- Semi-circular menu button - แสดงเฉพาะบน responsive -->
-<button id="menuButton" class="menu-button">
-    <span class="chevron-right">&#10095;</span>
-</button>
-
-</div>
-<!-- Main Content -->
-<div id="main-part">
-    <div id="nav-search-part">
-        <input type="search" name="nav-search" id="nav-search" placeholder="ค้นหาสถานที่ต้องการตรงนี้ได้เลย">
-        <div id="search-results" style="overflow: scroll"></div>
+    <!-- Updated Side Menu with proper data attributes -->
+    <div class="side-menu" id="sideMenu">
+        <div class="side-menu-header">
+            <img src="/static/img/sciLogo.png" alt="Logo">
+            <span class="title-menu">รายชื่ออาคาร</span>
+        </div>
+        <div class="side-menu-content">
+            <!-- Building 16 -->
+            <div class="building-menu">
+                <div class="building-menu-header">
+                    <span>อาคาร 12</span>
+                    <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <div class="building-menu-content">
+                    <ul>
+                        <li><a class="dropdown-item" href="#" data-building="16" data-floor="1">ชั้น 1</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="16" data-floor="2">ชั้น 2</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="16" data-floor="3">ชั้น 3</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="16" data-floor="4">ชั้น 4</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="building-menu">
+                <div class="building-menu-header">
+                    <span>อาคาร 13</span>
+                    <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <div class="building-menu-content">
+                    <ul>
+                        <li><a class="dropdown-item" href="#" data-building="18" data-floor="1">ชั้น 1</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="18" data-floor="2">ชั้น 2</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="18" data-floor="3">ชั้น 3</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="18" data-floor="4">ชั้น 4</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <!-- Building 17 -->
+            <div class="building-menu">
+                <div class="building-menu-header">
+                    <span>อาคาร 17</span>
+                    <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <div class="building-menu-content">
+                    <ul>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="1">ชั้น 1</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="2">ชั้น 2</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="3">ชั้น 3</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="4">ชั้น 4</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="5">ชั้น 5</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="6">ชั้น 6</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="7">ชั้น 7</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="8">ชั้น 8</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="9">ชั้น 9</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="17" data-floor="10">ชั้น 10</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Building 18 -->
+            <hr>
+            <!-- Building 19 -->
+            <div class="building-menu">
+                <div class="building-menu-header">
+                    <span>อาคาร 19</span>
+                    <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <div class="building-menu-content">
+                    <ul>
+                        <li><a class="dropdown-item" href="#" data-building="19" data-floor="1">ชั้น 1</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="19" data-floor="2">ชั้น 2</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="19" data-floor="3">ชั้น 3</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="19" data-floor="4">ชั้น 4</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <!-- Building 20 -->
+            <div class="building-menu">
+                <div class="building-menu-header">
+                    <span>อาคาร 20</span>
+                    <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <div class="building-menu-content">
+                    <ul>
+                        <li><a class="dropdown-item" href="#" data-building="20" data-floor="1">ชั้น 1</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="20" data-floor="2">ชั้น 2</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="20" data-floor="3">ชั้น 3</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="20" data-floor="4">ชั้น 4</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <!-- Building 21 -->
+            <div class="building-menu">
+                <div class="building-menu-header">
+                    <span>อาคาร 21</span>
+                    <span class="toggle-icon"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <div class="building-menu-content">
+                    <ul>
+                        <li><a class="dropdown-item" href="#" data-building="21" data-floor="1">ชั้น 1</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="21" data-floor="2">ชั้น 2</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="21" data-floor="3">ชั้น 3</a></li>
+                        <li><a class="dropdown-item" href="#" data-building="21" data-floor="4">ชั้น 4</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="bg-img-part">
-        <img src="/static/img/Diagram.jpeg" alt="">
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Semi-circular menu button - แสดงเฉพาะบน responsive -->
+    <button id="menuButton" class="menu-button">
+        <span class="chevron-right">&#10095;</span>
+    </button>
+
     </div>
-    <div class="list-tower-part">
-        <div class="Wrap-list-tower">
-            <div class="list-tower-card">
+    <!-- Main Content -->
+    <div id="main-part">
+        <div id="nav-search-part">
+            <input type="search" name="nav-search" id="nav-search" placeholder="ค้นหาสถานที่ต้องการตรงนี้ได้เลย">
+            <div id="search-results" style="overflow: scroll"></div>
+        </div>
+
+        <div id="bg-img-part">
+            <img src="/static/img/Diagram.jpeg" alt="">
+        </div>
+        <div class="list-tower-part">
+            <div class="Wrap-list-tower">
+                <div class="list-tower-card">
                     <span class="tw-name">อาคาร 21
                         &nbsp;อาคารปฏิบัติการเทคโนโลยีออกแบบวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 21')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
+                    <span class="icons" onclick="openBuildingModal('อาคาร 21')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
 
-            </div>
+                </div>
 
 
-            <div class="list-tower-card">
-                <span class="tw-name">อาคาร 20 &nbsp; อาคารเรียนรวมและปฏิบัติการคณะบริหารและเทคโนโลยีสารสนเทศ</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 20')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
-            </div>
-            <div class="list-tower-card">
-                <span class="tw-name">อาคาร 19 &nbsp;อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 19')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
-            </div>
-            <div class="list-tower-card">
+                <div class="list-tower-card">
+                    <span class="tw-name">อาคาร 20 &nbsp; อาคารเรียนรวมและปฏิบัติการคณะบริหารและเทคโนโลยีสารสนเทศ</span>
+                    <span class="icons" onclick="openBuildingModal('อาคาร 20')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <div class="list-tower-card">
+                    <span class="tw-name">อาคาร 19 &nbsp;อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ</span>
+                    <span class="icons" onclick="openBuildingModal('อาคาร 19')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <div class="list-tower-card">
                     <span class="tw-name" id="t17">อาคาร 17 &nbsp;อาคารเฉลิมพระเกียรติ
                         <br>(ตึกคณะวิทยาศาสตร์เเละเทคโนโลยี)</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร17')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
-            </div>
-            <div class="list-tower-card">
-                <span class="tw-name">อาคาร 13 &nbsp;อาคารคณะวิศวกรรมศาสตร์ <br>และสถาปัตยกรรมศาสตร์</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 13')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
-            </div>
-            <div class="list-tower-card">
-                <span class="tw-name">อาคาร 12 &nbsp;อาคารสาขาวิศวกรรมเครื่องกล</span>
-                <span class="icons" onclick="openBuildingModal('อาคาร 12')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
-            </div>
-            <div class="list-tower-card">
-                <span class="tw-name">อาคาร โรงอาหาร </span>
-                <span class="icons" onclick="openBuildingModal('โรงอาหาร')"><i
-                        class="fa-solid fa-magnifying-glass"></i></span>
+                    <span class="icons" onclick="openBuildingModal('อาคาร17')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <div class="list-tower-card">
+                    <span class="tw-name">อาคาร 13 &nbsp;อาคารคณะวิศวกรรมศาสตร์ <br>และสถาปัตยกรรมศาสตร์</span>
+                    <span class="icons" onclick="openBuildingModal('อาคาร 13')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <div class="list-tower-card">
+                    <span class="tw-name">อาคาร 12 &nbsp;อาคารสาขาวิศวกรรมเครื่องกล</span>
+                    <span class="icons" onclick="openBuildingModal('อาคาร 12')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
+                <div class="list-tower-card">
+                    <span class="tw-name">อาคาร โรงอาหาร </span>
+                    <span class="icons" onclick="openBuildingModal('โรงอาหาร')"><i
+                            class="fa-solid fa-magnifying-glass"></i></span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
 
-<div id="map-modal" class="modal">
-    <div class="modal-header" style="background-color:#FFB700 ;">
-        <h2 id="building-name">อาคาร</h2>
-        <button class="close-btn" onclick="closeModal()">X</button>
-    </div>
-
-    <div class="loading-indicator" id="loading-indicator">
-        <div class="loading-spinner"></div>
-        ~
-        <p>กำลังค้นหาเส้นทาง...</p>
-    </div>
-
-    <!-- Map container -->
-    <div id="map-container">
-        <div id="map"></div>
-        <div id="distance-info">ระยะทาง: <span id="distance-value">0</span> เมตร</div>
-    </div>
-</div>
-</div>
-</div>
-</div>
-
-
-<!-- อาคาร 21 -->
-<div class="modal-container" id="building-modal-21">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 21</h2>
-            <div onclick="closeBuildingModal('building-modal-21')" class="btn-closed">X</div>
+    <div id="map-modal" class="modal">
+        <div class="modal-header" style="background-color:#FFB700 ;">
+            <h2 id="building-name">อาคาร</h2>
+            <button class="close-btn" onclick="closeModal()">X</button>
         </div>
 
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/tower_21.jpg" alt="อาคาร 21"/>
+        <div class="loading-indicator" id="loading-indicator">
+            <div class="loading-spinner"></div>
+            ~
+            <p>กำลังค้นหาเส้นทาง...</p>
+        </div>
+
+        <!-- Map container -->
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="distance-info">ระยะทาง: <span id="distance-value">0</span> เมตร</div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+
+    <!-- อาคาร 21 -->
+    <div class="modal-container" id="building-modal-21">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 21</h2>
+                <div onclick="closeBuildingModal('building-modal-21')" class="btn-closed">X</div>
             </div>
-            <div class="list">
-                <p>อาคารปฏิบัติการเทคโนโลยีออกแบบวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</p>
-                <ul>
-                    <li>ชั้น 1: ห้องปฏิบัติการคอมพิวเตอร์</li>
-                    <li>ชั้น 2: ห้องเรียนทฤษฎี</li>
-                    <li>ชั้น 3: ห้องปฏิบัติการออกแบบ</li>
-                    <li>ชั้น 4: ห้องประชุม</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/tower_21.jpg" alt="อาคาร 21" />
+                </div>
+                <div class="list">
+                    <p>อาคารปฏิบัติการเทคโนโลยีออกแบบวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องปฏิบัติการคอมพิวเตอร์</li>
+                        <li>ชั้น 2: ห้องเรียนทฤษฎี</li>
+                        <li>ชั้น 3: ห้องปฏิบัติการออกแบบ</li>
+                        <li>ชั้น 4: ห้องประชุม</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-21'); showMapForBuilding('อาคาร21')">
+                        onclick="closeBuildingModal('building-modal-21'); showMapForBuilding('อาคาร21')">
                         กดเพื่อนำทาง
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<!-- อาคาร 20 -->
-<div class="modal-container" id="building-modal-20">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 20</h2>
-            <div onclick="closeBuildingModal('building-modal-20')" class="btn-closed">X</div>
-        </div>
-
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/tower_20.jpg" alt="อาคาร 20"/>
+    <!-- อาคาร 20 -->
+    <div class="modal-container" id="building-modal-20">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 20</h2>
+                <div onclick="closeBuildingModal('building-modal-20')" class="btn-closed">X</div>
             </div>
-            <div class="list">
-                <p>อาคารเรียนรวมและปฏิบัติการคณะบริหารและเทคโนโลยีสารสนเทศ</p>
-                <ul>
-                    <li>ชั้น 1: ห้องสมุด</li>
-                    <li>ชั้น 2: ห้องเรียน</li>
-                    <li>ชั้น 3: ห้องปฏิบัติการคอมพิวเตอร์</li>
-                    <li>ชั้น 4: ห้องสำนักงาน</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/tower_20.jpg" alt="อาคาร 20" />
+                </div>
+                <div class="list">
+                    <p>อาคารเรียนรวมและปฏิบัติการคณะบริหารและเทคโนโลยีสารสนเทศ</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องสมุด</li>
+                        <li>ชั้น 2: ห้องเรียน</li>
+                        <li>ชั้น 3: ห้องปฏิบัติการคอมพิวเตอร์</li>
+                        <li>ชั้น 4: ห้องสำนักงาน</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-20'); showMapForBuilding('อาคาร20')">
+                        onclick="closeBuildingModal('building-modal-20'); showMapForBuilding('อาคาร20')">
                         กดเพื่อนำทาง
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<!-- อาคาร 19 -->
-<div class="modal-container" id="building-modal-19">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 19</h2>
-            <div onclick="closeBuildingModal('building-modal-19')" class="btn-closed">X</div>
-        </div>
-
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/tower_19.jpeg" alt="อาคาร 19"/>
+    <!-- อาคาร 19 -->
+    <div class="modal-container" id="building-modal-19">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 19</h2>
+                <div onclick="closeBuildingModal('building-modal-19')" class="btn-closed">X</div>
             </div>
-            <div class="list">
-                <p>อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ</p>
-                <ul>
-                    <li>ชั้น 1: ห้องบริการ</li>
-                    <li>ชั้น 2: ห้องสมุด</li>
-                    <li>ชั้น 3: ห้องปฏิบัติการ IT</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/tower_19.jpeg" alt="อาคาร 19" />
+                </div>
+                <div class="list">
+                    <p>อาคารสำนักวิทยบริการและเทคโนโลยีสารสนเทศ</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องบริการ</li>
+                        <li>ชั้น 2: ห้องสมุด</li>
+                        <li>ชั้น 3: ห้องปฏิบัติการ IT</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-19'); showMapForBuilding('อาคาร19')">
+                        onclick="closeBuildingModal('building-modal-19'); showMapForBuilding('อาคาร19')">
                         กดเพื่อนำทาง
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<!-- อาคาร 17 -->
-<div class="modal-container" id="building-modal-17">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 17</h2>
-            <div onclick="closeBuildingModal('building-modal-17')" class="btn-closed">X</div>
-        </div>
-
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/tower_17.jpg" alt="อาคาร 17"/>
+    <!-- อาคาร 17 -->
+    <div class="modal-container" id="building-modal-17">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 17</h2>
+                <div onclick="closeBuildingModal('building-modal-17')" class="btn-closed">X</div>
             </div>
-            <div class="list">
-                <p>อาคารเฉลิมพระเกียรติ (ตึกคณะวิทยาศาสตร์และเทคโนโลยี)</p>
-                <ul>
-                    <li>ชั้น 1: ห้องปฏิบัติการเคมี</li>
-                    <li>ชั้น 2: ห้องปฏิบัติการฟิสิกส์</li>
-                    <li>ชั้น 3: ห้องปฏิบัติการชีววิทยา</li>
-                    <li>ชั้น 4: ห้องเรียน</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/tower_17.jpg" alt="อาคาร 17" />
+                </div>
+                <div class="list">
+                    <p>อาคารเฉลิมพระเกียรติ (ตึกคณะวิทยาศาสตร์และเทคโนโลยี)</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องปฏิบัติการเคมี</li>
+                        <li>ชั้น 2: ห้องปฏิบัติการฟิสิกส์</li>
+                        <li>ชั้น 3: ห้องปฏิบัติการชีววิทยา</li>
+                        <li>ชั้น 4: ห้องเรียน</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-17'); showMapForBuilding('อาคาร17')">
+                        onclick="closeBuildingModal('building-modal-17'); showMapForBuilding('อาคาร17')">
                         กดเพื่อนำทาง
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- อาคาร 13 -->
-<div class="modal-container" id="building-modal-13">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 13</h2>
-            <div onclick="closeBuildingModal('building-modal-13')" class="btn-closed">X</div>
-        </div>
+    <!-- อาคาร 13 -->
+    <div class="modal-container" id="building-modal-13">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 13</h2>
+                <div onclick="closeBuildingModal('building-modal-13')" class="btn-closed">X</div>
+            </div>
 
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/tower13.jpeg" alt="อาคาร 13"/>
-            </div>
-            <div class="list">
-                <p>อาคารคณะวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</p>
-                <ul>
-                    <li>ชั้น 1: ห้องสำนักงาน</li>
-                    <li>ชั้น 2: ห้องเรียน</li>
-                    <li>ชั้น 3: ห้องปฏิบัติการ</li>
-                    <li>ชั้น 4: ห้องแขก</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/tower13.jpeg" alt="อาคาร 13" />
+                </div>
+                <div class="list">
+                    <p>อาคารคณะวิศวกรรมศาสตร์และสถาปัตยกรรมศาสตร์</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องสำนักงาน</li>
+                        <li>ชั้น 2: ห้องเรียน</li>
+                        <li>ชั้น 3: ห้องปฏิบัติการ</li>
+                        <li>ชั้น 4: ห้องแขก</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-13'); showMapForBuilding('อาคาร13')">
+                        onclick="closeBuildingModal('building-modal-13'); showMapForBuilding('อาคาร13')">
                         กดเพื่อนำทาง
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- อาคาร 12 -->
-<div class="modal-container" id="building-modal-12">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 12</h2>
-            <div onclick="closeBuildingModal('building-modal-12')" class="btn-closed">X</div>
-        </div>
+    <!-- อาคาร 12 -->
+    <div class="modal-container" id="building-modal-12">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 12</h2>
+                <div onclick="closeBuildingModal('building-modal-12')" class="btn-closed">X</div>
+            </div>
 
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/tower_12.jpg" alt="อาคาร 12"/>
-            </div>
-            <div class="list">
-                <p>อาคารสาขาวิศวกรรมเครื่องกล</p>
-                <ul>
-                    <li>ชั้น 1: ห้องปฏิบัติการเครื่องกล</li>
-                    <li>ชั้น 2: ห้องเรียน</li>
-                    <li>ชั้น 3: ห้องสำนักงาน</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/tower_12.jpg" alt="อาคาร 12" />
+                </div>
+                <div class="list">
+                    <p>อาคารสาขาวิศวกรรมเครื่องกล</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องปฏิบัติการเครื่องกล</li>
+                        <li>ชั้น 2: ห้องเรียน</li>
+                        <li>ชั้น 3: ห้องสำนักงาน</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-12'); showMapForBuilding('อาคาร12')">
+                        onclick="closeBuildingModal('building-modal-12'); showMapForBuilding('อาคาร12')">
                         กดเพื่อนำทาง
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- โรงอาหาร -->
-<div class="modal-container" id="building-modal-0">
-    <div class="detail-building-modal">
-        <div class="header">
-            <h2 class="name-building">อาคาร 17</h2>
-            <div onclick="closeBuildingModal('building-modal-0')" class="btn-closed">X</div>
-        </div>
+    <!-- โรงอาหาร -->
+    <div class="modal-container" id="building-modal-0">
+        <div class="detail-building-modal">
+            <div class="header">
+                <h2 class="name-building">อาคาร 17</h2>
+                <div onclick="closeBuildingModal('building-modal-0')" class="btn-closed">X</div>
+            </div>
 
-        <div class="container">
-            <div class="image">
-                <img src="/static/img/outdoor/Restaurant.jpeg" alt="โรงอาหาร"/>
-            </div>
-            <div class="list">
-                <p>โรงอาหารของมหาวิทยาลัย</p>
-                <ul>
-                    <li>ชั้น 1: ห้องปฏิบัติการเคมี</li>
-                    <li>ชั้น 2: ห้องปฏิบัติการฟิสิกส์</li>
-                </ul>
-            </div>
-            <div class="btn-nav-container">
+            <div class="container">
+                <div class="image">
+                    <img src="/static/img/outdoor/Restaurant.jpeg" alt="โรงอาหาร" />
+                </div>
+                <div class="list">
+                    <p>โรงอาหารของมหาวิทยาลัย</p>
+                    <ul>
+                        <li>ชั้น 1: ห้องปฏิบัติการเคมี</li>
+                        <li>ชั้น 2: ห้องปฏิบัติการฟิสิกส์</li>
+                    </ul>
+                </div>
+                <div class="btn-nav-container">
                     <span class="btn-nav"
-                          onclick="closeBuildingModal('building-modal-0'); showMapForBuilding('โรงอาหาร')">
+                        onclick="closeBuildingModal('building-modal-0'); showMapForBuilding('โรงอาหาร')">
                         <i class="fa-solid fa-location-dot"></i>
                     </span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Navigation Modal -->
-<!-- Modal Root -->
-<div id="indoorModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="indoorModalLabel" hidden>
-    <!-- Backdrop -->
-    <div class="app-modal__backdrop" data-close="true" aria-hidden="true"></div>
+    <!-- Navigation Modal -->
+    <!-- Modal Root -->
+    <div id="indoorModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="indoorModalLabel" hidden>
+        <!-- Backdrop -->
+        <div class="app-modal__backdrop" data-close="true" aria-hidden="true"></div>
 
-    <!-- Dialog -->
-    <div class="app-modal__dialog" role="document" aria-describedby="indoorModalDesc">
-        <header class="app-modal__header">
-            <h2 class="app-modal__title" id="indoorModalLabel">แผนผังตึก</h2>
-            <button type="button" class="app-modal__close" data-close="true" aria-label="ปิดหน้าต่าง">×</button>
-        </header>
+        <!-- Dialog -->
+        <div class="app-modal__dialog" role="document" aria-describedby="indoorModalDesc">
+            <header class="app-modal__header">
+                <h2 class="app-modal__title" id="indoorModalLabel">แผนผังตึก</h2>
+                <button type="button" class="app-modal__close" data-close="true" aria-label="ปิดหน้าต่าง">×</button>
+            </header>
 
-        <div class="app-modal__body" id="indoorModalDesc">
-            <div class="select-floor-form">
-                <label for="startSelect" class="form-label">เลือกจุดเริ่มต้น</label>
-                <select id="startSelect" class="form-select" onchange="onStartChange()"
+            <div class="app-modal__body" id="indoorModalDesc">
+                <div class="select-floor-form">
+                    <label for="startSelect" class="form-label">เลือกจุดเริ่มต้น</label>
+                    <select id="startSelect" class="form-select" onchange="onStartChange()"
                         aria-label="เลือกจุดเริ่มต้น"></select>
 
-                <label for="destinationSelect" class="form-label mt-2">เลือกห้องปลายทาง (ข้ามชั้นได้)</label>
-                <select id="destinationSelect" class="form-select" onchange="onDestinationChange()"
+                    <label for="destinationSelect" class="form-label mt-2">เลือกห้องปลายทาง (ข้ามชั้นได้)</label>
+                    <select id="destinationSelect" class="form-select" onchange="onDestinationChange()"
                         aria-label="เลือกห้องที่ต้องการไป">
-                    <option value="">เลือกห้องที่ต้องการไป</option>
-                </select>
-            </div>
+                        <option value="">เลือกห้องที่ต้องการไป</option>
+                    </select>
+                </div>
 
-            <div class="navigation-container" id="indoorNavRoot" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
-            </div>
+                <div class="navigation-container" id="indoorNavRoot" role="img" aria-label="แผนผังอาคารและเส้นทางนำทาง">
+                </div>
 
-            <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
+                <div id="pathInfo" class="path-info-card" role="region" aria-label="ข้อมูลเส้นทาง"></div>
 
-            <div id="loadingIndicator" class="text-center" role="status" aria-live="polite" hidden>
-                <div class="loading-animation" aria-hidden="true"></div>
-                <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
+                <div id="loadingIndicator" class="text-center" role="status" aria-live="polite" hidden>
+                    <div class="loading-animation" aria-hidden="true"></div>
+                    <span class="ms-2">กำลังค้นหาเส้นทาง...</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<div class="success-modal hidden">
+    <div class="success-modal hidden">
 
-    <div class="first">
-        <div class="img-wrapper">
-            <img src="/static/img/alert/check.png" alt="">
+        <div class="first">
+            <div class="img-wrapper">
+                <img src="/static/img/alert/check.png" alt="">
+            </div>
+        </div>
+
+        <div class="second">
+            <h1>success</h1>
+            <p>คุณมาถึงสถานที่ต้องการเเล้ว !!</p>
+            <div class="star-rating" id="star-rating">
+                <span class="star" data-value="1">&#9733;</span>
+                <span class="star" data-value="2">&#9733;</span>
+                <span class="star" data-value="3">&#9733;</span>
+                <span class="star" data-value="4">&#9733;</span>
+                <span class="star" data-value="5">&#9733;</span>
+            </div>
+            <p id="rating-text"></p>
+            <p id="message"></p>
+            <button onclick="hideSuccessModal()">ปิด</button>
         </div>
     </div>
 
-    <div class="second">
-        <h1>success</h1>
-        <p>คุณมาถึงสถานที่ต้องการเเล้ว !!</p>
-        <div class="star-rating" id="star-rating">
-            <span class="star" data-value="1">&#9733;</span>
-            <span class="star" data-value="2">&#9733;</span>
-            <span class="star" data-value="3">&#9733;</span>
-            <span class="star" data-value="4">&#9733;</span>
-            <span class="star" data-value="5">&#9733;</span>
-        </div>
-        <p id="rating-text"></p>
-        <p id="message"></p>
-        <button onclick="hideSuccessModal()">ปิด</button>
-    </div>
-</div>
 
-
-<footer id="footer-area">
-    <img src="/static/img/sciLogo.png" alt="">
-    <span>Created By Chutiphon and Pipat Computer Science</span>
-</footer>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/SlideMenu.js"></script>
-<script src="/static/js/outdoor-navigation.js"></script>
-<script src="/static/js/startfeedback.js"></script>
-<script src="/static/js/indoor-navigation-main.js"></script>
-<script src="/static/js/search.js"></script>
-<script src="/static/js/linkHomepage.js"></script>
+    <footer id="footer-area">
+        <img src="/static/img/sciLogo.png" alt="">
+        <span>Created By Chutiphon and Pipat Computer Science</span>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/SlideMenu.js"></script>
+    <script src="/static/js/outdoor-navigation.js"></script>
+    <script src="/static/js/startfeedback.js"></script>
+    <script src="/static/js/indoor-navigation-main.js"></script>
+    <script src="/static/js/search.js"></script>
+    <script src="/static/js/linkHomepage.js"></script>
 </body>
 
 </html>
