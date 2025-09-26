@@ -286,6 +286,7 @@ def homepage():
 def index():
     return render_template('index.html')
 
+# ===== /find_path =====
 @app.route('/find_path', methods=['POST'])
 def get_path():
     payload = request.get_json(force=True) or {}
@@ -299,12 +300,8 @@ def get_path():
 
     _, nodes_df, connections_df, plan_df = load_data()
 
-    # ถ้าไม่ส่ง start มา → ดีฟอลต์เป็นลิฟต์ของชั้นที่ผู้ใช้กำลังดู
     if not start:
         start_node = pick_elevator_for_floor(nodes_df, building_id, floor)
-        # (ทางเลือก) ถ้าอยาก fallback ไปใช้ลิฟต์ของ "ชั้นปลายทาง" ให้ใช้ฟังก์ชันเดิมของคุณ
-        # if not start_node:
-        #     start_node = pick_elevator_for_destination_floor(nodes_df, destination)
     else:
         start_node = start
 
@@ -322,18 +319,15 @@ def get_path():
     # แปลง path → จุดบนภาพ + รายละเอียด
     path_coords, img_width, img_height = get_path_coordinates_and_image_size(nodes_df, path, plan_df)
 
-    def detail_for(nid):
-        row = nodes_df[nodes_df['NodeID'] == nid]
-        return str(row.iloc[0]['Detail']) if (not row.empty and 'Detail' in row) else nid
-
     result = {
         'path': path_coords,
-        'nodes': [{'node_id': nid, 'detail': detail_for(nid)} for nid in path],
+        # ✅ เติม type (และ floor แถมให้ด้วย ถ้าอยากใช้ต่อ)
+        'nodes': [node_info(nodes_df, nid) for nid in path],
         'img_width': img_width,
         'img_height': img_height,
         'start_node': start_node,
-        'start_detail': detail_for(start_node),
-        'destination_detail': detail_for(destination),
+        'start_detail': node_info(nodes_df, start_node)['detail'],
+        'destination_detail': node_info(nodes_df, destination)['detail'],
     }
 
     return app.response_class(
@@ -342,6 +336,8 @@ def get_path():
         mimetype='application/json'
     )
 
+
+# ===== /find_path_cross =====
 @app.route('/find_path_cross', methods=['POST'])
 def find_path_cross():
     payload = request.get_json(force=True) or {}
@@ -355,13 +351,11 @@ def find_path_cross():
 
     _, nodes_df, connections_df, plan_df = load_data()
 
-    # เลือก start: ถ้าไม่ได้ส่งมา ใช้ “ลิฟต์ของชั้นปัจจุบัน”
     if not start:
         start_node = pick_elevator_for_floor(nodes_df, building_id, cur_floor)
     else:
         start_node = start
 
-    # สร้างกราฟ + ขอบลิฟต์ข้ามชั้น
     graph = create_graph(nodes_df, connections_df)
 
     if start_node not in graph:
@@ -378,7 +372,7 @@ def find_path_cross():
     ef = int(nodes_df.loc[nodes_df['NodeID']==path[-1], 'floor'].iloc[0])
     bid = nodes_df.loc[nodes_df['NodeID']==path[0], 'B_ID'].iloc[0]
 
-    # ถ้าอยู่ชั้นเดียวกัน -> ใช้โครงเดิม (single)
+    # ชั้นเดียวกัน -> โหมด single
     if sf == ef:
         coords, w, h = path_coords_for_segment(nodes_df, path, plan_df, bid, sf)
         return app.response_class(
@@ -389,16 +383,15 @@ def find_path_cross():
                     'img_width': w, 'img_height': h,
                     'path': coords
                 },
-                'nodes': [{'node_id': nid,
-                           'detail': str(nodes_df.loc[nodes_df['NodeID']==nid, 'Detail'].iloc[0])
-                                     if not nodes_df.loc[nodes_df['NodeID']==nid].empty else nid}
-                          for nid in path],
-                'start_node': start_node, 'destination_node': dest
+                # ✅ เติม type ใน nodes
+                'nodes': [node_info(nodes_df, nid) for nid in path],
+                'start_node': start_node,
+                'destination_node': dest
             }, cls=NumpyEncoder),
             status=200, mimetype='application/json'
         )
 
-    # ข้ามชั้น → หา “จุดต่อลิฟต์คู่” (สอง node ติดกันที่เป็นลิฟต์ ElevatorID เดียวกัน)
+    # ข้ามชั้น → หา “จุดต่อลิฟต์คู่”
     elev_col = 'ElevatorID' if 'ElevatorID' in nodes_df.columns else None
     type_col = 'Type'
     floor_col = 'floor'
@@ -415,7 +408,6 @@ def find_path_cross():
                 elev_id = ra[elev_col]
                 split_idx = i
                 break
-    # fallback: หากไม่พบคู่ลิฟต์ชัดเจน ให้ split เมื่อ floor เปลี่ยนครั้งแรก
     if split_idx is None:
         for i in range(len(path)-1):
             fa = int(nodes_df.loc[nodes_df['NodeID']==path[i], floor_col].iloc[0])
@@ -435,10 +427,6 @@ def find_path_cross():
     origin_coords, ow, oh = path_coords_for_segment(nodes_df, origin_seg, plan_df, bid, of)
     dest_coords,   dw, dh = path_coords_for_segment(nodes_df, dest_seg,   plan_df, bid, df)
 
-    def detail(nid):
-        row = nodes_df[nodes_df['NodeID']==nid]
-        return str(row.iloc[0]['Detail']) if not row.empty and 'Detail' in row else str(nid)
-
     return app.response_class(
         response=json.dumps({
             'mode': 'cross',
@@ -451,13 +439,12 @@ def find_path_cross():
                 'path': dest_coords, 'elevator_node': elev_end
             },
             'elevator_id': elev_id,
-            'nodes': [{'node_id': nid, 'detail': detail(nid)} for nid in path],
+            # ✅ เติม type ใน nodes
+            'nodes': [node_info(nodes_df, nid) for nid in path],
             'start_node': start_node, 'destination_node': dest
         }, cls=NumpyEncoder),
         status=200, mimetype='application/json'
     )
-
-
 
 @app.route('/route', methods=['POST'])
 def route():
@@ -772,6 +759,17 @@ def submit_rating():
     except Exception as e:
         print("🔥 Error:", str(e))  # จะพิมพ์ใน terminal
         return jsonify({'error': str(e)}), 500
+
+def node_info(nodes_df, nid):
+    row = nodes_df[nodes_df['NodeID'] == nid]
+    if row.empty:
+        return {'node_id': nid, 'detail': str(nid), 'type': None, 'floor': None}
+    # ดึงค่าแบบปลอดภัย
+    detail = str(row.iloc[0]['Detail']) if 'Detail' in row.columns else str(nid)
+    ntype  = str(row.iloc[0]['Type'])   if 'Type'   in row.columns else None
+    floor  = int(row.iloc[0]['floor'])  if 'floor'  in row.columns else None
+    return {'node_id': nid, 'detail': detail, 'type': ntype, 'floor': floor}
+
 
 
 if __name__ == '__main__':

@@ -668,22 +668,77 @@ function calculateTotalDistance(pathCoords) {
 }
 
 function updatePathInfo(path, pathCoords) {
-    if (!path || path.length === 0) return;
+  if (!Array.isArray(path) || path.length === 0) return;
 
-    let info = '<h3>ข้อมูลเส้นทาง</h3><ol class="path-steps">';
-    path.forEach((node, i) => {
-        const name = node.detail || node.node_id;
-        if (i === 0) {
-            info += `<li class="step-start">เริ่มต้นจาก <strong>${name}</strong></li>`;
-        } else if (i === path.length - 1) {
-            info += `<li class="step-end">ถึง <strong>${name}</strong></li>`;
-        } else {
-            info += `<li class="step-through">ผ่าน ${name}</li>`;
-        }
-    });
-    info += '</ol>';
-    document.getElementById('pathInfo').innerHTML = info;
+  const getType  = n => (n?.type ?? '').toString().trim().toLowerCase();
+  const getFloor = n => (n?.floor ?? null);
+  const isElev   = n => getType(n) === 'elevator' || /ลิฟต์/i.test(n?.detail || '');
+  const arrow = (from, to) => {
+    if (typeof from === 'number' && typeof to === 'number') {
+      if (to > from) return 'ขึ้นลิฟต์';
+      if (to < from) return 'ลงลิฟต์';
+    }
+    return 'ใช้ลิฟต์';
+  };
+
+  const SKIP_INDEX = path.length - 2;
+
+  let info = '<h3>ข้อมูลเส้นทาง</h3><ol class="path-steps">';
+  let i = 0;
+
+  while (i < path.length) {
+    const node = path[i];
+    const name = node.detail || node.node_id;
+    const floor = getFloor(node);
+
+    // เริ่มต้น
+    if (i === 0) {
+      info += `<li class="step-start">เริ่มต้นจาก <strong>${name}</strong>${floor!=null?` (ชั้น ${floor})`:''}</li>`;
+      i++;
+      continue;
+    }
+
+    // ===== รวบ "ช่วงลิฟต์ต่อเนื่อง" ให้เป็นบรรทัดเดียว =====
+    if (isElev(node)) {
+      // จุดเริ่มช่วง: ถ้าก่อนหน้าก็เป็นลิฟต์ด้วย ให้เริ่มตั้งแต่ตัวก่อนหน้า
+      let s = i;
+      if (i > 0 && isElev(path[i-1])) s = i - 1;
+
+      // วิ่งไปจนกว่าจะสุดช่วงลิฟต์
+      let j = Math.max(i, s);
+      while (j + 1 < path.length && isElev(path[j + 1])) j++;
+
+      const fromF = getFloor(path[s]);
+      const toF   = getFloor(path[j]);
+
+      if (fromF !== null && toF !== null && fromF !== toF) {
+        info += `<li class="step-elevator"><strong>${arrow(fromF, toF)} จากชั้น ${fromF}</strong> ไปยังชั้น <strong>${toF}</strong></li>`;
+      } else {
+        // กรณีข้อมูลชั้นไม่ครบ
+        info += `<li class="step-elevator">ใช้ลิฟต์ที่ <strong>${name}</strong></li>`;
+      }
+
+      i = j + 1; // ข้ามทั้งช่วงลิฟต์
+      continue;
+    }
+    if (i === SKIP_INDEX && i !== path.length - 1 && !isElev(node)) {
+      i++; // ข้ามไม่แสดง
+      continue;
+    }
+
+    // ปลายทาง/ผ่านทั่วไป
+    if (i === path.length - 1) {
+      info += `<li class="step-end">ถึง <strong>${name}</strong>${floor!=null?` (ชั้น ${floor})`:''}</li>`;
+    } else {
+      info += `<li class="step-through">ผ่าน ${name}</li>`;
+    }
+    i++;
+  }
+
+  info += '</ol>';
+  document.getElementById('pathInfo').innerHTML = info;
 }
+
 
 // Simple resize handler
 window.addEventListener('resize', function () {
@@ -761,45 +816,35 @@ window.handlePathData = window.handlePathData || function (data) {
 };
 
 function handlePathDataCross(data) {
-    try {
-        if (!data || data.mode !== 'cross') {
-            document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
-            return;
-        }
-
-        ensureStackMode();
-
-        const imgFrom = document.getElementById('floorPlan_from');
-        const imgTo = document.getElementById('floorPlan_to');
-        const cvsFrom = document.getElementById('pathCanvas_from');
-        const cvsTo = document.getElementById('pathCanvas_to');
-
-        setupCanvasFor(imgFrom, cvsFrom);
-        setupCanvasFor(imgTo, cvsTo);
-
-        const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path, data.origin.img_width, data.origin.img_height);
-        const scaledTo = scalePathToImageSizeFor(imgTo, cvsTo, data.destination.path, data.destination.img_width, data.destination.img_height);
-
-        startCrossFloorAnimation(scaledFrom, scaledTo);
-
-        const steps = (data.nodes || []).map((n, i) => {
-            const name = n.detail || n.node_id;
-            if (i === 0) return `<li class="step-start">เริ่มจาก <strong>${name}</strong> (ชั้น ${data.origin.floor})</li>`;
-            if (i === data.nodes.length - 1) return `<li class="step-end">ถึง <strong>${name}</strong> (ชั้น ${data.destination.floor})</li>`;
-            return `<li class="step-through">ผ่าน ${name}</li>`;
-        }).join('');
-
-        const len = arr => arr.reduce((s, p, i) => i ? s + Math.hypot(p.x - arr[i - 1].x, p.y - arr[i - 1].y) : 0, 0);
-
-        document.getElementById('pathInfo').innerHTML = `
-      <h3>ข้อมูลเส้นทาง</h3>
-      <ol class="path-steps">${steps}</ol>
-    `;
-    } catch (e) {
-        console.error(e);
-        document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
+  try {
+    if (!data || data.mode !== 'cross') {
+      document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
+      return;
     }
+
+    ensureStackMode();
+
+    const imgFrom = document.getElementById('floorPlan_from');
+    const imgTo   = document.getElementById('floorPlan_to');
+    const cvsFrom = document.getElementById('pathCanvas_from');
+    const cvsTo   = document.getElementById('pathCanvas_to');
+
+    setupCanvasFor(imgFrom, cvsFrom);
+    setupCanvasFor(imgTo, cvsTo);
+
+    const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path, data.origin.img_width, data.origin.img_height);
+    const scaledTo   = scalePathToImageSizeFor(imgTo,   cvsTo,   data.destination.path, data.destination.img_width, data.destination.img_height);
+
+    startCrossFloorAnimation(scaledFrom, scaledTo);
+
+    // ✅ ใช้ตัวเรนเดอร์เดียวกับโหมดปกติ (จะรวมช่วงลิฟต์ให้ด้วย)
+    updatePathInfo(data.nodes || [], null);
+  } catch (e) {
+    console.error(e);
+    document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
+  }
 }
+
 
 // NEW: index ข้อมูลห้องทั้งหมดในอาคาร
 let allRoomsIndex = {};

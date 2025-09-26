@@ -30,9 +30,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     data.forEach(item => {
                         const div = document.createElement("div");
                         if (item.type === "building" ){
-                            div.textContent = `${item.name} ( ${item.floor ?? '-'} ชั้น)`;
+                            div.textContent = `${item.name} (${item.floor ?? '-'} ชั้น)`;
+                        if (item.name === "โรงอาหาร"){
+                            div.textContent = `${item.name}`;
+                        }
                         }else {
-                            div.textContent = `${item.name} (ชั้น ${item.floor ?? '-'})`;
+                            div.textContent = `${item.name} (อาคาร ${item.building_id} ชั้น ${item.floor ?? '-'})`;
                         }
                         div.style.cursor = "pointer";
                         div.style.padding = "8px";
