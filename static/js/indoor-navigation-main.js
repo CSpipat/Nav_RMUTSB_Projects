@@ -207,43 +207,48 @@ const DEFAULT_ENTRANCE_NODE = {
 };
 
 function populateStartSelect(rooms, buildingId, floor) {
-    const select = document.getElementById('startSelect');
-    if (!select) return;
+  const select = document.getElementById('startSelect');
+  if (!select) return;
 
-    // เคลียร์
-    select.innerHTML = '';
+  // เคลียร์ของเดิม
+  select.innerHTML = '';
 
-    // ตรวจว่ามี default entrance เขียนไว้ไหม
-    const specialEntrance = DEFAULT_ENTRANCE_NODE[buildingId] || '';
+  // บังคับเป็นตัวเลข เผื่อเคยส่งมาเป็น string
+  const bId = Number(buildingId);
 
-    // สร้าง option แรก (default)
-    const optDefault = document.createElement('option');
-    // ถ้าเป็นอาคาร 12 → ใช้ "หน้าประตู" และส่ง node id เข้าตรงๆ
-    if (buildingId === 12 && specialEntrance) {
-        optDefault.value = specialEntrance; // สำคัญ: ส่ง NodeID จริงเข้า backend เลย
-        optDefault.textContent = `หน้าประตู (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
-    } else {
-        // อาคารอื่นๆ: ให้ backend auto-pick (ลิฟต์/บันได) โดยปล่อยค่าว่าง
-        optDefault.value = '';
-        // แนะนำให้เปลี่ยน copy ให้กลางๆ กับลิฟต์/บันได
-        optDefault.textContent = `จุดเชื่อมชั้นของชั้นนี้ (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
-    }
-    select.appendChild(optDefault);
+  // ถ้ามีค่า default entrance เป็น NodeID ของอาคารนั้น ๆ
+  const specialEntrance = (typeof DEFAULT_ENTRANCE_NODE !== 'undefined' && DEFAULT_ENTRANCE_NODE[bId]) ? DEFAULT_ENTRANCE_NODE[bId] : '';
 
-    // (ตัวเลือกเสริม) เติม node/ห้องบนชั้นนี้ให้เลือกเป็น start ได้
-    rooms.forEach(room => {
-        const option = document.createElement('option');
-        option.value = room.NodeID;
-        option.textContent = `${room.Detail} (ชั้น ${room.floor})`;
-        select.appendChild(option);
-    });
+  // คิด "ค่าเริ่มต้น" ให้เสร็จก่อน แล้วค่อยสร้าง option ทีเดียว
+  let defaultValue = '';
+  let defaultLabel = `จุดเชื่อมชั้นของชั้นนี้ (แนะนำ) — อาคาร ${bId} ชั้น ${floor}`;
 
-    // ตั้งค่าเริ่มต้น:
-    // - อาคาร 12 → ใช้ค่า NodeID ของ "ทางเข้า"
-    // - อาคารอื่น → ให้ backend เลือกเอง (เว้นว่าง)
-    select.value = specialEntrance || '';
+  // ⛳ ลำดับความสำคัญ: (1) บันไดชั้น 2 ของอาคาร 12 → (2) ทางเข้าเฉพาะของอาคาร 12 → (3) ปล่อยว่างให้ backend auto-pick
+  if (bId === 12 && Number(floor) === 2) {
+    defaultValue = 'N143';
+    defaultLabel = `บันได (แนะนำ) — อาคาร ${bId} ชั้น ${floor}`;
+  } else if (bId === 12 && specialEntrance) {
+    defaultValue = specialEntrance; // ส่ง NodeID จริงเข้า backend
+    defaultLabel = `หน้าประตู (แนะนำ) — อาคาร ${bId} ชั้น ${floor}`;
+  } // else คง defaultValue = '' ให้ backend auto-pick
+
+  // ✅ สร้าง option แรก (default)
+  const optDefault = document.createElement('option');
+  optDefault.value = defaultValue;
+  optDefault.textContent = defaultLabel;
+  select.appendChild(optDefault);
+
+  // ✅ เติมรายการห้องใน "ชั้นนี้" ให้เลือกเป็น start ได้
+  rooms.forEach(room => {
+    const option = document.createElement('option');
+    option.value = room.NodeID;
+    option.textContent = `${room.Detail} (ชั้น ${room.floor})`;
+    select.appendChild(option);
+  });
+
+  // ✅ set ค่าเริ่มต้น “ครั้งเดียว” หลังใส่ options ครบ
+  select.value = defaultValue;
 }
-
 
 // ===== Promise version ONLY (clean) =====
 function loadRoomsAndShowModal(buildingId, floor) {
