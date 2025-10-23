@@ -32,6 +32,80 @@ def load_data():
     plan_df = pd.read_csv('Plan.csv')
     return building_df, nodes_df, connections_df, plan_df
 
+def augment_graph_with_vertical_connectors(
+    graph,
+    nodes_df,
+    vertical_cost_per_floor=100.0,
+    stairs_xy_tolerance=12.0  # พิกัด (พิกเซล) ที่ถือว่าเป็นบันไดจุดเดียวกันข้ามชั้น
+):
+    """
+    สร้างขอบ (edge) ทางดิ่งทั้ง Elevator และ Stairs
+
+    - Elevator: จับคู่ด้วย ElevatorID ภายในอาคารเดียวกัน แล้วเชื่อมชั้นติดกัน
+    - Stairs  : ไม่มี StairsID -> จับคู่ด้วยพิกัด (X,Y) ใกล้กันภายในอาคารเดียวกันและชั้นติดกัน
+    """
+    # normalize ชื่อคอลัมน์
+    cols = {c.lower(): c for c in nodes_df.columns}
+    type_col  = cols.get('type', 'Type')
+    floor_col = cols.get('floor', 'floor')
+    bid_col   = cols.get('b_id', 'B_ID')
+    node_col  = cols.get('nodeid', 'NodeID')
+    elev_col  = cols.get('elevatorid', 'ElevatorID')
+
+    # ---------- 1) เชื่อมลิฟต์ด้วย ElevatorID ----------
+    if elev_col in nodes_df.columns:
+        elev_df = nodes_df[nodes_df[type_col].astype(str).str.lower() == 'elevator'].copy()
+        for (b_id, eid), g in elev_df.groupby([bid_col, elev_col]):
+            g = g.sort_values(by=floor_col)
+            prev = None
+            for _, row in g.iterrows():
+                cur = row[node_col]
+                if prev is not None:
+                    fprev = int(nodes_df.loc[nodes_df[node_col] == prev, floor_col].iloc[0])
+                    fcur  = int(row[floor_col])
+                    w = abs(fcur - fprev) * float(vertical_cost_per_floor)
+                    graph[prev].append((cur, w))
+                    graph[cur].append((prev, w))
+                prev = cur
+
+    # ---------- 2) เชื่อมบันไดด้วย "พิกัดใกล้กัน + ชั้นติดกัน" ----------
+    stairs_df = nodes_df[nodes_df[type_col].astype(str).str.lower() == 'stairs'].copy()
+    if stairs_df.empty:
+        return graph
+
+    # จัดกลุ่มตามอาคารก่อน
+    for b_id, gb in stairs_df.groupby(bid_col):
+        # สร้าง map: floor -> [(node_id, x, y)]
+        floor_map = defaultdict(list)
+        for _, r in gb.iterrows():
+            try:
+                nid = r[node_col]
+                x = float(r['X']); y = float(r['Y'])
+                fl = int(r[floor_col])
+                floor_map[fl].append((nid, x, y))
+            except Exception:
+                continue
+
+        # ไล่จับคู่ระหว่างชั้นที่ติดกัน เช่น 1-2, 2-3, ...
+        floors_sorted = sorted(floor_map.keys())
+        for i in range(len(floors_sorted) - 1):
+            f1 = floors_sorted[i]
+            f2 = floors_sorted[i + 1]
+            for nid1, x1, y1 in floor_map[f1]:
+                # หา node ใน f2 ที่พิกัดใกล้ที่สุด
+                best = None
+                best_dist = None
+                for nid2, x2, y2 in floor_map[f2]:
+                    d = math.hypot(x1 - x2, y1 - y2)
+                    if best is None or d < best_dist:
+                        best, best_dist = nid2, d
+                # ถ้าพิกัดใกล้พอ → เชื่อมชั้นติดกัน
+                if best is not None and (best_dist is None or best_dist <= stairs_xy_tolerance):
+                    w = 1 * float(vertical_cost_per_floor)  # ข้ามทีละชั้น → cost = 1 ชั้น
+                    graph[nid1].append((best, w))
+                    graph[best].append((nid1, w))
+    return graph
+
 
 # Create a graph for indoor navigation
 def create_graph(nodes_df, connections_df):
@@ -41,24 +115,21 @@ def create_graph(nodes_df, connections_df):
         source = row['NodeID']
         if isinstance(row['ConnectedTO'], str):
             targets = row['ConnectedTO'].split(',')
-
             for target in targets:
                 target = target.strip()
-
                 source_node = nodes_df[nodes_df['NodeID'] == source]
                 target_node = nodes_df[nodes_df['NodeID'] == target]
-
                 if not source_node.empty and not target_node.empty:
-                    source_coords = source_node[['X', 'Y']].values[0]
-                    target_coords = target_node[['X', 'Y']].values[0]
-
-                    distance = np.sqrt((source_coords[0] - target_coords[0]) ** 2 +
-                                       (source_coords[1] - target_coords[1]) ** 2)
-
+                    sx, sy = source_node[['X','Y']].values[0]
+                    tx, ty = target_node[['X','Y']].values[0]
+                    distance = np.hypot(sx - tx, sy - ty)
                     graph[source].append((target, distance))
                     graph[target].append((source, distance))
-    augment_graph_with_elevators(graph, nodes_df)
+
+    # ✅ เชื่อมทางดิ่งทั้ง elevator และ stairs
+    augment_graph_with_vertical_connectors(graph, nodes_df)
     return graph
+
 
 # ===== NEW: vertical edges via elevators (same ElevatorID) =====
 def augment_graph_with_elevators(graph, nodes_df, vertical_cost_per_floor=100.0):
@@ -274,8 +345,61 @@ def path_coords_for_segment(nodes_df, path_segment, plan_df, building_id, floor)
             coords.append({'x': int(x), 'y': int(y), 'node_id': str(nid)})
     return coords, w, h
 
+def find_crossfloor_split(nodes_df, path, type_col='Type', floor_col='floor'):
+    """
+    หา index ที่เส้นทางข้ามชั้น (รองรับทั้ง elevator และ stairs) จาก Type + floor เปลี่ยน
+    """
+    connector_type = None
+    split_idx = None
+
+    for i in range(len(path) - 1):
+        a, b = path[i], path[i + 1]
+        ra = nodes_df[nodes_df['NodeID'] == a].iloc[0]
+        rb = nodes_df[nodes_df['NodeID'] == b].iloc[0]
+
+        type_a = str(ra.get(type_col, '')).lower()
+        type_b = str(rb.get(type_col, '')).lower()
+        floor_a = int(ra.get(floor_col, 0))
+        floor_b = int(rb.get(floor_col, 0))
+
+        if floor_a != floor_b and (
+            (type_a == 'elevator' and type_b == 'elevator') or
+            (type_a == 'stairs' and type_b == 'stairs')
+        ):
+            connector_type = 'elevator' if type_a == 'elevator' else 'stairs'
+            split_idx = i
+            break
+
+    # fallback: ถ้า node ไม่ได้แท็ก type
+    if split_idx is None:
+        for i in range(len(path) - 1):
+            fa = int(nodes_df.loc[nodes_df['NodeID'] == path[i], floor_col].iloc[0])
+            fb = int(nodes_df.loc[nodes_df['NodeID'] == path[i+1], floor_col].iloc[0])
+            if fa != fb:
+                split_idx = i
+                connector_type = str(nodes_df.loc[nodes_df['NodeID'] == path[i], type_col].iloc[0]).lower()
+                break
+
+    return split_idx, connector_type
 
 
+def pick_connector_for_floor(nodes_df, building_id, floor):
+    floor = int(floor) if floor is not None else None
+    if floor is None:
+        return None
+    sub = nodes_df[(nodes_df['B_ID'] == building_id) & (nodes_df['floor'] == floor)]
+    if sub.empty:
+        return None
+
+    if 'Type' in sub.columns:
+        elev = sub[sub['Type'].astype(str).str.lower() == 'elevator']
+        if not elev.empty:
+            return elev.iloc[0]['NodeID']
+        stairs = sub[sub['Type'].astype(str).str.lower() == 'stairs']
+        if not stairs.empty:
+            return stairs.iloc[0]['NodeID']
+
+    return sub.iloc[0]['NodeID']
 
 @app.route('/')
 def homepage():
@@ -301,7 +425,9 @@ def get_path():
     _, nodes_df, connections_df, plan_df = load_data()
 
     if not start:
-        start_node = pick_elevator_for_floor(nodes_df, building_id, floor)
+        start_node = pick_connector_for_floor(nodes_df, building_id, floor)
+        if start_node is None:
+            return jsonify({'error': f'No suitable start node found for building {building_id} floor {floor}'}), 404
     else:
         start_node = start
 
@@ -316,12 +442,10 @@ def get_path():
     if not path:
         return jsonify({'error': f'No path found from {start_node} to {destination}'}), 404
 
-    # แปลง path → จุดบนภาพ + รายละเอียด
     path_coords, img_width, img_height = get_path_coordinates_and_image_size(nodes_df, path, plan_df)
 
     result = {
         'path': path_coords,
-        # ✅ เติม type (และ floor แถมให้ด้วย ถ้าอยากใช้ต่อ)
         'nodes': [node_info(nodes_df, nid) for nid in path],
         'img_width': img_width,
         'img_height': img_height,
@@ -335,6 +459,7 @@ def get_path():
         status=200,
         mimetype='application/json'
     )
+
 
 
 # ===== /find_path_cross =====
@@ -352,7 +477,9 @@ def find_path_cross():
     _, nodes_df, connections_df, plan_df = load_data()
 
     if not start:
-        start_node = pick_elevator_for_floor(nodes_df, building_id, cur_floor)
+        start_node = pick_connector_for_floor(nodes_df, building_id, cur_floor)
+        if start_node is None:
+            return jsonify({'error': f'No suitable start node found for building {building_id} floor {cur_floor}'}), 404
     else:
         start_node = start
 
@@ -368,9 +495,9 @@ def find_path_cross():
         return jsonify({'error': f'No path found from {start_node} to {dest}'}), 404
 
     # หาชั้นของต้นทางและปลายทาง
-    sf = int(nodes_df.loc[nodes_df['NodeID']==path[0], 'floor'].iloc[0])
-    ef = int(nodes_df.loc[nodes_df['NodeID']==path[-1], 'floor'].iloc[0])
-    bid = nodes_df.loc[nodes_df['NodeID']==path[0], 'B_ID'].iloc[0]
+    sf = int(nodes_df.loc[nodes_df['NodeID'] == path[0],  'floor'].iloc[0])
+    ef = int(nodes_df.loc[nodes_df['NodeID'] == path[-1], 'floor'].iloc[0])
+    bid = nodes_df.loc[nodes_df['NodeID'] == path[0], 'B_ID'].iloc[0]
 
     # ชั้นเดียวกัน -> โหมด single
     if sf == ef:
@@ -383,7 +510,6 @@ def find_path_cross():
                     'img_width': w, 'img_height': h,
                     'path': coords
                 },
-                # ✅ เติม type ใน nodes
                 'nodes': [node_info(nodes_df, nid) for nid in path],
                 'start_node': start_node,
                 'destination_node': dest
@@ -391,38 +517,17 @@ def find_path_cross():
             status=200, mimetype='application/json'
         )
 
-    # ข้ามชั้น → หา “จุดต่อลิฟต์คู่”
-    elev_col = 'ElevatorID' if 'ElevatorID' in nodes_df.columns else None
-    type_col = 'Type'
-    floor_col = 'floor'
-
-    elev_start = elev_end = elev_id = None
-    split_idx = None
-    for i in range(len(path)-1):
-        a, b = path[i], path[i+1]
-        ra = nodes_df[nodes_df['NodeID']==a].iloc[0]
-        rb = nodes_df[nodes_df['NodeID']==b].iloc[0]
-        if str(ra[type_col]).lower()=='elevator' and str(rb[type_col]).lower()=='elevator':
-            if elev_col and ra[elev_col]==rb[elev_col] and ra[floor_col]!=rb[floor_col]:
-                elev_start, elev_end = a, b
-                elev_id = ra[elev_col]
-                split_idx = i
-                break
+    # ข้ามชั้น -> หา split และชนิดตัวเชื่อม
+    split_idx, connector_type = find_crossfloor_split(nodes_df, path)
     if split_idx is None:
-        for i in range(len(path)-1):
-            fa = int(nodes_df.loc[nodes_df['NodeID']==path[i], floor_col].iloc[0])
-            fb = int(nodes_df.loc[nodes_df['NodeID']==path[i+1], floor_col].iloc[0])
-            if fa != fb:
-                split_idx = i
-                elev_start, elev_end = path[i], path[i+1]
-                elev_id = nodes_df.loc[nodes_df['NodeID']==elev_start, elev_col].iloc[0] if elev_col else None
-                break
+        return jsonify({'error': 'ไม่พบจุดเชื่อมข้ามชั้น (stairs/elevator) ในเส้นทางนี้'}), 404
 
-    origin_seg = path[:split_idx+1]
-    dest_seg   = path[split_idx+1:]
+    origin_seg = path[:split_idx + 1]
+    dest_seg   = path[split_idx + 1:]
 
-    of = int(nodes_df.loc[nodes_df['NodeID']==origin_seg[0], floor_col].iloc[0])
-    df = int(nodes_df.loc[nodes_df['NodeID']==dest_seg[-1],   floor_col].iloc[0])
+    floor_col = 'floor'
+    of = int(nodes_df.loc[nodes_df['NodeID'] == origin_seg[0], floor_col].iloc[0])
+    df = int(nodes_df.loc[nodes_df['NodeID'] == dest_seg[-1],   floor_col].iloc[0])
 
     origin_coords, ow, oh = path_coords_for_segment(nodes_df, origin_seg, plan_df, bid, of)
     dest_coords,   dw, dh = path_coords_for_segment(nodes_df, dest_seg,   plan_df, bid, df)
@@ -432,16 +537,18 @@ def find_path_cross():
             'mode': 'cross',
             'origin': {
                 'floor': of, 'img_width': ow, 'img_height': oh,
-                'path': origin_coords, 'elevator_node': elev_start
+                'path': origin_coords,
+                'connector_node': origin_seg[-1]
             },
             'destination': {
                 'floor': df, 'img_width': dw, 'img_height': dh,
-                'path': dest_coords, 'elevator_node': elev_end
+                'path': dest_coords,
+                'connector_node': dest_seg[0]
             },
-            'elevator_id': elev_id,
-            # ✅ เติม type ใน nodes
+            'connector_type': connector_type,  # 'stairs' หรือ 'elevator'
             'nodes': [node_info(nodes_df, nid) for nid in path],
-            'start_node': start_node, 'destination_node': dest
+            'start_node': start_node,
+            'destination_node': dest
         }, cls=NumpyEncoder),
         status=200, mimetype='application/json'
     )

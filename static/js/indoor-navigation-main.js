@@ -30,7 +30,7 @@ const Modal = (() => {
         trapFocus(modalEl);
 
         // custom event (แทน shown.bs.modal)
-        modalEl.dispatchEvent(new CustomEvent('modal:shown', { bubbles: true }));
+        modalEl.dispatchEvent(new CustomEvent('modal:shown', {bubbles: true}));
     }
 
     function close(modalEl) {
@@ -52,7 +52,7 @@ const Modal = (() => {
         releaseFocus();
 
         // custom event
-        modalEl.dispatchEvent(new CustomEvent('modal:hidden', { bubbles: true }));
+        modalEl.dispatchEvent(new CustomEvent('modal:hidden', {bubbles: true}));
 
         // restore focus
         if (lastFocused && lastFocused.focus) {
@@ -102,7 +102,7 @@ const Modal = (() => {
         }
     }
 
-    return { open, close };
+    return {open, close};
 })();
 
 // Global variables for indoor navigation
@@ -201,6 +201,11 @@ function closeAllModals() {
     }
 }
 
+// ใช้ตั้งค่า default start node แบบพิเศษรายอาคาร
+const DEFAULT_ENTRANCE_NODE = {
+    12: 'N130', // ทางเข้าอาคาร 12 (ตัวอย่างจากข้อมูลที่ให้มา)
+};
+
 function populateStartSelect(rooms, buildingId, floor) {
     const select = document.getElementById('startSelect');
     if (!select) return;
@@ -208,10 +213,21 @@ function populateStartSelect(rooms, buildingId, floor) {
     // เคลียร์
     select.innerHTML = '';
 
-    // ตัวเลือกดีฟอลต์: ปล่อย value ว่าง เพื่อให้ backend auto-pick ลิฟต์ของชั้นนี้
+    // ตรวจว่ามี default entrance เขียนไว้ไหม
+    const specialEntrance = DEFAULT_ENTRANCE_NODE[buildingId] || '';
+
+    // สร้าง option แรก (default)
     const optDefault = document.createElement('option');
-    optDefault.value = '';
-    optDefault.textContent = `ลิฟต์ชั้นนี้ (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
+    // ถ้าเป็นอาคาร 12 → ใช้ "หน้าประตู" และส่ง node id เข้าตรงๆ
+    if (buildingId === 12 && specialEntrance) {
+        optDefault.value = specialEntrance; // สำคัญ: ส่ง NodeID จริงเข้า backend เลย
+        optDefault.textContent = `หน้าประตู (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
+    } else {
+        // อาคารอื่นๆ: ให้ backend auto-pick (ลิฟต์/บันได) โดยปล่อยค่าว่าง
+        optDefault.value = '';
+        // แนะนำให้เปลี่ยน copy ให้กลางๆ กับลิฟต์/บันได
+        optDefault.textContent = `จุดเชื่อมชั้นของชั้นนี้ (แนะนำ) — อาคาร ${buildingId} ชั้น ${floor}`;
+    }
     select.appendChild(optDefault);
 
     // (ตัวเลือกเสริม) เติม node/ห้องบนชั้นนี้ให้เลือกเป็น start ได้
@@ -222,9 +238,12 @@ function populateStartSelect(rooms, buildingId, floor) {
         select.appendChild(option);
     });
 
-    // ตั้งค่าเริ่มต้น = ลิฟต์ชั้นนี้ (ปล่อยให้ backend เลือก NodeID จริง)
-    select.value = '';
+    // ตั้งค่าเริ่มต้น:
+    // - อาคาร 12 → ใช้ค่า NodeID ของ "ทางเข้า"
+    // - อาคารอื่น → ให้ backend เลือกเอง (เว้นว่าง)
+    select.value = specialEntrance || '';
 }
+
 
 // ===== Promise version ONLY (clean) =====
 function loadRoomsAndShowModal(buildingId, floor) {
@@ -240,7 +259,7 @@ function loadRoomsAndShowModal(buildingId, floor) {
                 // สร้าง index NodeID -> {floor, detail}
                 allRoomsIndex = {};
                 Object.keys(allByFloor).forEach(fl => {
-                    allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = { floor: Number(fl), detail: it.Detail });
+                    allByFloor[fl].forEach(it => allRoomsIndex[it.NodeID] = {floor: Number(fl), detail: it.Detail});
                 });
 
                 // เติม startSelect = ห้องบน "ชั้นปัจจุบัน" + ค่าเริ่มต้นเป็น "ลิฟต์ชั้นนี้"
@@ -330,7 +349,11 @@ function hideLoadingIndicator() {
 function onDestinationChange() {
     const sel = document.getElementById('destinationSelect');
     const dest = sel.value;
-    if (!dest) { clearPath(); document.getElementById('pathInfo').innerHTML = ''; return; }
+    if (!dest) {
+        clearPath();
+        document.getElementById('pathInfo').innerHTML = '';
+        return;
+    }
 
     const info = allRoomsIndex[dest];
 
@@ -358,10 +381,15 @@ function onDestinationChange() {
 
         let loaded = 0;
         const tryDraw = () => {
-            if (++loaded === 2) { initStackCanvasSizing(); findPath(); }
+            if (++loaded === 2) {
+                initStackCanvasSizing();
+                findPath();
+            }
         };
-        imgFrom.onload = tryDraw; imgFrom.onerror = tryDraw;
-        imgTo.onload = tryDraw; imgTo.onerror = tryDraw;
+        imgFrom.onload = tryDraw;
+        imgFrom.onerror = tryDraw;
+        imgTo.onload = tryDraw;
+        imgTo.onerror = tryDraw;
     }
 }
 
@@ -393,8 +421,8 @@ function setupCanvas() {
             const displayHeight = imgRect.height;
 
             console.log('Image dimensions:', {
-                natural: { width: img.naturalWidth, height: img.naturalHeight },
-                displayed: { width: displayWidth, height: displayHeight }
+                natural: {width: img.naturalWidth, height: img.naturalHeight},
+                displayed: {width: displayWidth, height: displayHeight}
             });
 
             // sync canvas กับรูป
@@ -451,7 +479,7 @@ function findPath() {
     };
 
     fetch(url, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(body)
     })
         .then(r => {
@@ -484,9 +512,9 @@ function scalePathToImageSize(pathCoords, originalWidth, originalHeight) {
     const scaleY = currentHeight / originalHeight;
 
     console.log('Scaling path coordinates:', {
-        original: { width: originalWidth, height: originalHeight },
-        current: { width: currentWidth, height: currentHeight },
-        scale: { x: scaleX, y: scaleY }
+        original: {width: originalWidth, height: originalHeight},
+        current: {width: currentWidth, height: currentHeight},
+        scale: {x: scaleX, y: scaleY}
     });
 
     const scaledCoords = pathCoords.map(point => ({
@@ -539,7 +567,7 @@ function startGoogleMapsAnimation(pathCoords) {
 
         // วาดเส้นทางแบบ Google Maps สีสดใส
         drawGoogleMapsPath(ctx, visible, 1);
-        drawRunningLights(ctx, visible, mVis, runnerDist, { width: 6 });
+        drawRunningLights(ctx, visible, mVis, runnerDist, {width: 6});
         drawAnimatedNodes(ctx, visible, 1);
 
         animationId = requestAnimationFrame(animate);
@@ -668,75 +696,76 @@ function calculateTotalDistance(pathCoords) {
 }
 
 function updatePathInfo(path, pathCoords) {
-  if (!Array.isArray(path) || path.length === 0) return;
+    if (!Array.isArray(path) || path.length === 0) return;
 
-  const getType  = n => (n?.type ?? '').toString().trim().toLowerCase();
-  const getFloor = n => (n?.floor ?? null);
-  const isElev   = n => getType(n) === 'elevator' || /ลิฟต์/i.test(n?.detail || '');
-  const arrow = (from, to) => {
-    if (typeof from === 'number' && typeof to === 'number') {
-      if (to > from) return 'ขึ้นลิฟต์';
-      if (to < from) return 'ลงลิฟต์';
+    const getType = n => (n?.type ?? '').toString().trim().toLowerCase();
+    const getFloor = n => (n?.floor ?? null);
+    const isElev = n => getType(n) === 'elevator' || /ลิฟต์/i.test(n?.detail || '');
+    const isStairs = n => getType(n) === 'stairs' || /บันได|บรรได|stairs?/i.test(n?.detail || '');
+    const arrow = (from, to, mode) => {
+        if (typeof from === 'number' && typeof to === 'number') {
+            if (to > from) return mode === 'stairs' ? 'ขึ้นบันได' : 'ขึ้นลิฟต์';
+            if (to < from) return mode === 'stairs' ? 'ลงบันได' : 'ลงลิฟต์';
+        }
+        return mode === 'stairs' ? 'ใช้บันได' : 'ใช้ลิฟต์';
+    };
+
+    const SKIP_INDEX = path.length - 2;
+
+    let info = '<h3>ข้อมูลเส้นทาง</h3><ol class="path-steps">';
+    let i = 0;
+
+    while (i < path.length) {
+        const node = path[i];
+        const name = node.detail || node.node_id;
+        const floor = getFloor(node);
+
+        // เริ่มต้น
+        if (i === 0) {
+            info += `<li class="step-start">เริ่มต้นจาก <strong>${name}</strong>${floor != null ? ` (ชั้น ${floor})` : ''}</li>`;
+            i++;
+            continue;
+        }
+
+        // ===== รวมช่วงตัวเชื่อมชั้น (ลิฟต์/บันได) =====
+        if (isElev(node) || isStairs(node)) {
+            const isStairMode = isStairs(node);
+            let s = i;
+            if (i > 0 && (isElev(path[i - 1]) || isStairs(path[i - 1]))) s = i - 1;
+
+            let j = Math.max(i, s);
+            while (j + 1 < path.length && (isElev(path[j + 1]) || isStairs(path[j + 1]))) j++;
+
+            const fromF = getFloor(path[s]);
+            const toF = getFloor(path[j]);
+            const mode = isStairMode ? 'stairs' : (isElev(node) ? 'elevator' : 'connector');
+
+            if (fromF !== null && toF !== null && fromF !== toF) {
+                info += `<li class="step-connector"><strong>${arrow(fromF, toF, mode)} จากชั้น ${fromF}</strong> ไปยังชั้น <strong>${toF}</strong></li>`;
+            } else {
+                info += `<li class="step-connector">${isStairMode ? 'ใช้บันได' : 'ใช้ลิฟต์'} ที่ <strong>${name}</strong></li>`;
+            }
+
+            i = j + 1;
+            continue;
+        }
+
+        if (i === SKIP_INDEX && i !== path.length - 1 && !(isElev(node) || isStairs(node))) {
+            i++; // ข้ามไม่แสดง
+            continue;
+        }
+
+        // ปลายทาง/ผ่านทั่วไป
+        if (i === path.length - 1) {
+            info += `<li class="step-end">ถึง <strong>${name}</strong>${floor != null ? ` (ชั้น ${floor})` : ''}</li>`;
+        } else {
+            info += `<li class="step-through">ผ่าน ${name}</li>`;
+        }
+        i++;
     }
-    return 'ใช้ลิฟต์';
-  };
 
-  const SKIP_INDEX = path.length - 2;
-
-  let info = '<h3>ข้อมูลเส้นทาง</h3><ol class="path-steps">';
-  let i = 0;
-
-  while (i < path.length) {
-    const node = path[i];
-    const name = node.detail || node.node_id;
-    const floor = getFloor(node);
-
-    // เริ่มต้น
-    if (i === 0) {
-      info += `<li class="step-start">เริ่มต้นจาก <strong>${name}</strong>${floor!=null?` (ชั้น ${floor})`:''}</li>`;
-      i++;
-      continue;
-    }
-
-    // ===== รวบ "ช่วงลิฟต์ต่อเนื่อง" ให้เป็นบรรทัดเดียว =====
-    if (isElev(node)) {
-      // จุดเริ่มช่วง: ถ้าก่อนหน้าก็เป็นลิฟต์ด้วย ให้เริ่มตั้งแต่ตัวก่อนหน้า
-      let s = i;
-      if (i > 0 && isElev(path[i-1])) s = i - 1;
-
-      // วิ่งไปจนกว่าจะสุดช่วงลิฟต์
-      let j = Math.max(i, s);
-      while (j + 1 < path.length && isElev(path[j + 1])) j++;
-
-      const fromF = getFloor(path[s]);
-      const toF   = getFloor(path[j]);
-
-      if (fromF !== null && toF !== null && fromF !== toF) {
-        info += `<li class="step-elevator"><strong>${arrow(fromF, toF)} จากชั้น ${fromF}</strong> ไปยังชั้น <strong>${toF}</strong></li>`;
-      } else {
-        // กรณีข้อมูลชั้นไม่ครบ
-        info += `<li class="step-elevator">ใช้ลิฟต์ที่ <strong>${name}</strong></li>`;
-      }
-
-      i = j + 1; // ข้ามทั้งช่วงลิฟต์
-      continue;
-    }
-    if (i === SKIP_INDEX && i !== path.length - 1 && !isElev(node)) {
-      i++; // ข้ามไม่แสดง
-      continue;
-    }
-
-    // ปลายทาง/ผ่านทั่วไป
-    if (i === path.length - 1) {
-      info += `<li class="step-end">ถึง <strong>${name}</strong>${floor!=null?` (ชั้น ${floor})`:''}</li>`;
-    } else {
-      info += `<li class="step-through">ผ่าน ${name}</li>`;
-    }
-    i++;
-  }
-
-  info += '</ol>';
-  document.getElementById('pathInfo').innerHTML = info;
+    info += '</ol>';
+    document.getElementById('pathInfo').innerHTML = info;
 }
 
 
@@ -816,33 +845,33 @@ window.handlePathData = window.handlePathData || function (data) {
 };
 
 function handlePathDataCross(data) {
-  try {
-    if (!data || data.mode !== 'cross') {
-      document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
-      return;
+    try {
+        if (!data || data.mode !== 'cross') {
+            document.getElementById('pathInfo').innerHTML = '<p class="error">ไม่พบเส้นทางข้ามชั้น</p>';
+            return;
+        }
+
+        ensureStackMode();
+
+        const imgFrom = document.getElementById('floorPlan_from');
+        const imgTo = document.getElementById('floorPlan_to');
+        const cvsFrom = document.getElementById('pathCanvas_from');
+        const cvsTo = document.getElementById('pathCanvas_to');
+
+        setupCanvasFor(imgFrom, cvsFrom);
+        setupCanvasFor(imgTo, cvsTo);
+
+        const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path, data.origin.img_width, data.origin.img_height);
+        const scaledTo = scalePathToImageSizeFor(imgTo, cvsTo, data.destination.path, data.destination.img_width, data.destination.img_height);
+
+        startCrossFloorAnimation(scaledFrom, scaledTo);
+
+        // ✅ ใช้ตัวเรนเดอร์เดียวกับโหมดปกติ (จะรวมช่วงลิฟต์ให้ด้วย)
+        updatePathInfo(data.nodes || [], null);
+    } catch (e) {
+        console.error(e);
+        document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
     }
-
-    ensureStackMode();
-
-    const imgFrom = document.getElementById('floorPlan_from');
-    const imgTo   = document.getElementById('floorPlan_to');
-    const cvsFrom = document.getElementById('pathCanvas_from');
-    const cvsTo   = document.getElementById('pathCanvas_to');
-
-    setupCanvasFor(imgFrom, cvsFrom);
-    setupCanvasFor(imgTo, cvsTo);
-
-    const scaledFrom = scalePathToImageSizeFor(imgFrom, cvsFrom, data.origin.path, data.origin.img_width, data.origin.img_height);
-    const scaledTo   = scalePathToImageSizeFor(imgTo,   cvsTo,   data.destination.path, data.destination.img_width, data.destination.img_height);
-
-    startCrossFloorAnimation(scaledFrom, scaledTo);
-
-    // ✅ ใช้ตัวเรนเดอร์เดียวกับโหมดปกติ (จะรวมช่วงลิฟต์ให้ด้วย)
-    updatePathInfo(data.nodes || [], null);
-  } catch (e) {
-    console.error(e);
-    document.getElementById('pathInfo').innerHTML = '<p class="error">เกิดข้อผิดพลาดในการแสดงเส้นทาง</p>';
-  }
 }
 
 
@@ -934,7 +963,7 @@ function startCrossFloorAnimation(scaledFrom, scaledTo) {
         const mVis = buildPathMetrics(visible);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         drawGoogleMapsPath(ctx, visible, 1);
-        drawRunningLights(ctx, visible, mVis, runnerDist, { width: 6 });
+        drawRunningLights(ctx, visible, mVis, runnerDist, {width: 6});
         pulsePhase = phase;
         drawAnimatedNodes(ctx, visible, 1);
     }
@@ -958,6 +987,7 @@ function startCrossFloorAnimation(scaledFrom, scaledTo) {
     cancelAnimationFrame(animationId);
     animationId = requestAnimationFrame(tick);
 }
+
 function setupCanvasFor(imgEl, canvasEl) {
     if (!imgEl || !canvasEl) return;
 
@@ -988,7 +1018,7 @@ function scalePathToImageSizeFor(imgEl, canvasEl, pathCoords, originalWidth, ori
     const ow = originalWidth || imgEl.naturalWidth || cw || 1;
     const oh = originalHeight || imgEl.naturalHeight || ch || 1;
     const sx = cw / ow, sy = ch / oh;
-    return pathCoords.map(p => ({ x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id }));
+    return pathCoords.map(p => ({x: Math.round(p.x * sx), y: Math.round(p.y * sy), node_id: p.node_id}));
 }
 
 function syncCanvasToImage(imgEl, canvasEl) {
@@ -1016,7 +1046,7 @@ function initStackCanvasSizing() {
 
 // === Running-light utilities ===
 function buildPathMetrics(coords) {
-    if (!coords || coords.length < 2) return { total: 0, segLengths: [], cum: [0] };
+    if (!coords || coords.length < 2) return {total: 0, segLengths: [], cum: [0]};
     const segLengths = [];
     let total = 0;
     for (let i = 1; i < coords.length; i++) {
@@ -1028,12 +1058,12 @@ function buildPathMetrics(coords) {
     }
     const cum = [0];
     for (const l of segLengths) cum.push(cum[cum.length - 1] + l);
-    return { total, segLengths, cum };
+    return {total, segLengths, cum};
 }
 
 function pointAtDistance(coords, metrics, d) {
-    const { total, cum } = metrics;
-    if (!coords || coords.length === 0) return { x: 0, y: 0 };
+    const {total, cum} = metrics;
+    if (!coords || coords.length === 0) return {x: 0, y: 0};
     if (total === 0) return coords[0];
     d = Math.max(0, Math.min(d, total));
     let i = 1;
@@ -1042,7 +1072,7 @@ function pointAtDistance(coords, metrics, d) {
     const a = coords[i0], b = coords[i0 + 1] || coords[i0];
     const segLen = metrics.segLengths[i0] || 1;
     const t = segLen ? (d - cum[i0]) / segLen : 0;
-    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    return {x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t};
 }
 
 // ปรับปรุงไฟวิ่งให้สีสดใสขึ้น
@@ -1088,7 +1118,7 @@ function drawRunningLights(ctx, coords, metrics, headDist, opts = {}) {
     ctx.globalCompositeOperation = 'screen';
 
     // เส้นหาง
-   // tail effect
+    // tail effect
     const tailGrad = ctx.createLinearGradient(tail.x, tail.y, head.x, head.y);
     tailGrad.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
     tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
